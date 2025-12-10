@@ -1,8 +1,7 @@
 package client.ui;
 
 import client.RMIClient;
-import client. utils.InputHelper;
-import server.RMIServer;
+import client.utils.InputHelper;
 
 public class ConsoleUI {
 
@@ -64,13 +63,10 @@ public class ConsoleUI {
     }
 
     private void startServer() {
-        try {
-            System.out.println("\n🚀 Starting RMI Server...\n");
-            RMIServer. main(null);
-        } catch (Exception e) {
-            System.err. println("\n❌ Server error: " + e.getMessage());
-            e.printStackTrace();
-        }
+        System.out.println("\n⚠️  Please start the RMI Server separately using:");
+        System.out.println("   cd RMIServer");
+        System.out.println("   run.bat");
+        System.out.println("\n💡 The server and client should run in separate processes.");
     }
 
     private void startClient() {
@@ -89,27 +85,11 @@ public class ConsoleUI {
     }
 
     private void startBoth() {
-        System.out.println("\n🚀 Starting server in background...");
-
-        Thread serverThread = new Thread(() -> {
-            try {
-                RMIServer.main(null);
-            } catch (Exception e) {
-                System.err. println("\n❌ Server error: " + e.getMessage());
-            }
-        });
-        serverThread.setDaemon(true);
-        serverThread.start();
-
-        System.out. println("⏳ Waiting for server to start...");
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        System.out.println("🔗 Starting client...\n");
-        startClient();
+        System.out.println("\n⚠️  Server and client should run in separate processes.");
+        System.out.println("\n💡 Please:");
+        System.out.println("   1. Start the server: cd RMIServer && run.bat");
+        System.out.println("   2. Start the client: cd RMIClient && run.bat");
+        System.out.println("\nThen use option 2 to connect to the server.");
     }
 
     private void runInteractiveTests() {

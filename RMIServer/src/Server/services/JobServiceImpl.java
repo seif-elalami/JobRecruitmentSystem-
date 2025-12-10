@@ -1,10 +1,10 @@
-package server.services;
+package Server.services;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import server.database.MongoDBConnection;
+import Server.database.MongoDBConnection;
 import shared.interfaces.IJobService;      // import job service Interfaces
 import shared.models.Job;                 // import job model
 

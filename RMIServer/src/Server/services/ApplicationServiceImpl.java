@@ -1,17 +1,16 @@
-package server.services;
+package Server.services;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import server. database.MongoDBConnection;
+import Server.database.MongoDBConnection;
 import shared.interfaces.IApplicationService;
 import shared.models.Application;
 
-import java.rmi. RemoteException;
-import java. rmi.server.UnicastRemoteObject;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class ApplicationServiceImpl extends UnicastRemoteObject implements IApplicationService {

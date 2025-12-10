@@ -1,8 +1,8 @@
-package server.services;
+package Server.services;
 
-import server.database.MongoDBConnection;
-import server.utils. PasswordUtil;
-import server.utils.ValidationUtil;
+import Server.database.MongoDBConnection;
+import Server.utils.PasswordUtil;
+import Server.utils.ValidationUtil;
 import shared.interfaces.IAuthService;
 import shared.interfaces.IApplicantService;
 import shared. models.Session;

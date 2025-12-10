@@ -1,4 +1,4 @@
-package server.database;
+package Server.database;
 
 import com. mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;

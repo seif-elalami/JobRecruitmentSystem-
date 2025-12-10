@@ -1,12 +1,21 @@
 {
-    "java.project.sourcePaths": ["src"],
+    "java.project.sourcePaths":  [
+        "RMIClient/src",
+        "RMIServer/src",
+        "Shared/src"
+    ],
     "java.project.outputPath": "bin",
     "java.project.referencedLibraries": [
-        "lib/**/*.jar"
+        "lib/**/*.jar",
+        "RMIClient/lib/**/*.jar",
+        "RMIServer/lib/**/*.jar"
     ],
-    "files.exclude": {
-        "**/.git": true,
+    "files.exclude":  {
+        "**/.git":  true,
         "**/.DS_Store": true,
-        "**/bin": true
-    }
+        "**/bin": true,
+        "**/*.class": true
+    },
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.compile.nullAnalysis.mode": "automatic"
 }

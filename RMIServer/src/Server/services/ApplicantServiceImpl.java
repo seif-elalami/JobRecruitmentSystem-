@@ -1,7 +1,7 @@
-package server.services;
+package Server.services;
 
-import server.database. MongoDBConnection;
-import server.utils.ValidationUtil;
+import Server.database.MongoDBConnection;
+import Server.utils.ValidationUtil;
 import shared.interfaces. IApplicantService;
 import shared.models.Applicant;
 

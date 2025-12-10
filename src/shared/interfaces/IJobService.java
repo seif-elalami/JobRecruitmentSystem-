@@ -1,6 +1,6 @@
 package shared. interfaces;
 
-import shared.models. Job;
+import shared.models. Job;                    // model import for job
 import java.rmi.Remote;
 import java. rmi.RemoteException;
 import java.util.List;

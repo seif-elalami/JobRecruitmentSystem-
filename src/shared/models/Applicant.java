@@ -8,14 +8,14 @@ public class Applicant implements Serializable {
     private static final long serialVersionUID = 1L;
 
     // Fields
-    private String id;              // MongoDB ObjectId (set after saving)
-    private String name;            // Full name
-    private String email;           // Email address (unique)
-    private String phone;           // Phone number
-    private String resume;          // Resume text or file path
-    private List<String> skills;    // List of skills
-    private String education;       // Education background
-    private int experience;         // Years of experience
+    private String id;              // MongoDB ObjectId
+    private String name;
+    private String email;
+    private String phone;
+    private String resume;
+    private List<String> skills;
+    private String education;
+    private int experience;
 
     // Default constructor
     public Applicant() {

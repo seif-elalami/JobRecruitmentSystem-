@@ -3,10 +3,10 @@ package server.services;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
-import org. bson.types.ObjectId;
+import org.bson.types.ObjectId;
 import server.database.MongoDBConnection;
-import shared.interfaces.IJobService;
-import shared.models.Job;
+import shared.interfaces.IJobService;      // import job service Interfaces
+import shared.models.Job;                 // import job model
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;

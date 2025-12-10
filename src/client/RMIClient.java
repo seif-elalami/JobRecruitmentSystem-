@@ -1,7 +1,7 @@
 package client;
 
 import shared.interfaces.IApplicantService;
-import shared. interfaces.IJobService;
+import shared.interfaces.IJobService;
 import shared.interfaces.IApplicationService;
 import shared.interfaces.IAuthService;
 

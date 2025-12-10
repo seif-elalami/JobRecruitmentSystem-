@@ -1,0 +1,180 @@
+package client.ui;
+
+import client.RMIClient;
+import client. utils.InputHelper;
+import server.RMIServer;
+
+public class ConsoleUI {
+
+    private RMIClient client;
+
+    public void start() {
+        boolean running = true;
+
+        while (running) {
+            showMainMenu();
+            int choice = InputHelper.getInt();
+            System.out.println();
+
+            switch (choice) {
+                case 1:
+                    startServer();
+                    break;
+                case 2:
+                    startClient();
+                    break;
+                case 3:
+                    startBoth();
+                    break;
+                case 4:
+                    runInteractiveTests();  // Dev mode - no login
+                    break;
+                case 5:
+                    runUserApplication();   // Production mode - login required
+                    break;
+                case 0:
+                    running = false;
+                    System.out.println("\n👋 Goodbye!");
+                    break;
+                default:
+                    System.out.println("❌ Invalid choice!");
+            }
+
+            if (running && choice != 1) {
+                InputHelper.pause();
+            }
+        }
+
+        InputHelper.close();
+    }
+
+    private void showMainMenu() {
+        System.out. println("\n╔════════════════════════════════════════╗");
+        System.out.println("║    Job Recruitment System - Main      ║");
+        System.out.println("╚════════════════════════════════════════╝");
+        System.out. println();
+        System.out.println("1. Start Server");
+        System.out. println("2. Start Client");
+        System.out.println("3. Start Both");
+        System.out.println("4. Interactive Tests (Dev Mode)");
+        System.out.println("5. User Application (Production Mode)");
+        System.out.println("0. Exit");
+        System.out.println("═══════════════════════════════════════════");
+        System.out.print("Choice: ");
+    }
+
+    private void startServer() {
+        try {
+            System.out.println("\n🚀 Starting RMI Server...\n");
+            RMIServer. main(null);
+        } catch (Exception e) {
+            System.err. println("\n❌ Server error: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void startClient() {
+        try {
+            System.out.println("\n🔗 Connecting to RMI Server...");
+            client = new RMIClient();
+            System.out.println("✅ Client connected successfully!");
+            System.out.println("\n💡 You can now run interactive tests (option 4 or 5).");
+        } catch (Exception e) {
+            System.err.println("\n❌ Client connection failed!");
+            System.err.println("Error: " + e.getMessage());
+            System.err.println("\n💡 Make sure:");
+            System.err.println("   1. MongoDB is running (port 27020)");
+            System.err. println("   2. RMI Server is running (port 1099)");
+        }
+    }
+
+    private void startBoth() {
+        System.out.println("\n🚀 Starting server in background...");
+
+        Thread serverThread = new Thread(() -> {
+            try {
+                RMIServer.main(null);
+            } catch (Exception e) {
+                System.err. println("\n❌ Server error: " + e.getMessage());
+            }
+        });
+        serverThread.setDaemon(true);
+        serverThread.start();
+
+        System.out. println("⏳ Waiting for server to start...");
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("🔗 Starting client...\n");
+        startClient();
+    }
+
+    private void runInteractiveTests() {
+        if (client == null) {
+            System.out.println("\n⚠️  Client not connected!");
+            if (InputHelper.confirm("Connect now?")) {
+                startClient();
+                if (client == null) return;
+            } else {
+                return;
+            }
+        }
+
+        boolean back = false;
+        while (!back) {
+            showTestMenu();
+            int choice = InputHelper.getInt();
+            System.out.println();
+
+            switch (choice) {
+                case 1:
+                    new ApplicantServiceTest(client).run();
+                    break;
+                case 2:
+                    new JobServiceTest(client).run();
+                    break;
+                case 3:
+                    new ApplicationServiceTest(client).run();
+                    break;
+                case 4:
+                    new AuthServiceTest(client).run();
+                    break;
+                case 0:
+                    back = true;
+                    break;
+                default:
+                    System.out. println("❌ Invalid choice!");
+            }
+        }
+    }
+
+    private void showTestMenu() {
+        System.out.println("\n╔════════════════════════════════════════╗");
+        System.out.println("║       Interactive Tests Menu           ║");
+        System.out.println("╚════════════════════════════════════════╝");
+        System.out. println("1. Test Applicant Service");
+        System.out.println("2. Test Job Service");
+        System.out.println("3. Test Application Service");
+        System.out.println("4. Test Auth Service");
+        System.out.println("0. Back to Main Menu");
+        System.out.print("\nChoice: ");
+    }
+
+    private void runUserApplication() {
+        if (client == null) {
+            System.out.println("\n⚠️  Client not connected!");
+            if (InputHelper.confirm("Connect now?")) {
+                startClient();
+                if (client == null) return;
+            } else {
+                return;
+            }
+        }
+
+        UserApplication app = new UserApplication(client);
+        app.run();
+    }
+}

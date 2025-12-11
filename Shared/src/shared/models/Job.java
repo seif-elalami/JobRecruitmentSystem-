@@ -10,7 +10,7 @@ public class Job implements Serializable {
 
     private String jobId;
     // Alias so UI/tests can call getId()
-    private String id;
+
     private String title;
     private String description;
     private List<String> requirements;
@@ -59,7 +59,6 @@ public class Job implements Serializable {
 
     public void setJobId(String jobId) {
         this.jobId = jobId;
-        this.id = jobId; // keep alias in sync
     }
 
     // Alias for UI/tests
@@ -69,7 +68,7 @@ public class Job implements Serializable {
 
     public void setId(String id) {
         this.jobId = id;
-        this.id = id;
+
     }
 
     public String getTitle() {

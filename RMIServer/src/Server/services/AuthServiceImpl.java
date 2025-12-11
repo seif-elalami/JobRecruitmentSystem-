@@ -14,8 +14,10 @@ import org. bson.types.ObjectId;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService {
@@ -120,7 +122,7 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
             }
 
             // Verify password
-            if (! user.getPassword().equals(password)) {
+            if (!user.getPassword().equals(password)) {
                 System.out.println("❌ Login failed: Invalid password - " + email);
                 throw new RemoteException("Invalid email or password");
             }
@@ -143,6 +145,8 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
             throw new RemoteException("Login failed", e);
         }
     }
+
+
 
     @Override
     public boolean logout(String sessionToken) throws RemoteException {
@@ -184,37 +188,53 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
         }
     }
 
-    @Override
     public User getUserById(String userId) throws RemoteException {
         try {
-            Document userDoc = userCollection.find(new Document("_id", new ObjectId(userId))).first();
+            System.out.println("   🔍 Getting user by ID: " + userId);
 
-            if (userDoc == null) {
-                return null;
+            ObjectId objectId = new ObjectId(userId);
+            Document userDoc = userCollection.find(new Document("_id", objectId)).first(); // ✅ Use existing userCollection
+
+            if (userDoc != null) {
+                User user = documentToUser(userDoc);
+                System.out.println("   ✅ Found user: " + user.getEmail() + " (Role: " + user.getRole() + ")");
+                return user;
             }
 
-            return documentToUser(userDoc);
+            System.out.println("   ⚠️  User not found");
+            return null;
 
+        } catch (IllegalArgumentException e) {
+            System.err.println("   ❌ Invalid user ID format");
+            return null;
         } catch (Exception e) {
-            System.err.println("❌ Error getting user:  " + e.getMessage());
+            System.err.println("   ❌ Error getting user: " + e.getMessage());
+            e.printStackTrace();
             throw new RemoteException("Failed to get user", e);
         }
     }
 
+
     @Override
     public User getUserByEmail(String email) throws RemoteException {
         try {
+            System.out.println("🔍 Getting user by email:  " + email);
+
             Document userDoc = userCollection.find(new Document("email", email)).first();
 
-            if (userDoc == null) {
-                return null;
+            if (userDoc != null) {
+                User user = documentToUser(userDoc);
+                System.out.println("✅ Found user: " + user.getEmail());
+                return user;
             }
 
-            return documentToUser(userDoc);
+            System.out.println("⚠️  User not found with email: " + email);
+            return null;
 
         } catch (Exception e) {
-            System. err.println("❌ Error getting user:  " + e.getMessage());
-            throw new RemoteException("Failed to get user", e);
+            System.err.println("❌ Error getting user by email: " + e.getMessage());
+            e.printStackTrace();
+            throw new RemoteException("Failed to get user by email", e);
         }
     }
 
@@ -269,11 +289,32 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
             return session.getRole().equalsIgnoreCase(requiredRole);
 
         } catch (Exception e) {
-            System.err.println("❌ Role check error: " + e. getMessage());
+            System.err.println("❌ Role check error: " + e.getMessage());
             return false;
         }
     }
 
+
+    public List<User> getAllUsers() throws RemoteException {
+    try {
+        System.out.println("   🔍 Getting all users");
+
+        List<User> users = new ArrayList<>();
+
+        for (Document doc : userCollection.find()) {  // ✅ Use existing userCollection
+            User user = documentToUser(doc);
+            users. add(user);
+        }
+
+        System.out.println("   ✅ Found " + users.size() + " user(s)");
+        return users;
+
+    } catch (Exception e) {
+        System.err.println("   ❌ Error:  " + e.getMessage());
+        e.printStackTrace();
+        throw new RemoteException("Failed to get users", e);
+    }
+}
     /**
      * Helper method to update last login time
      */

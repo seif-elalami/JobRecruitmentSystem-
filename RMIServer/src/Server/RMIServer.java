@@ -35,7 +35,7 @@ public class RMIServer {
             // Step 2: Start RMI Registry
             System.out.println("🔧 Step 2: Starting RMI Registry on port " + RMI_PORT + "...");
             try {
-                LocateRegistry. createRegistry(RMI_PORT);  // ← FIX: No variable
+                LocateRegistry.createRegistry(RMI_PORT);
                 System.out.println("   ✅ RMI Registry started");
             } catch (Exception e) {
                 System.out.println("   ⚠️  RMI Registry already running");
@@ -78,11 +78,11 @@ public class RMIServer {
             System.out.println("╔════════════════════════════════════════╗");
             System.out.println("║     ✅ SERVER RUNNING!                    ║");
             System.out.println("╚════════════════════════════════════════╝");
-            System.out. println();
+            System.out.println();
             System.out.println("Server Details:");
             System.out.println("  • RMI Port: " + RMI_PORT);
-            System.out.println("  • MongoDB:   localhost:27020");
-            System. out.println("  • Status:  Ready to accept connections");
+            System.out.println("  • MongoDB:   localhost:27017");
+            System.out.println("  • Status:  Ready to accept connections");
             System.out.println();
             System.out.println("Available Services:");
             System.out.println("  • " + serverURL + "ApplicantService");

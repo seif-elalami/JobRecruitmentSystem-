@@ -1,4 +1,5 @@
 {
+    "java.jdt.ls.java.home": "C:\\Java\\jdk-21",
     "java.project.sourcePaths":  [
         "RMIClient/src",
         "RMIServer/src",

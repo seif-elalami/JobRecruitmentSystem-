@@ -102,7 +102,7 @@ public class ApplicationServiceTest {
             Application application = new Application(jobId, applicantId, coverLetter);
 
             System. out.println("\n📤 Submitting application...");
-            String appId = service.submitApplication(application);
+            String appId = service.SubmitApplication(application);
 
             System.out.println("✅ SUCCESS!");
             System.out.println("   Application ID: " + appId);

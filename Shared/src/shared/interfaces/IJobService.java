@@ -1,33 +1,55 @@
-package shared. interfaces;
+package shared.interfaces;
 
-import shared.models. Job;                    // model import for job
+import shared.models.Job;
+
 import java.rmi.Remote;
 import java. rmi.RemoteException;
 import java.util.List;
 
 public interface IJobService extends Remote {
 
-    // CREATE - Post a new job (used by recruiters)
+    /**
+     * Create a new job posting
+     */
     String createJob(Job job) throws RemoteException;
 
-    // READ - Get job by ID
+    /**
+     * Get job by ID
+     */
     Job getJobById(String id) throws RemoteException;
 
-    // READ - Get all open jobs (used by applicants to browse)
+    /**
+     * Get all jobs
+     */
     List<Job> getAllJobs() throws RemoteException;
 
-    // READ - Search jobs by title
-    List<Job> searchJobsByTitle(String title) throws RemoteException;
+    /**
+     * Get jobs posted by specific recruiter
+     */
+    List<Job> getJobsByRecruiterId(String recruiterId) throws RemoteException;  // ← ADD THIS
 
-    // READ - Get jobs by location
+    /**
+     * Get jobs filtered by location
+     */
     List<Job> getJobsByLocation(String location) throws RemoteException;
 
-    // UPDATE - Update job details
+    /**
+     * Search jobs by title
+     */
+    List<Job> searchJobsByTitle(String title) throws RemoteException;
+
+    /**
+     * Update job
+     */
     boolean updateJob(Job job) throws RemoteException;
 
-    // UPDATE - Close a job (no longer accepting applications)
-    boolean closeJob(String jobId) throws RemoteException;
-
-    // DELETE - Remove a job
+    /**
+     * Delete job
+     */
     boolean deleteJob(String id) throws RemoteException;
+
+    /**
+     * Close job (change status to CLOSED)
+     */
+    boolean closeJob(String id) throws RemoteException;
 }

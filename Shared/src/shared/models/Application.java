@@ -30,6 +30,8 @@ public class Application implements Serializable {
 
     // Getters
     public String getId() { return id; }
+    // Alias used in recruiter UI
+    public String getApplicationId() { return id; }
     public String getJobId() { return jobId; }
     public String getApplicantId() { return applicantId; }
     public Date getApplicationDate() { return applicationDate; }
@@ -38,6 +40,7 @@ public class Application implements Serializable {
 
     // Setters
     public void setId(String id) { this.id = id; }
+    public void setApplicationId(String id) { this.id = id; }
     public void setJobId(String jobId) { this.jobId = jobId; }
     public void setApplicantId(String applicantId) { this.applicantId = applicantId; }
     public void setApplicationDate(Date applicationDate) { this.applicationDate = applicationDate; }

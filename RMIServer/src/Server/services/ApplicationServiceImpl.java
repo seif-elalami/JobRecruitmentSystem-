@@ -19,20 +19,20 @@ public class ApplicationServiceImpl extends UnicastRemoteObject implements IAppl
 
     public ApplicationServiceImpl() throws RemoteException {
         super();
-        MongoDatabase database = MongoDBConnection.getInstance(). getDatabase();
+        MongoDatabase database = MongoDBConnection.getInstance().getDatabase();
         applicationCollection = database.getCollection("applications");
         System.out.println("✅ ApplicationService initialized");
     }
 
     // ========================================
-    // FUNCTION 1: SUBMIT APPLICATION
+    // FUNCTION 1:  SUBMIT APPLICATION
     // ========================================
     @Override
-    public String submitApplication(Application application) throws RemoteException {
+    public String SubmitApplication(Application application) throws RemoteException {
         try {
             System.out.println("Submitting application.. .");
             System.out.println("   Job ID: " + application.getJobId());
-            System.out. println("   Applicant ID: " + application.getApplicantId());
+            System.out. println("   Applicant ID:  " + application.getApplicantId());
 
             Document doc = new Document();
             doc.append("jobId", application.getJobId());
@@ -51,18 +51,26 @@ public class ApplicationServiceImpl extends UnicastRemoteObject implements IAppl
             return id;
 
         } catch (Exception e) {
-            System.err.println("❌ Error submitting application: " + e.getMessage());
-            throw new RemoteException("Error submitting application: " + e.getMessage(), e);
+            System.err.println("❌ Error submitting application:  " + e.getMessage());
+            throw new RemoteException("Error submitting application:  " + e.getMessage(), e);
         }
     }
 
     // ========================================
-    // FUNCTION 2: GET APPLICATION BY ID
+    // FUNCTION 2: CREATE APPLICATION (Alias for submitApplication)
+    // ========================================
+    @Override
+    public String CreateApplication(Application application) throws RemoteException {
+        return SubmitApplication(application);
+    }
+
+    // ========================================
+    // FUNCTION 3: GET APPLICATION BY ID
     // ========================================
     @Override
     public Application getApplicationById(String id) throws RemoteException {
         try {
-            System.out. println("Searching for application with ID: " + id);
+            System.out.println("Searching for application with ID: " + id);
 
             Document query = new Document("_id", new ObjectId(id));
             Document doc = applicationCollection. find(query).first();
@@ -80,13 +88,13 @@ public class ApplicationServiceImpl extends UnicastRemoteObject implements IAppl
             return application;
 
         } catch (Exception e) {
-            System.err.println("❌ Error getting application by ID: " + e.getMessage());
-            throw new RemoteException("Error getting application by ID: " + e. getMessage(), e);
+            System.err.println("❌ Error getting application by ID: " + e. getMessage());
+            throw new RemoteException("Error getting application by ID:  " + e.getMessage(), e);
         }
     }
 
     // ========================================
-    // FUNCTION 3: GET APPLICATIONS BY APPLICANT ID
+    // FUNCTION 4: GET APPLICATIONS BY APPLICANT ID
     // ========================================
     @Override
     public List<Application> getApplicationsByApplicantId(String applicantId) throws RemoteException {
@@ -101,23 +109,48 @@ public class ApplicationServiceImpl extends UnicastRemoteObject implements IAppl
                 applications.add(application);
             }
 
-            System.out. println("✅ Found " + applications.size() + " applications for applicant");
+            System.out.println("✅ Found " + applications.size() + " applications for applicant");
 
             return applications;
 
         } catch (Exception e) {
-            System.err. println("❌ Error getting applications by applicant ID: " + e.getMessage());
+            System.err.println("❌ Error getting applications by applicant ID:  " + e.getMessage());
             throw new RemoteException("Error getting applications by applicant ID: " + e.getMessage(), e);
         }
     }
 
     // ========================================
-    // FUNCTION 4: GET APPLICATIONS BY JOB ID
+    // FUNCTION 5: GET ALL APPLICATIONS (RECRUITERS/ADMINS)
+    // ========================================
+    @Override
+    public List<Application> getAllApplications() throws RemoteException {
+        try {
+            System.out.println("Fetching all applications...");
+
+            List<Application> applications = new ArrayList<>();
+            for (Document doc : applicationCollection.find()) {
+                Application application = documentToApplication(doc);
+                if (application != null) {
+                    applications.add(application);
+                }
+            }
+
+            System.out.println("✅ Found " + applications.size() + " application(s)");
+            return applications;
+
+        } catch (Exception e) {
+            System. err.println("❌ Error fetching all applications: " + e. getMessage());
+            throw new RemoteException("Error fetching all applications:  " + e.getMessage(), e);
+        }
+    }
+
+    // ========================================
+    // FUNCTION 6: GET APPLICATIONS BY JOB ID
     // ========================================
     @Override
     public List<Application> getApplicationsByJobId(String jobId) throws RemoteException {
         try {
-            System.out.println("Retrieving applications for job: " + jobId);
+            System.out.println("Retrieving applications for job:  " + jobId);
 
             List<Application> applications = new ArrayList<>();
             Document query = new Document("jobId", jobId);
@@ -127,18 +160,18 @@ public class ApplicationServiceImpl extends UnicastRemoteObject implements IAppl
                 applications.add(application);
             }
 
-            System.out.println("✅ Found " + applications.size() + " applications for job");
+            System.out.println("✅ Found " + applications. size() + " applications for job");
 
             return applications;
 
         } catch (Exception e) {
             System.err.println("❌ Error getting applications by job ID: " + e.getMessage());
-            throw new RemoteException("Error getting applications by job ID: " + e.getMessage(), e);
+            throw new RemoteException("Error getting applications by job ID:  " + e.getMessage(), e);
         }
     }
 
     // ========================================
-    // FUNCTION 5: UPDATE APPLICATION STATUS
+    // FUNCTION 7: UPDATE APPLICATION STATUS
     // ========================================
     @Override
     public boolean updateApplicationStatus(String applicationId, String status) throws RemoteException {
@@ -148,8 +181,9 @@ public class ApplicationServiceImpl extends UnicastRemoteObject implements IAppl
             System.out.println("   New Status: " + status);
 
             // Validate status
-            if (! status.equals("PENDING") && !status.equals("ACCEPTED") && !status.equals("REJECTED")) {
-                System.err.println("❌ Invalid status: " + status);
+            if (! status.equals("PENDING") && !status.equals("ACCEPTED") &&
+                !status.equals("REJECTED") && !status.equals("UNDER_REVIEW")) {
+                System.err.println("❌ Invalid status:  " + status);
                 return false;
             }
 
@@ -159,7 +193,7 @@ public class ApplicationServiceImpl extends UnicastRemoteObject implements IAppl
             long modifiedCount = applicationCollection.updateOne(query, update).getModifiedCount();
 
             if (modifiedCount > 0) {
-                System.out.println("✅ Application status updated to: " + status);
+                System.out. println("✅ Application status updated to: " + status);
                 return true;
             } else {
                 System.out.println("❌ Application not found or not updated");
@@ -167,24 +201,24 @@ public class ApplicationServiceImpl extends UnicastRemoteObject implements IAppl
             }
 
         } catch (Exception e) {
-            System. err.println("❌ Error updating application status: " + e. getMessage());
+            System.err.println("❌ Error updating application status: " + e.getMessage());
             throw new RemoteException("Error updating application status: " + e.getMessage(), e);
         }
     }
 
     // ========================================
-    // FUNCTION 6: DELETE APPLICATION
+    // FUNCTION 8: DELETE APPLICATION
     // ========================================
     @Override
     public boolean deleteApplication(String id) throws RemoteException {
         try {
-            System.out. println("Deleting application with ID: " + id);
+            System.out.println("Deleting application with ID:  " + id);
 
             Document query = new Document("_id", new ObjectId(id));
             long deletedCount = applicationCollection.deleteOne(query).getDeletedCount();
 
             if (deletedCount > 0) {
-                System.out. println("✅ Application deleted successfully");
+                System.out.println("✅ Application deleted successfully");
                 return true;
             } else {
                 System.out.println("❌ Application not found");
@@ -206,12 +240,12 @@ public class ApplicationServiceImpl extends UnicastRemoteObject implements IAppl
         }
 
         Application application = new Application();
-        application.setId(doc.getObjectId("_id").toString());
-        application.setJobId(doc.getString("jobId"));
+        application. setId(doc.getObjectId("_id").toString());
+        application.setJobId(doc. getString("jobId"));
         application.setApplicantId(doc.getString("applicantId"));
-        application. setApplicationDate(doc.getDate("applicationDate"));
-        application. setStatus(doc.getString("status"));
-        application.setCoverLetter(doc.getString("coverLetter"));
+        application.setApplicationDate(doc.getDate("applicationDate"));
+        application.setStatus(doc. getString("status"));
+        application. setCoverLetter(doc.getString("coverLetter"));
 
         return application;
     }

@@ -70,7 +70,7 @@ public class ApplicantMenu {
         System.out.println("\n╔════════════════════════════════════════╗");
         System.out.println("║       Applicant Dashboard              ║");
         System.out.println("╚════════════════════════════════════════╝");
-        System.out.println("   User: " + session.getEmail());
+        System.out.println("   User: " + session.getUserEmail());
         System.out.println();
         System.out.println("1. Browse Jobs");
         System.out.println("2. Apply to Job");
@@ -140,12 +140,12 @@ public class ApplicantMenu {
 
             Application application = new Application(
                 jobId,
-                session.getProfileId(),
+                session.getUserId(),
                 coverLetter
             );
 
             System. out.println("\n📤 Submitting application...");
-            String appId = appService.submitApplication(application);
+            String appId = appService.SubmitApplication(application);
 
             System.out.println("✅ Application submitted successfully!");
             System. out.println("   Application ID: " + appId);
@@ -160,7 +160,7 @@ public class ApplicantMenu {
             System.out.println("=== MY APPLICATIONS ===\n");
             System.out.println("📤 Fetching your applications...");
 
-            List<Application> apps = appService.getApplicationsByApplicantId(session.getProfileId());
+            List<Application> apps = appService.getApplicationsByApplicantId(session.getUserId());
 
             if (apps. isEmpty()) {
                 System.out.println("You haven't applied to any jobs yet.");
@@ -191,7 +191,7 @@ public class ApplicantMenu {
         System. out.println("=== UPDATE PROFILE ===\n");
 
         System.out.println("📤 Fetching your profile...");
-        Applicant profile = applicantService.getApplicantById(session.getProfileId());
+        Applicant profile = applicantService.getApplicantById(session.getUserId());
 
         if (profile == null) {
             System.out.println("❌ Profile not found!");
@@ -252,7 +252,7 @@ public class ApplicantMenu {
             System.out.println("=== MY PROFILE ===\n");
 
             System.out.println("📤 Fetching your profile.. .");
-            Applicant profile = applicantService.getApplicantById(session.getProfileId());
+            Applicant profile = applicantService.getApplicantById(session.getUserId());
 
             if (profile == null) {
                 System.out.println("❌ Profile not found!");

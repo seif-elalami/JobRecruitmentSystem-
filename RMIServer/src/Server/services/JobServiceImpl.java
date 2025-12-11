@@ -1,16 +1,18 @@
 package Server.services;
 
+import Server.database.MongoDBConnection;
+import shared.interfaces.IJobService;
+import shared.models.Job;
+
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
-import org.bson.types.ObjectId;
-import Server.database.MongoDBConnection;
-import shared.interfaces.IJobService;      // import job service Interfaces
-import shared.models.Job;                 // import job model
+import org.bson.types. ObjectId;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class JobServiceImpl extends UnicastRemoteObject implements IJobService {
@@ -20,267 +22,217 @@ public class JobServiceImpl extends UnicastRemoteObject implements IJobService {
     public JobServiceImpl() throws RemoteException {
         super();
         MongoDatabase database = MongoDBConnection.getInstance().getDatabase();
-        jobCollection = database. getCollection("jobs");
+        jobCollection = database.getCollection("jobs");
         System.out.println("✅ JobService initialized");
     }
 
-    // ========================================
-    // FUNCTION 1: CREATE JOB
-    // ========================================
     @Override
     public String createJob(Job job) throws RemoteException {
         try {
-            System.out.println("Creating job: " + job.getTitle());
+            // Allow posting without recruiterId from older clients
+            if (job.getRecruiterId() == null || job.getRecruiterId().isEmpty()) {
+                job.setRecruiterId("UNKNOWN");
+            }
 
             Document doc = new Document();
-            doc. append("title", job.getTitle());
+            doc.append("title", job.getTitle());
             doc.append("description", job.getDescription());
+            doc.append("requirements", job.getRequirements());
             doc.append("company", job.getCompany());
             doc.append("location", job.getLocation());
-            doc. append("salary", job.getSalary());
-            doc.append("requirements", job.getRequirements());
-            doc.append("status", job.getStatus());
+            doc.append("salary", job.getSalary());
+            doc.append("status", "OPEN");
+            doc.append("postedDate", new Date());
+            doc.append("recruiterId", job. getRecruiterId());  // ← ADD THIS
 
             jobCollection.insertOne(doc);
-            String id = doc.getObjectId("_id"). toString();
 
-            System. out.println("✅ Job created successfully!");
-            System.out.println("   ID: " + id);
-            System.out. println("   Title: " + job.getTitle());
-            System. out.println("   Company: " + job.getCompany());
+            String id = doc. getObjectId("_id").toString();
+            job.setJobId(id);
+
+            System.out.println("✅ Job created:  " + job.getTitle() + " (ID: " + id + ", Recruiter: " + job. getRecruiterId() + ")");
 
             return id;
 
         } catch (Exception e) {
             System.err.println("❌ Error creating job: " + e.getMessage());
-            throw new RemoteException("Error creating job: " + e.getMessage(), e);
+            e.printStackTrace();
+            throw new RemoteException("Failed to create job", e);
         }
     }
 
-    // ========================================
-    // FUNCTION 2: GET JOB BY ID
-    // ========================================
     @Override
     public Job getJobById(String id) throws RemoteException {
         try {
-            System.out. println("Searching for job with ID: " + id);
-
-            Document query = new Document("_id", new ObjectId(id));
-            Document doc = jobCollection. find(query).first();
+            Document doc = jobCollection.find(new Document("_id", new ObjectId(id))).first();
 
             if (doc == null) {
-                System.out.println("❌ Job not found with ID: " + id);
                 return null;
             }
 
-            Job job = documentToJob(doc);
-
-            System.out.println("✅ Job found!");
-            System.out.println("   Title: " + job.getTitle());
-            System.out.println("   Company: " + job.getCompany());
-
-            return job;
+            return documentToJob(doc);
 
         } catch (Exception e) {
-            System.err. println("❌ Error getting job by ID: " + e.getMessage());
-            throw new RemoteException("Error getting job by ID: " + e.getMessage(), e);
+            System.err.println("❌ Error getting job: " + e.getMessage());
+            throw new RemoteException("Failed to get job", e);
         }
     }
 
-    // ========================================
-    // FUNCTION 3: GET ALL JOBS
-    // ========================================
     @Override
     public List<Job> getAllJobs() throws RemoteException {
         try {
-            System.out.println("Retrieving all jobs...");
-
             List<Job> jobs = new ArrayList<>();
 
             for (Document doc : jobCollection.find()) {
-                Job job = documentToJob(doc);
-                jobs.add(job);
+                jobs.add(documentToJob(doc));
             }
 
-            System.out. println("✅ Retrieved " + jobs.size() + " jobs");
+            System.out.println("✅ Retrieved " + jobs.size() + " job(s)");
 
             return jobs;
 
         } catch (Exception e) {
-            System.err. println("❌ Error getting all jobs: " + e.getMessage());
-            throw new RemoteException("Error getting all jobs: " + e.getMessage(), e);
+            System.err.println("❌ Error getting jobs: " + e.getMessage());
+            throw new RemoteException("Failed to get jobs", e);
         }
     }
 
-    // ========================================
-    // FUNCTION 4: SEARCH JOBS BY TITLE
-    // ========================================
+    // ← ADD THIS METHOD
+    @Override
+    public List<Job> getJobsByRecruiterId(String recruiterId) throws RemoteException {
+        try {
+            List<Job> jobs = new ArrayList<>();
+
+            Document query = new Document("recruiterId", recruiterId);
+
+            for (Document doc : jobCollection.find(query)) {
+                jobs.add(documentToJob(doc));
+            }
+
+            System.out.println("✅ Retrieved " + jobs.size() + " job(s) for recruiter: " + recruiterId);
+
+            return jobs;
+
+        } catch (Exception e) {
+            System.err. println("❌ Error getting jobs by recruiter: " + e.getMessage());
+            throw new RemoteException("Failed to get jobs by recruiter", e);
+        }
+    }
+
+    @Override
+    public List<Job> getJobsByLocation(String location) throws RemoteException {
+        try {
+            List<Job> jobs = new ArrayList<>();
+
+            Document query = new Document("location", new Document("$regex", location).append("$options", "i"));
+
+            for (Document doc : jobCollection.find(query)) {
+                jobs.add(documentToJob(doc));
+            }
+
+            System.out.println("✅ Retrieved " + jobs.size() + " job(s) for location: " + location);
+
+            return jobs;
+
+        } catch (Exception e) {
+            System.err.println("❌ Error getting jobs by location: " + e.getMessage());
+            throw new RemoteException("Failed to get jobs by location", e);
+        }
+    }
+
     @Override
     public List<Job> searchJobsByTitle(String title) throws RemoteException {
         try {
-            System.out.println("Searching for jobs with title: " + title);
-
             List<Job> jobs = new ArrayList<>();
 
-            // Case-insensitive regex search
-            Document regex = new Document("$regex", title). append("$options", "i");
-            Document query = new Document("title", regex);
+            Document query = new Document("title", new Document("$regex", title).append("$options", "i"));
 
             for (Document doc : jobCollection.find(query)) {
-                Job job = documentToJob(doc);
-                jobs.add(job);
+                jobs.add(documentToJob(doc));
             }
 
-            System.out. println("✅ Found " + jobs.size() + " job(s) matching: " + title);
+            System.out. println("✅ Found " + jobs.size() + " job(s) matching:  " + title);
 
             return jobs;
 
         } catch (Exception e) {
             System.err.println("❌ Error searching jobs: " + e.getMessage());
-            throw new RemoteException("Error searching jobs: " + e.getMessage(), e);
+            throw new RemoteException("Failed to search jobs", e);
         }
     }
 
-    // ========================================
-    // FUNCTION 5: GET JOBS BY LOCATION
-    // ========================================
-    @Override
-    public List<Job> getJobsByLocation(String location) throws RemoteException {
-        try {
-            System.out.println("Searching for jobs in location: " + location);
-
-            List<Job> jobs = new ArrayList<>();
-            Document query = new Document("location", location);
-
-            for (Document doc : jobCollection.find(query)) {
-                Job job = documentToJob(doc);
-                jobs.add(job);
-            }
-
-            System.out. println("✅ Found " + jobs.size() + " job(s) in: " + location);
-
-            return jobs;
-
-        } catch (Exception e) {
-            System.err.println("❌ Error getting jobs by location: " + e. getMessage());
-            throw new RemoteException("Error getting jobs by location: " + e.getMessage(), e);
-        }
-    }
-
-    // ========================================
-    // FUNCTION 6: UPDATE JOB
-    // ========================================
     @Override
     public boolean updateJob(Job job) throws RemoteException {
         try {
-            System.out.println("Updating job: " + job.getTitle());
+            Document query = new Document("_id", new ObjectId(job.getJobId()));
 
-            Document updateDoc = new Document("title", job.getTitle())
-                    . append("description", job.getDescription())
-                    .append("company", job.getCompany())
-                    .append("location", job.getLocation())
-                    . append("salary", job.getSalary())
-                    .append("requirements", job.getRequirements())
-                    .append("status", job.getStatus());
+            Document update = new Document();
+            update.append("title", job.getTitle());
+            update.append("description", job. getDescription());
+            update.append("requirements", job.getRequirements());
+            update.append("status", job.getStatus());
 
-            Document query = new Document("_id", new ObjectId(job. getId()));
-            Document update = new Document("$set", updateDoc);
+            Document updateDoc = new Document("$set", update);
 
-            long modifiedCount = jobCollection.updateOne(query, update).getModifiedCount();
+            jobCollection.updateOne(query, updateDoc);
 
-            if (modifiedCount > 0) {
-                System.out.println("✅ Job updated successfully");
-                return true;
-            } else {
-                System.out.println("❌ Job not found or not modified");
-                return false;
-            }
+            System. out.println("✅ Job updated: " + job.getTitle());
+
+            return true;
 
         } catch (Exception e) {
-            System. err.println("❌ Error updating job: " + e.getMessage());
-            throw new RemoteException("Error updating job: " + e.getMessage(), e);
+            System.err.println("❌ Error updating job: " + e.getMessage());
+            return false;
         }
     }
 
-    // ========================================
-    // FUNCTION 7: CLOSE JOB
-    // ========================================
-    @Override
-    public boolean closeJob(String jobId) throws RemoteException {
-        try {
-            System.out.println("Closing job with ID: " + jobId);
-
-            Document query = new Document("_id", new ObjectId(jobId));
-            Document update = new Document("$set", new Document("status", "CLOSED"));
-
-            long modifiedCount = jobCollection.updateOne(query, update).getModifiedCount();
-
-            if (modifiedCount > 0) {
-                System.out.println("✅ Job closed successfully");
-                return true;
-            } else {
-                System.out.println("❌ Job not found or already closed");
-                return false;
-            }
-
-        } catch (Exception e) {
-            System.err.println("❌ Error closing job: " + e. getMessage());
-            throw new RemoteException("Error closing job: " + e.getMessage(), e);
-        }
-    }
-
-    // ========================================
-    // FUNCTION 8: DELETE JOB
-    // ========================================
     @Override
     public boolean deleteJob(String id) throws RemoteException {
         try {
-            System.out. println("Deleting job with ID: " + id);
-
             Document query = new Document("_id", new ObjectId(id));
-            long deletedCount = jobCollection.deleteOne(query).getDeletedCount();
+            jobCollection.deleteOne(query);
 
-            if (deletedCount > 0) {
-                System.out. println("✅ Job deleted successfully");
-                return true;
-            } else {
-                System.out.println("❌ Job not found");
-                return false;
-            }
+            System.out.println("✅ Job deleted: " + id);
+
+            return true;
 
         } catch (Exception e) {
             System.err.println("❌ Error deleting job: " + e.getMessage());
-            throw new RemoteException("Error deleting job: " + e.getMessage(), e);
+            return false;
         }
     }
 
-    // ========================================
-    // HELPER METHOD
-    // ========================================
-    private Job documentToJob(Document doc) {
-        if (doc == null) {
-            return null;
-        }
+    @Override
+    public boolean closeJob(String id) throws RemoteException {
+        try {
+            Document query = new Document("_id", new ObjectId(id));
+            Document update = new Document("$set", new Document("status", "CLOSED"));
 
+            jobCollection. updateOne(query, update);
+
+            System.out.println("✅ Job closed: " + id);
+
+            return true;
+
+        } catch (Exception e) {
+            System.err.println("❌ Error closing job: " + e. getMessage());
+            return false;
+        }
+    }
+
+    private Job documentToJob(Document doc) {
         Job job = new Job();
-        job. setId(doc.getObjectId("_id").toString());
+        job.setJobId(doc.getObjectId("_id").toString());
         job.setTitle(doc.getString("title"));
         job.setDescription(doc.getString("description"));
+        job.setRequirements(doc.getList("requirements", String.class));
         job.setCompany(doc.getString("company"));
         job.setLocation(doc.getString("location"));
-
-        // Handle salary - might be Double or Integer
-        Object salaryObj = doc.get("salary");
-        if (salaryObj instanceof Double) {
-            job.setSalary((Double) salaryObj);
-        } else if (salaryObj instanceof Integer) {
-            job.setSalary(((Integer) salaryObj).doubleValue());
-        } else if (salaryObj != null) {
-            job.setSalary(Double.parseDouble(salaryObj. toString()));
-        }
-
-        job.setRequirements(doc.getString("requirements"));
+        Double salary = doc.getDouble("salary");
+        job.setSalary(salary != null ? salary : 0.0);
         job.setStatus(doc.getString("status"));
+        job.setPostedDate(doc.getDate("postedDate"));
+        job.setRecruiterId(doc.getString("recruiterId"));  // ← ADD THIS
 
         return job;
     }

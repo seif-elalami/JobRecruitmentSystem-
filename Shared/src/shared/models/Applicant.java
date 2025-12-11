@@ -1,14 +1,15 @@
 package shared.models;
 
-import java. io.Serializable;
+import shared.interfaces.ICandidateView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Applicant implements Serializable {
+// ✅ REMOVE Serializable - only implement ICandidateView
+public class Applicant implements ICandidateView {  // ← Fixed!
     private static final long serialVersionUID = 1L;
 
     // Fields
-    private String id;              // MongoDB ObjectId
+    private String id;
     private String name;
     private String email;
     private String phone;
@@ -17,12 +18,11 @@ public class Applicant implements Serializable {
     private String education;
     private int experience;
 
-    // Default constructor
+    // Constructors
     public Applicant() {
         this.skills = new ArrayList<>();
     }
 
-    // Constructor with all fields except id
     public Applicant(String name, String email, String phone,
                      String resume, String education, int experience) {
         this.name = name;
@@ -35,34 +35,42 @@ public class Applicant implements Serializable {
     }
 
     // Getters
+    @Override
     public String getId() {
         return id;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public String getEmail() {
         return email;
     }
 
+    @Override
     public String getPhone() {
         return phone;
     }
 
+    @Override
     public String getResume() {
         return resume;
     }
 
+    @Override
     public List<String> getSkills() {
         return skills;
     }
 
+    @Override
     public String getEducation() {
         return education;
     }
 
+    @Override
     public int getExperience() {
         return experience;
     }
@@ -100,7 +108,7 @@ public class Applicant implements Serializable {
         this.experience = experience;
     }
 
-    // Helper method to add a single skill
+    // Helper method
     public void addSkill(String skill) {
         if (this.skills == null) {
             this.skills = new ArrayList<>();

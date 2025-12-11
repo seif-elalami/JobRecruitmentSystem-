@@ -4,142 +4,97 @@ import shared.models.Recruiter;
 import shared.models.Job;
 import shared.models.Application;
 import shared.models. Applicant;
-import shared.models.Interview;
+import shared. models.Interview;
 
-import java.rmi.Remote;
-import java. rmi.RemoteException;
+import java. rmi.Remote;
+import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Recruiter Service Interface
- * Handles recruiter-specific operations:  jobs, applications, interviews
- */
 public interface IRecruiterService extends Remote {
 
     // ========================================
-    // Recruiter Profile Management (Keep for Auth)
+    // RECRUITER MANAGEMENT
     // ========================================
 
-    /**
-     * Create a new recruiter profile (used by AuthService)
-     */
     String createRecruiter(Recruiter recruiter) throws RemoteException;
 
-    /**
-     * Get recruiter by ID
-     */
     Recruiter getRecruiterById(String id) throws RemoteException;
 
-    /**
-     * Get recruiter by email
-     */
     Recruiter getRecruiterByEmail(String email) throws RemoteException;
 
-    /**
-     * Update recruiter profile
-     */
     boolean updateRecruiter(Recruiter recruiter) throws RemoteException;
 
     // ========================================
-    // 1. Job Posting Management
+    // JOB MANAGEMENT
     // ========================================
 
-    /**
-     * Post a new job (Create job posting)
-     * @param job Job object with details
-     * @return Job ID if successful
-     */
     String postJob(Job job) throws RemoteException;
 
-    /**
-     * View all jobs posted by specific recruiter
-     * @param recruiterId ID of the recruiter
-     * @return List of jobs posted by this recruiter
-     */
     List<Job> getMyJobPostings(String recruiterId) throws RemoteException;
 
-    /**
-     * Close a job posting
-     * @param jobId ID of the job to close
-     * @param recruiterId ID of the recruiter (for verification)
-     * @return true if successful
-     */
     boolean closeJobPosting(String jobId, String recruiterId) throws RemoteException;
 
     // ========================================
-    // 2. Application Management
+    // APPLICATION MANAGEMENT
     // ========================================
 
-    /**
-     * View all applications for a specific job
-     * @param jobId ID of the job
-     * @return List of applications for this job
-     */
     List<Application> getApplicationsForJob(String jobId) throws RemoteException;
 
-    /**
-     * Update application status (accept/reject)
-     * @param applicationId ID of the application
-     * @param status New status ("ACCEPTED", "REJECTED", "UNDER_REVIEW")
-     * @return true if successful
-     */
     boolean updateApplicationStatus(String applicationId, String status) throws RemoteException;
 
     // ========================================
-    // 3. Applicant Search
+    // APPLICANT SEARCH (Returns Full Applicant Objects)
     // ========================================
 
-    /**
-     * Search for applicants by skills
-     * @param skills Skills to search for (comma-separated or keywords)
-     * @return List of matching applicants
-     */
     List<Applicant> searchApplicantsBySkills(String skills) throws RemoteException;
 
-    /**
-     * Search for applicants by experience
-     * @param experience Experience keywords
-     * @return List of matching applicants
-     */
     List<Applicant> searchApplicantsByExperience(String experience) throws RemoteException;
 
     // ========================================
-    // 4. Interview Management
+    // INTERVIEW MANAGEMENT
+    // ========================================
+
+    String createInterview(Interview interview) throws RemoteException;
+
+    boolean updateInterview(Interview interview) throws RemoteException;
+
+    boolean cancelInterview(String interviewId) throws RemoteException;
+
+    List<Interview> getMyInterviews(String recruiterId) throws RemoteException;
+
+    Interview getInterviewById(String interviewId) throws RemoteException;
+
+    // ========================================
+    // ✅ MATCH CV FEATURE - READ-ONLY CANDIDATE VIEWS
     // ========================================
 
     /**
-     * Create/Schedule a new interview
-     * @param interview Interview object with details
-     * @return Interview ID if successful
+     * Get read-only candidate views for all applicants who applied to a specific job
+     * @param jobId The job ID
+     * @return List of read-only candidate profiles
      */
-    String createInterview(Interview interview) throws RemoteException;
+    List<ICandidateView> getCandidatesForJob(String jobId) throws RemoteException;
 
     /**
-     * Update interview details
-     * @param interview Updated interview object
-     * @return true if successful
+     * Get a single candidate's read-only profile by ID
+     * @param candidateId The candidate/applicant ID
+     * @return Read-only candidate view
      */
-    boolean updateInterview(Interview interview) throws RemoteException;
+    ICandidateView getCandidateById(String candidateId) throws RemoteException;
 
     /**
-     * Cancel an interview
-     * @param interviewId ID of the interview
-     * @return true if successful
+     * Search all candidates by skills (returns read-only views)
+     * Useful for finding qualified candidates across all applications
+     * @param skills Skills to search for (e.g., "Java, RMI")
+     * @return List of matching candidates (read-only)
      */
-    boolean cancelInterview(String interviewId) throws RemoteException;
+    List<ICandidateView> searchCandidatesBySkillsReadOnly(String skills) throws RemoteException;
 
     /**
-     * Get all interviews for a specific recruiter
-     * @param recruiterId ID of the recruiter
-     * @return List of interviews
+     * Search candidates by minimum years of experience (returns read-only views)
+     * @param minYears Minimum years of experience required
+     * @return List of matching candidates (read-only)
      */
-    List<Interview> getMyInterviews(String recruiterId) throws RemoteException;
-
-    /**
-     * Get interview by ID
-     * @param interviewId ID of the interview
-     * @return Interview object
-     */
-    Interview getInterviewById(String interviewId) throws RemoteException;
+    List<ICandidateView> searchCandidatesByMinExperience(int minYears) throws RemoteException;
 }

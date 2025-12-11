@@ -15,46 +15,51 @@ import java.util.List;
 
 public class ApplicationServiceImpl extends UnicastRemoteObject implements IApplicationService {
 
+    private MongoDatabase database;
     private MongoCollection<Document> applicationCollection;
 
     public ApplicationServiceImpl() throws RemoteException {
         super();
-        MongoDatabase database = MongoDBConnection.getInstance().getDatabase();
-        applicationCollection = database.getCollection("applications");
+        this.database = MongoDBConnection. getInstance().getDatabase();
+        this.applicationCollection = database.getCollection("applications");
+
         System.out.println("✅ ApplicationService initialized");
+        System.out.println("   Database: " + database.getName());
+        System.out.println("   Collection: applications");
+        System.out.println("   Current count: " + applicationCollection.countDocuments());
     }
 
     // ========================================
     // FUNCTION 1:  SUBMIT APPLICATION
     // ========================================
-    @Override
+     @Override
     public String SubmitApplication(Application application) throws RemoteException {
         try {
-            System.out.println("Submitting application.. .");
+            System.out.println("\n📤 Submitting application");
             System.out.println("   Job ID: " + application.getJobId());
-            System.out. println("   Applicant ID:  " + application.getApplicantId());
+            System.out. println("   Applicant ID: " + application.getApplicantId());
 
             Document doc = new Document();
-            doc.append("jobId", application.getJobId());
-            doc.append("applicantId", application.getApplicantId());
-            doc.append("applicationDate", application.getApplicationDate());
+            doc.append("jobId", application.getJobId());  // Store as String
+            doc.append("applicantId", application.getApplicantId());  // Store as String
+            doc. append("applicationDate", application.getApplicationDate());
             doc.append("status", application.getStatus());
             doc.append("coverLetter", application.getCoverLetter());
 
             applicationCollection.insertOne(doc);
-            String id = doc.getObjectId("_id").toString();
 
-            System.out.println("✅ Application submitted successfully!");
-            System.out.println("   Application ID: " + id);
-            System.out.println("   Status: " + application.getStatus());
+            String applicationId = doc.getObjectId("_id").toString();
+            System.out.println("✅ Application submitted with ID: " + applicationId);
 
-            return id;
+            return applicationId;
 
         } catch (Exception e) {
-            System.err.println("❌ Error submitting application:  " + e.getMessage());
-            throw new RemoteException("Error submitting application:  " + e.getMessage(), e);
+            System.err. println("❌ Error submitting application: " + e.getMessage());
+            e.printStackTrace();
+            throw new RemoteException("Failed to submit application", e);
         }
     }
+
 
     // ========================================
     // FUNCTION 2: CREATE APPLICATION (Alias for submitApplication)
@@ -148,27 +153,73 @@ public class ApplicationServiceImpl extends UnicastRemoteObject implements IAppl
     // FUNCTION 6: GET APPLICATIONS BY JOB ID
     // ========================================
     @Override
-    public List<Application> getApplicationsByJobId(String jobId) throws RemoteException {
+public List<Application> getApplicationsByJobId(String jobId) throws RemoteException {
+    try {
+        System. out.println("📋 Getting applications for job: " + jobId);
+
+        List<Application> applications = new ArrayList<>();
+
+        // ✅ FIX: Try both String and ObjectId formats
+        Document query;
+
         try {
-            System.out.println("Retrieving applications for job:  " + jobId);
+            // Try as ObjectId first
+            ObjectId jobObjectId = new ObjectId(jobId);
+            query = new Document("jobId", jobObjectId);
+            System.out.println("   Searching with ObjectId: " + jobObjectId);
+        } catch (IllegalArgumentException e) {
+            // If not valid ObjectId, search as String
+            query = new Document("jobId", jobId);
+            System.out.println("   Searching with String: " + jobId);
+        }
 
-            List<Application> applications = new ArrayList<>();
-            Document query = new Document("jobId", jobId);
+        System.out.println("   Query: " + query.toJson());
 
-            for (Document doc : applicationCollection. find(query)) {
-                Application application = documentToApplication(doc);
-                applications.add(application);
+        long count = applicationCollection.countDocuments(query);
+        System.out. println("   Matches found: " + count);
+
+        for (Document doc : applicationCollection.find(query)) {
+            Application app = documentToApplication(doc);
+            applications.add(app);
+            System.out.println("   ✅ Found application: " + app.getApplicationId());
+        }
+
+        // ✅ If no results, try the OTHER format
+        if (applications.isEmpty()) {
+            System.out. println("\n   ⚠️ No results with first query, trying alternate format.. .");
+
+            Document alternateQuery;
+            if (query.get("jobId") instanceof ObjectId) {
+                // We tried ObjectId, now try String
+                alternateQuery = new Document("jobId", jobId);
+                System.out. println("   Trying as String: " + alternateQuery.toJson());
+            } else {
+                // We tried String, now try ObjectId
+                try {
+                    alternateQuery = new Document("jobId", new ObjectId(jobId));
+                    System.out.println("   Trying as ObjectId: " + alternateQuery.toJson());
+                } catch (IllegalArgumentException ex) {
+                    System.out.println("   ❌ Cannot convert to ObjectId");
+                    return applications;
+                }
             }
 
-            System.out.println("✅ Found " + applications. size() + " applications for job");
-
-            return applications;
-
-        } catch (Exception e) {
-            System.err.println("❌ Error getting applications by job ID: " + e.getMessage());
-            throw new RemoteException("Error getting applications by job ID:  " + e.getMessage(), e);
+            for (Document doc : applicationCollection.find(alternateQuery)) {
+                Application app = documentToApplication(doc);
+                applications.add(app);
+                System.out.println("   ✅ Found with alternate query: " + app.getApplicationId());
+            }
         }
+
+        System.out.println("✅ Total applications found: " + applications.size());
+        return applications;
+
+    } catch (Exception e) {
+        System.err.println("❌ Error getting applications:  " + e.getMessage());
+        e.printStackTrace();
+        throw new RemoteException("Failed to get applications", e);
     }
+}
 
     // ========================================
     // FUNCTION 7: UPDATE APPLICATION STATUS
@@ -234,19 +285,31 @@ public class ApplicationServiceImpl extends UnicastRemoteObject implements IAppl
     // ========================================
     // HELPER METHOD
     // ========================================
-    private Application documentToApplication(Document doc) {
-        if (doc == null) {
-            return null;
-        }
+  private Application documentToApplication(Document doc) {
+    Application app = new Application();
 
-        Application application = new Application();
-        application. setId(doc.getObjectId("_id").toString());
-        application.setJobId(doc. getString("jobId"));
-        application.setApplicantId(doc.getString("applicantId"));
-        application.setApplicationDate(doc.getDate("applicationDate"));
-        application.setStatus(doc. getString("status"));
-        application. setCoverLetter(doc.getString("coverLetter"));
+    app.setApplicationId(doc.getObjectId("_id").toString());
 
-        return application;
+    // ✅ Handle jobId as either String or ObjectId
+    Object jobIdObj = doc.get("jobId");
+    if (jobIdObj instanceof ObjectId) {
+        app.setJobId(((ObjectId) jobIdObj).toString());
+    } else {
+        app.setJobId(doc.getString("jobId"));
     }
+
+    // ✅ Handle applicantId as either String or ObjectId
+    Object applicantIdObj = doc. get("applicantId");
+    if (applicantIdObj instanceof ObjectId) {
+        app.setApplicantId(((ObjectId) applicantIdObj).toString());
+    } else {
+        app.setApplicantId(doc.getString("applicantId"));
+    }
+
+    app. setApplicationDate(doc.getDate("applicationDate"));
+    app.setStatus(doc.getString("status"));
+    app.setCoverLetter(doc.getString("coverLetter"));
+
+    return app;
+}
 }

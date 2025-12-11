@@ -8,8 +8,9 @@ import java.util.List;
 public interface IApplicationService extends Remote {
 
     // CREATE - Submit a job application
-    String submitApplication(Application application) throws RemoteException;
+    String CreateApplication(Application application) throws RemoteException;
 
+String SubmitApplication(Application application) throws RemoteException;
     // READ - Get application by ID
     Application getApplicationById(String id) throws RemoteException;
 
@@ -18,6 +19,9 @@ public interface IApplicationService extends Remote {
 
     // READ - Get all applications by a specific applicant (used by applicants)
     List<Application> getApplicationsByApplicantId(String applicantId) throws RemoteException;
+
+    // READ - Get all applications (used by recruiters/admins)
+    List<Application> getAllApplications() throws RemoteException;
 
     // UPDATE - Update application status (used by recruiters)
     boolean updateApplicationStatus(String applicationId, String status) throws RemoteException;

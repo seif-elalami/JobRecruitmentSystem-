@@ -110,7 +110,7 @@ public class TestRMI {
             );
 
             System.out.println("Calling remote method: submitApplication()");
-            String applicationId = applicationService.submitApplication(application);
+            String applicationId = applicationService.SubmitApplication(application);
 
             System.out.println("✅ Remote call successful!");
             System.out.println("   Returned Application ID: " + applicationId);
@@ -141,7 +141,7 @@ public class TestRMI {
             System.out. println("========================================\n");
 
             System.out.println("Calling remote method: searchApplicantsBySkill('RMI')");
-            List<Applicant> rmiApplicants = applicantService.searchApplicantsBySkill("RMI");
+            List<Applicant> rmiApplicants = applicantService.searchApplicantsBySkills("RMI");
 
             System.out.println("✅ Remote call successful!");
             System.out.println("   Found " + rmiApplicants. size() + " applicant(s) with RMI skill");

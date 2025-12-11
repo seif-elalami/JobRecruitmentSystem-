@@ -7,55 +7,35 @@ public class Session implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private String sessionToken;
-    private String userId;
-    private String email;
-    private String role;
-    private String profileId;
-    private Date createdAt;
-    private Date expiresAt;
+    // Session timeout in milliseconds (e.g., 30 minutes)
+    private static final long SESSION_TIMEOUT = 30 * 60 * 1000;  // 30 minutes
 
-    /**
-     * Default constructor (required for serialization)
-     */
+    private String sessionId;
+    private String userId;
+    private String userEmail;
+    private String role;
+    private Date loginTime;
+    private Date lastActivity;
+
+    // Constructors
     public Session() {
     }
 
-    /**
-     * Full constructor - THIS IS WHAT YOU NEED!
-     * Used in AuthServiceImpl. login() method
-     */
-    public Session(String sessionToken, String userId, String email, String role,
-                   String profileId, Date createdAt, Date expiresAt) {
-        this.sessionToken = sessionToken;
+    public Session(String userId, String userEmail, String role) {
         this.userId = userId;
-        this.email = email;
+        this.userEmail = userEmail;
         this.role = role;
-        this.profileId = profileId;
-        this.createdAt = createdAt;
-        this.expiresAt = expiresAt;
+        this.loginTime = new Date();
+        this.lastActivity = new Date();
     }
 
-    /**
-     * Check if session is expired
-     */
-    public boolean isExpired() {
-        if (expiresAt == null) {
-            return true;
-        }
-        return new Date().after(expiresAt);
+    // Getters and Setters
+    public String getSessionId() {
+        return sessionId;
     }
 
-    // ============================================
-    // GETTERS AND SETTERS
-    // ============================================
-
-    public String getSessionToken() {
-        return sessionToken;
-    }
-
-    public void setSessionToken(String sessionToken) {
-        this.sessionToken = sessionToken;
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
 
     public String getUserId() {
@@ -66,12 +46,12 @@ public class Session implements Serializable {
         this.userId = userId;
     }
 
-    public String getEmail() {
-        return email;
+    public String getUserEmail() {
+        return userEmail;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 
     public String getRole() {
@@ -82,40 +62,74 @@ public class Session implements Serializable {
         this.role = role;
     }
 
-    public String getProfileId() {
-        return profileId;
+    public Date getLoginTime() {
+        return loginTime;
     }
 
-    public void setProfileId(String profileId) {
-        this.profileId = profileId;
+    public void setLoginTime(Date loginTime) {
+        this.loginTime = loginTime;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
+    public Date getLastActivity() {
+        return lastActivity;
     }
 
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
+    public void setLastActivity(Date lastActivity) {
+        this.lastActivity = lastActivity;
     }
 
-    public Date getExpiresAt() {
-        return expiresAt;
+    /**
+     * Update last activity time to current time
+     */
+    public void updateActivity() {
+        this.lastActivity = new Date();
     }
 
-    public void setExpiresAt(Date expiresAt) {
-        this.expiresAt = expiresAt;
+    /**
+     * Check if session has expired based on last activity
+     * Session expires after SESSION_TIMEOUT milliseconds of inactivity
+     *
+     * @return true if session is expired, false otherwise
+     */
+    public boolean isExpired() {
+        if (lastActivity == null) {
+            return true;
+        }
+
+        long currentTime = System.currentTimeMillis();
+        long lastActivityTime = lastActivity.getTime();
+        long timeSinceLastActivity = currentTime - lastActivityTime;
+
+        return timeSinceLastActivity > SESSION_TIMEOUT;
+    }
+
+    /**
+     * Get remaining time before session expires (in minutes)
+     *
+     * @return remaining minutes, or 0 if expired
+     */
+    public long getRemainingMinutes() {
+        if (isExpired()) {
+            return 0;
+        }
+
+        long currentTime = System.currentTimeMillis();
+        long lastActivityTime = lastActivity.getTime();
+        long timeSinceLastActivity = currentTime - lastActivityTime;
+        long remainingTime = SESSION_TIMEOUT - timeSinceLastActivity;
+
+        return remainingTime / (60 * 1000);  // Convert to minutes
     }
 
     @Override
     public String toString() {
         return "Session{" +
-                "sessionToken='" + sessionToken + '\'' +
+                "sessionId='" + sessionId + '\'' +
                 ", userId='" + userId + '\'' +
-                ", email='" + email + '\'' +
+                ", userEmail='" + userEmail + '\'' +
                 ", role='" + role + '\'' +
-                ", profileId='" + profileId + '\'' +
-                ", createdAt=" + createdAt +
-                ", expiresAt=" + expiresAt +
+                ", loginTime=" + loginTime +
+                ", lastActivity=" + lastActivity +
                 ", expired=" + isExpired() +
                 '}';
     }

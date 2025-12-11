@@ -70,7 +70,7 @@ public class ApplicantMenu {
         System.out.println("\n╔════════════════════════════════════════╗");
         System.out.println("║       Applicant Dashboard              ║");
         System.out.println("╚════════════════════════════════════════╝");
-        System.out.println("   User: " + session.getEmail());
+        System.out.println("   User: " + session.getUserEmail());
         System.out.println();
         System.out.println("1. Browse Jobs");
         System.out.println("2. Apply to Job");
@@ -81,36 +81,49 @@ public class ApplicantMenu {
         System.out.print("\nChoice: ");
     }
 
-    private void browseJobs(IJobService jobService) {
-        try {
-            System. out.println("=== BROWSE JOBS ===\n");
-            System.out.println("📤 Fetching available jobs...");
+  private void browseJobs(IJobService jobService) {
+    try {
+        System.out.println("\n=== BROWSE AVAILABLE JOBS ===\n");
 
-            List<Job> jobs = jobService.getAllJobs();
+        System.out.println("📤 Fetching available jobs...");
 
-            if (jobs.isEmpty()) {
-                System.out.println("No jobs available at the moment.");
-                return;
-            }
+        // Get all open jobs
+        List<Job> jobs = jobService.getAllJobs();
 
-            System. out.println("✅ Found " + jobs.size() + " job(s)\n");
+        if (jobs.isEmpty()) {
+            System.out.println("⚠️  No jobs available at the moment!");
+        } else {
+            System.out.println("✅ Found " + jobs.size() + " job(s):\n");
 
             for (int i = 0; i < jobs.size(); i++) {
                 Job job = jobs.get(i);
-                System.out.println("─────────────────────────────────────");
-                System.out.println((i + 1) + ". " + job.getTitle());
-                System.out.println("   Company: " + job.getCompany());
-                System.out.println("   Location: " + job. getLocation());
-                System.out.println("   Salary: $" + job.getSalary());
-                System.out.println("   Status: " + job.getStatus());
-                System.out.println("   Job ID: " + job.getId());
-            }
-            System.out.println("─────────────────────────────────────");
 
-        } catch (Exception e) {
-            System.err.println("❌ Error: " + e.getMessage());
+                // Only show OPEN jobs
+                if ("OPEN".equals(job.getStatus())) {
+                    System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                    System.out.println("📋 Job " + (i + 1) + ":");
+                    System.out. println("   Job ID:        " + job.getJobId());
+                    System. out.println("   Title:        " + job.getTitle());
+                    System.out.println("   Description:   " + job.getDescription());
+                    System.out.println("   Status:       " + job.getStatus());
+                    System.out.println("   Posted:       " + job.getPostedDate());
+
+                    if (job.getRequirements() != null && !job.getRequirements().isEmpty()) {
+                        System. out.println("   Requirements:");
+                        for (String req : job.getRequirements()) {
+                            System.out.println("      • " + req);
+                        }
+                    }
+                    System.out.println();
+                }
+            }
         }
+
+    } catch (Exception e) {
+        System.err.println("❌ Error fetching jobs: " + e.getMessage());
+        e.printStackTrace();
     }
+}
 
     private void applyToJob(IJobService jobService, IApplicationService appService) {
         try {
@@ -140,12 +153,12 @@ public class ApplicantMenu {
 
             Application application = new Application(
                 jobId,
-                session.getProfileId(),
+                session.getUserId(),
                 coverLetter
             );
 
             System. out.println("\n📤 Submitting application...");
-            String appId = appService.submitApplication(application);
+            String appId = appService.SubmitApplication(application);
 
             System.out.println("✅ Application submitted successfully!");
             System. out.println("   Application ID: " + appId);
@@ -160,7 +173,7 @@ public class ApplicantMenu {
             System.out.println("=== MY APPLICATIONS ===\n");
             System.out.println("📤 Fetching your applications...");
 
-            List<Application> apps = appService.getApplicationsByApplicantId(session.getProfileId());
+            List<Application> apps = appService.getApplicationsByApplicantId(session.getUserId());
 
             if (apps. isEmpty()) {
                 System.out.println("You haven't applied to any jobs yet.");
@@ -191,7 +204,7 @@ public class ApplicantMenu {
         System. out.println("=== UPDATE PROFILE ===\n");
 
         System.out.println("📤 Fetching your profile...");
-        Applicant profile = applicantService.getApplicantById(session.getProfileId());
+        Applicant profile = applicantService.getApplicantById(session.getUserId());
 
         if (profile == null) {
             System.out.println("❌ Profile not found!");
@@ -252,7 +265,7 @@ public class ApplicantMenu {
             System.out.println("=== MY PROFILE ===\n");
 
             System.out.println("📤 Fetching your profile.. .");
-            Applicant profile = applicantService.getApplicantById(session.getProfileId());
+            Applicant profile = applicantService.getApplicantById(session.getUserId());
 
             if (profile == null) {
                 System.out.println("❌ Profile not found!");

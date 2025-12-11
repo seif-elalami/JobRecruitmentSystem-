@@ -1,0 +1,21 @@
+# Ignore compiled Java classes and build output
+bin/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Temporary files
+*.log
+*.tmp
+
+# Maven/Gradle (if used)
+target/
+build/
+
+# Libraries
+lib/

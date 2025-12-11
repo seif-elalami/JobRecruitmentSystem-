@@ -129,7 +129,7 @@ public class ApplicantServiceImpl extends UnicastRemoteObject implements IApplic
     }
 
     @Override
-    public List<Applicant> searchApplicantsBySkill(String skill) throws RemoteException {
+    public List<Applicant> searchApplicantsBySkills(String skill) throws RemoteException {
         try {
             List<Applicant> applicants = new ArrayList<>();
 
@@ -155,17 +155,17 @@ public class ApplicantServiceImpl extends UnicastRemoteObject implements IApplic
             // ============================================
             // VALIDATION - Phone Number (if provided)
             // ============================================
-            if (applicant. getPhone() != null && !applicant.getPhone().isEmpty()) {
+            if (applicant.getPhone() != null && !applicant.getPhone().isEmpty()) {
                 if (!ValidationUtil.isValidPhone(applicant.getPhone())) {
-                    System. err.println("❌ Update applicant failed: " + ValidationUtil.getPhoneErrorMessage());
-                    throw new RemoteException(ValidationUtil. getPhoneErrorMessage());
+                    System.err.println("❌ Update applicant failed: " + ValidationUtil.getPhoneErrorMessage());
+                    throw new RemoteException(ValidationUtil.getPhoneErrorMessage());
                 }
             }
 
             // ============================================
             // VALIDATION - Email Format
             // ============================================
-            if (!ValidationUtil.isValidEmail(applicant. getEmail())) {
+            if (!ValidationUtil.isValidEmail(applicant.getEmail())) {
                 System.err.println("❌ Update applicant failed: " + ValidationUtil.getEmailErrorMessage());
                 throw new RemoteException(ValidationUtil.getEmailErrorMessage());
             }
@@ -175,7 +175,7 @@ public class ApplicantServiceImpl extends UnicastRemoteObject implements IApplic
             Document update = new Document();
             update.append("name", applicant.getName());
             update.append("email", applicant.getEmail());
-            update. append("phone", applicant.getPhone());
+            update.append("phone", applicant.getPhone());
             update.append("resume", applicant.getResume());
             update.append("skills", applicant.getSkills());
             update.append("education", applicant.getEducation());
@@ -190,14 +190,35 @@ public class ApplicantServiceImpl extends UnicastRemoteObject implements IApplic
             return true;
 
         } catch (RemoteException e) {
-            throw e;  // Re-throw validation errors
+            throw e; // Re-throw validation errors
         } catch (Exception e) {
-            System.err. println("❌ Error updating applicant: " + e.getMessage());
+            System.err.println("❌ Error updating applicant: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
     }
 
+    @Override
+public List<Applicant> searchApplicantsByExperience(String experience) throws RemoteException {
+    try {
+        List<Applicant> applicants = new ArrayList<>();
+
+        // Search using regex (case-insensitive)
+        Document query = new Document("experience", new Document("$regex", experience).append("$options", "i"));
+
+        for (Document doc : applicantCollection.find(query)) {
+            applicants.add(documentToApplicant(doc));
+        }
+
+        System.out.println("✅ Found " + applicants.size() + " applicant(s) with experience: " + experience);
+
+        return applicants;
+
+    } catch (Exception e) {
+        System.err.println("❌ Error searching applicants by experience: " + e.getMessage());
+        throw new RemoteException("Failed to search applicants", e);
+    }
+}
     @Override
     public boolean deleteApplicant(String id) throws RemoteException {
         try {

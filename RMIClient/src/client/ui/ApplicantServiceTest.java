@@ -179,7 +179,7 @@ public class ApplicantServiceTest {
             String skill = InputHelper.getString();
 
             System.out.println("\n📤 Searching...");
-            List<Applicant> results = service.searchApplicantsBySkill(skill);
+            List<Applicant> results = service.searchApplicantsBySkills(skill);
 
             System.out.println("✅ Found " + results.size() + " applicant(s)\n");
 

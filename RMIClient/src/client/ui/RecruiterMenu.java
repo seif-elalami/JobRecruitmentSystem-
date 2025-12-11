@@ -35,96 +35,146 @@ public class RecruiterMenu {
         show();
     }
 
-    public void show() {
-        boolean running = true;
+ public void show() {
+    boolean running = true;
 
-        while (running) {
-            showMenu();
-            int choice = InputHelper.getInt();
-            System.out.println();
+    while (running) {
+        showMenu();
+        int choice = InputHelper.getInt();
+        System.out.println();
 
-            switch (choice) {
-                case 1:
-                    createJobPosting();
-                    break;
-                case 2:
-                    viewMyJobPostings();
-                    break;
-                case 3:
-                    viewAllApplications();
-                    break;
-                case 4:
-                    reviewApplication();
-                    break;
-                case 5:
-                    closeJobPosting();
-                    break;
-                case 6:  // ✅ NEW - Match CV
-                    matchCandidatesToJob();
-                    break;
-                case 7:  // ✅ NEW - View Candidate Details
-                    viewCandidateDetails();
-                    break;
-                case 8:  // ✅ NEW - Search by Skills (Read-Only)
-                    searchCandidatesBySkillsReadOnly();
-                    break;
-                case 9:  // ✅ NEW - Search by Experience
-                    searchByExperienceLevel();
-                    break;
-                case 10:
-                    scheduleInterview();
-                    break;
-                case 11:
-                    viewMyInterviews();
-                    break;
-                case 12:
-                    updateInterview();
-                    break;
-                case 13:
-                    cancelInterview();
-                    break;
-                case 0:
-                    running = false;
-                    System.out.println("👋 Logging out...");
-                    break;
-                default:
-                    System.out.println("❌ Invalid choice!");
-            }
+        switch (choice) {
+            // Recruiter Profile
+            case 1:
+                viewMyProfile();
+                break;
+            case 2:
+                updateMyProfile();
+                break;
 
-            if (running && choice != 0) {
-                InputHelper.pause();
-            }
+            // Job Management
+            case 3:
+                createJobPosting();
+                break;
+            case 4:
+                viewMyJobPostings();
+                break;
+            case 5:
+                closeJobPosting();
+                break;
+
+            // Application Management
+            case 6:
+                viewAllApplications();
+                break;
+            case 7:
+                viewApplicationsForSpecificJob();
+                break;
+            case 8:
+                reviewApplication();
+                break;
+
+            // Candidate Matching (Read-Only)
+            case 9:
+                matchCandidatesToJob();
+                break;
+            case 10:
+                viewCandidateDetails();
+                break;
+            case 11:
+                searchCandidatesBySkillsReadOnly();
+                break;
+            case 12:
+                searchByExperienceLevel();
+                break;
+
+            // Applicant Search (Full Access)
+            case 13:
+                searchApplicantsBySkills();
+                break;
+            case 14:
+                searchApplicantsByExperience();
+                break;
+
+            // Interview Management
+            case 15:
+                scheduleInterview();
+                break;
+            case 16:
+                viewMyInterviews();
+                break;
+            case 17:
+                viewInterviewDetails();
+                break;
+            case 18:
+                updateInterview();
+                break;
+            case 19:
+                cancelInterview();
+                break;
+
+            case 0:
+                running = false;
+                System.out.println("👋 Logging out...");
+                break;
+
+            default:
+                System.out.println("❌ Invalid choice!");
+        }
+
+        if (running && choice != 0) {
+            InputHelper.pause();
         }
     }
+}
 
-    private void showMenu() {
-        System.out. println("\n╔════════════════════════════════════════╗");
-        System.out. println("║       Recruiter Menu                   ║");
-        System.out.println("╚════════════════════════════════════════╝");
-        System.out. println("Welcome, " + session.getUserEmail() + " (Recruiter)");
-        System.out.println();
-        System.out.println("📋 Job Management:");
-        System.out.println("  1. Create Job Posting");
-        System.out.println("  2. View My Job Postings");
-        System.out.println("  3. View All Applications");
-        System.out.println("  4. Review Application");
-        System.out.println("  5. Close Job Posting");
-        System.out.println();
-        System.out.println("🔍 Candidate Matching:");
-        System.out.println("  6. Match Candidates to Job (View CVs)");
-        System.out.println("  7. View Candidate Details");
-        System.out.println("  8. Search Candidates by Skills");
-        System.out.println("  9. Search by Experience Level");
-        System.out.println();
-        System.out.println("📅 Interview Management:");
-        System.out.println("  10. Schedule Interview");
-        System.out. println("  11. View My Interviews");
-        System.out. println("  12. Update Interview");
-        System.out.println("  13. Cancel Interview");
-        System.out.println();
-        System.out.println("  0. Logout");
-        System.out.print("\nChoice: ");
-    }
+   private void showMenu() {
+    System.out.println("\n╔════════════════════════════════════════╗");
+    System.out.println("║       Recruiter Menu                   ║");
+    System.out.println("╚════════════════════════════════════════╝");
+    System.out.println("Welcome, " + session.getUserEmail() + " (Recruiter)");
+    System.out.println();
+
+    System.out.println("👤 Recruiter Profile:");
+    System.out.println("  1.   View My Profile");
+    System.out.println("  2.  Update My Profile");
+    System.out.println();
+
+    System.out.println("📋 Job Management:");
+    System.out.println("  3.  Create Job Posting");
+    System.out.println("  4.  View My Job Postings");
+    System.out.println("  5.  Close Job Posting");
+    System.out.println();
+
+    System.out.println("📝 Application Management:");
+    System.out.println("  6.  View All Applications");
+    System.out.println("  7.  View Applications for Specific Job");
+    System.out.println("  8.  Review Application (Accept/Reject)");
+    System.out.println();
+
+    System.out.println("🔍 Candidate Matching & Search (Read-Only):");
+    System.out.println("  9.  Match Candidates to Job (View CVs)");
+    System.out.println("  10. View Candidate Details");
+    System.out.println("  11. Search Candidates by Skills");
+    System.out.println("  12. Search by Experience Level");
+    System.out.println();
+
+    System.out.println("👥 Applicant Search (Full Access):");
+    System.out.println("  13. Search Applicants by Skills");
+    System.out.println("  14. Search Applicants by Experience");
+    System.out.println();
+
+    System.out.println("📅 Interview Management:");
+    System.out.println("  15. Schedule Interview");
+    System.out.println("  16. View My Interviews");
+    System.out.println("  17. View Interview Details");
+    System.out.println("  18. Update Interview");
+    System.out.println("  19. Cancel Interview");
+    System.out.println();
+
+    System.out.println("  0.  Logout");
+    System.out.print("\nChoice: ");
+}
 
     // ========================================
     // JOB MANAGEMENT
@@ -690,7 +740,7 @@ public class RecruiterMenu {
 
     private void cancelInterview() {
         try {
-            System. out.println("=== CANCEL INTERVIEW ===\n");
+            System.out.println("=== CANCEL INTERVIEW ===\n");
 
             System.out.print("Enter Interview ID: ");
             String interviewId = InputHelper.getString();
@@ -700,12 +750,12 @@ public class RecruiterMenu {
                 boolean cancelled = recruiterService.cancelInterview(interviewId);
 
                 if (cancelled) {
-                    System. out.println("✅ Interview cancelled successfully!");
+                    System.out.println("✅ Interview cancelled successfully!");
                 } else {
                     System.out.println("❌ Cancellation failed!");
                 }
             } else {
-                System. out.println("⚠️  Cancelled");
+                System.out.println("⚠️  Cancelled");
             }
 
         } catch (Exception e) {
@@ -714,6 +764,228 @@ public class RecruiterMenu {
         }
     }
 
+    private void viewMyProfile() {
+        try {
+            System.out.println("\n╔════════════════════════════════════════╗");
+            System.out.println("║         My Recruiter Profile           ║");
+            System.out.println("╚════════════════════════════════════════╝");
+
+            System.out.println("\n📤 Fetching profile.. .");
+
+            shared.models.Recruiter recruiter = recruiterService.getRecruiterById(session.getUserId());
+
+            if (recruiter != null) {
+                System.out.println("\n✅ Profile found:\n");
+                System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                System.out.println("   🆔 ID:           " + recruiter.getId());
+                System.out.println("   👤 Name:        " + recruiter.getName());
+                System.out.println("   📧 Email:       " + recruiter.getEmail());
+                System.out.println(
+                        "   📱 Phone:       " + (recruiter.getPhone() != null ? recruiter.getPhone() : "Not set"));
+                System.out.println("   🏢 Company:     "
+                        + (recruiter.getCompany() != null ? recruiter.getCompany() : "Not specified"));
+                System.out.println("   🏛️  Department:  "
+                        + (recruiter.getDepartment() != null ? recruiter.getDepartment() : "Not specified"));
+                System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            } else {
+                System.out.println("⚠️  Profile not found!");
+            }
+
+        } catch (Exception e) {
+            System.err.println("❌ Error fetching profile: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+
+
+    private void viewApplicationsForSpecificJob() {
+        try {
+            System.out.println("\n╔════════════════════════════════════════╗");
+            System.out.println("║  View Applications for Specific Job    ║");
+            System.out.println("╚════════════════════════════════════════╝\n");
+
+            System.out.print("Enter Job ID: ");
+            String jobId = InputHelper.getString();
+
+            System.out.println("\n📤 Fetching applications for job:  " + jobId + "...");
+
+            List<Application> applications = recruiterService.getApplicationsForJob(jobId);
+
+            if (applications.isEmpty()) {
+                System.out.println("\n⚠️  No applications found for this job!");
+            } else {
+                System.out.println("\n✅ Found " + applications.size() + " application(s):\n");
+
+                for (int i = 0; i < applications.size(); i++) {
+                    Application app = applications.get(i);
+                    System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                    System.out.println("📄 Application " + (i + 1) + ":");
+                    displayApplication(app);
+                    System.out.println();
+                }
+            }
+
+        } catch (Exception e) {
+            System.err.println("❌ Error fetching applications: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void searchApplicantsBySkills() {
+        try {
+            System.out.println("\n╔════════════════════════════════════════╗");
+            System.out.println("║   Search Applicants by Skills          ║");
+            System.out.println("║        (Full Access)                   ║");
+            System.out.println("╚════════════════════════════════════════╝\n");
+
+            System.out.print("Enter skills to search for (e.g., 'Java, Python'): ");
+            String skills = InputHelper.getString();
+
+            System.out.println("\n🔍 Searching applicants with skills: " + skills + "...");
+
+            List<Applicant> applicants = recruiterService.searchApplicantsBySkills(skills);
+
+            if (applicants.isEmpty()) {
+                System.out.println("\n⚠️  No applicants found with those skills!");
+            } else {
+                System.out.println("\n✅ Found " + applicants.size() + " applicant(s):\n");
+
+                for (int i = 0; i < applicants.size(); i++) {
+                    Applicant app = applicants.get(i);
+                    System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                    System.out.println("📄 Applicant " + (i + 1) + ":");
+                    displayApplicant(app);
+                    System.out.println();
+                }
+            }
+
+        } catch (Exception e) {
+            System.err.println("❌ Error searching applicants: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+
+
+    private void searchApplicantsByExperience() {
+    try {
+        System.out.println("\n╔════════════════════════════════════════╗");
+        System.out.println("║ Search Applicants by Experience        ║");
+        System.out.println("║        (Full Access)                   ║");
+        System.out. println("╚════════════════════════════════════════╝\n");
+
+        System.out.print("Enter experience to search for (e.g., '5 years', '3'): ");
+        String experience = InputHelper.getString();
+
+        System.out.println("\n🔍 Searching applicants with experience:  " + experience + "...");
+
+        List<Applicant> applicants = recruiterService.searchApplicantsByExperience(experience);
+
+        if (applicants. isEmpty()) {
+            System.out.println("\n⚠️  No applicants found with that experience!");
+        } else {
+            System.out.println("\n✅ Found " + applicants. size() + " applicant(s):\n");
+
+            for (int i = 0; i < applicants.size(); i++) {
+                Applicant app = applicants.get(i);
+                System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                System.out.println("📄 Applicant " + (i + 1) + ":");
+                displayApplicant(app);
+                System.out.println();
+            }
+        }
+
+    } catch (Exception e) {
+        System.err.println("❌ Error searching applicants:  " + e.getMessage());
+        e.printStackTrace();
+    }
+}
+
+
+private void viewInterviewDetails() {
+    try {
+        System.out.println("\n╔════════════════════════════════════════╗");
+        System.out.println("║       View Interview Details           ║");
+        System.out.println("╚════════════════════════════════════════╝\n");
+
+        System.out.print("Enter Interview ID:  ");
+        String interviewId = InputHelper.getString();
+
+        System.out.println("\n📤 Fetching interview details...");
+
+        Interview interview = recruiterService.getInterviewById(interviewId);
+
+        if (interview != null) {
+            System.out.println("\n✅ Interview found:\n");
+            System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            displayInterview(interview);
+            System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        } else {
+            System.out.println("⚠️  Interview not found!");
+        }
+
+    } catch (Exception e) {
+        System.err.println("❌ Error fetching interview: " + e.getMessage());
+        e.printStackTrace();
+    }
+}
+
+private void updateMyProfile() {
+    try {
+        System.out. println("\n╔════════════════════════════════════════╗");
+        System.out. println("║         Update My Profile              ║");
+        System.out.println("╚════════════════════════════════════════╝");
+
+        shared.models.Recruiter recruiter = recruiterService.getRecruiterById(session.getUserId());
+
+        if (recruiter == null) {
+            System.out.println("❌ Profile not found!");
+            return;
+        }
+
+        System.out. println("\nCurrent Profile:");
+        System.out.println("  Name:       " + recruiter.getName());
+        System.out.println("  Email:      " + recruiter. getEmail());
+        System.out.println("  Phone:      " + (recruiter.getPhone() != null ? recruiter.getPhone() : "Not set"));
+        System.out.println("  Company:    " + (recruiter. getCompany() != null ? recruiter.getCompany() : "Not set"));
+        System.out.println("  Department: " + (recruiter.getDepartment() != null ? recruiter.getDepartment() : "Not set"));
+
+        System.out.println("\n--- Enter new details (press Enter to keep current) ---\n");
+
+        System.out.print("New Phone:  ");
+        String phone = InputHelper.getString();
+        if (!phone.isEmpty()) {
+            recruiter.setPhone(phone);
+        }
+
+        System.out.print("New Company: ");
+        String company = InputHelper.getString();
+        if (!company.isEmpty()) {
+            recruiter.setCompany(company);
+        }
+
+        System.out.print("New Department: ");
+        String department = InputHelper.getString();
+        if (!department.isEmpty()) {
+            recruiter.setDepartment(department);
+        }
+
+        System.out.println("\n📤 Updating profile...");
+
+        boolean success = recruiterService.updateRecruiter(recruiter);
+
+        if (success) {
+            System.out.println("✅ Profile updated successfully!");
+        } else {
+            System.out.println("❌ Failed to update profile!");
+        }
+
+    } catch (Exception e) {
+        System.err.println("❌ Error updating profile: " + e.getMessage());
+        e.printStackTrace();
+    }
+}
     // ========================================
     // DISPLAY HELPER METHODS
     // ========================================

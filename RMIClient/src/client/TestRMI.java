@@ -172,7 +172,7 @@ public class TestRMI {
             System.err.println("\n❌ RMI Test failed:");
             e.printStackTrace();
             System.err.println("\n⚠️  Make sure:");
-            System.err.println("   1. MongoDB is running on port 27020");
+            System.err.println("   1. MongoDB is running on port 27017");
             System.err.println("   2. RMI Server is running (run RMIServer.java first)");
         }
     }

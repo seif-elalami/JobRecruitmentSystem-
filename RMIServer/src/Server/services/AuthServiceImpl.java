@@ -1,10 +1,10 @@
 package Server.services;
 
 import Server.database.MongoDBConnection;
-import Server.utils. PasswordUtil;
+import Server.utils.PasswordUtil;
 import Server.utils.ValidationUtil;
 import shared.interfaces.IAuthService;
-import shared.models. Session;
+import shared.models.Session;
 import shared.models.User;
 
 import com.mongodb.client.MongoCollection;
@@ -40,7 +40,7 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
             System.out.println("📝 Registration attempt:  " + user.getEmail());
 
             // Validate email format
-            if (!ValidationUtil.isValidEmail(user. getEmail())) {
+            if (!ValidationUtil.isValidEmail(user.getEmail())) {
                 System.err.println("❌ Registration failed: " + ValidationUtil.getEmailErrorMessage());
                 throw new RemoteException(ValidationUtil.getEmailErrorMessage());
             }
@@ -60,7 +60,7 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
             // Validate phone if provided
             if (user.getPhone() != null && !user.getPhone().isEmpty()) {
                 if (!ValidationUtil.isValidPhone(user.getPhone())) {
-                    System.err.println("❌ Registration failed: " + ValidationUtil. getPhoneErrorMessage());
+                    System.err.println("❌ Registration failed: " + ValidationUtil.getPhoneErrorMessage());
                     throw new RemoteException(ValidationUtil.getPhoneErrorMessage());
                 }
             }
@@ -102,7 +102,7 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
         } catch (RemoteException e) {
             throw e;
         } catch (Exception e) {
-            System.err. println("❌ Registration error:  " + e.getMessage());
+            System.err.println("❌ Registration error:  " + e.getMessage());
             e.printStackTrace();
             throw new RemoteException("Registration failed", e);
         }
@@ -176,7 +176,7 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
             }
 
             if (session.isExpired()) {
-                activeSessions. remove(sessionToken);
+                activeSessions.remove(sessionToken);
                 return null;
             }
 
@@ -242,7 +242,7 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
     public boolean changePassword(String email, String oldPassword, String newPassword) throws RemoteException {
         try {
             // Validate new password
-            if (newPassword == null || newPassword. length() < 6) {
+            if (newPassword == null || newPassword.length() < 6) {
                 System.err.println("❌ Password change failed: Password must be at least 6 characters");
                 return false;
             }
@@ -257,7 +257,7 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
 
             // Verify old password
             if (!user.getPassword().equals(oldPassword)) {
-                System.err. println("❌ Password change failed: Old password incorrect");
+                System.err.println("❌ Password change failed: Old password incorrect");
                 return false;
             }
 
@@ -303,7 +303,7 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
 
         for (Document doc : userCollection.find()) {  // ✅ Use existing userCollection
             User user = documentToUser(doc);
-            users. add(user);
+            users.add(user);
         }
 
         System.out.println("   ✅ Found " + users.size() + " user(s)");
@@ -337,23 +337,23 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
         // Common fields
         user.setUserId(doc.getObjectId("_id").toString());
         user.setUsername(doc.getString("username"));
-        user.setEmail(doc. getString("email"));
+        user.setEmail(doc.getString("email"));
         user.setPassword(doc.getString("password"));
-        user.setRole(doc. getString("role"));
+        user.setRole(doc.getString("role"));
         user.setPhone(doc.getString("phone"));
         user.setCreatedAt(doc.getDate("createdAt"));
-        user.setLastLogin(doc. getDate("lastLogin"));
+        user.setLastLogin(doc.getDate("lastLogin"));
         user.setActive(doc.getBoolean("isActive", true));
 
         // Role-specific fields
         if ("APPLICANT".equals(user.getRole())) {
-            user.setSkills(doc. getString("skills"));
+            user.setSkills(doc.getString("skills"));
             user.setExperience(doc.getString("experience"));
-        } else if ("RECRUITER".equals(user. getRole())) {
-            user.setDepartment(doc. getString("department"));
+        } else if ("RECRUITER".equals(user.getRole())) {
+            user.setDepartment(doc.getString("department"));
             user.setCompany(doc.getString("company"));
             user.setPosition(doc.getString("position"));
-            user.setDescription(doc. getString("description"));
+            user.setDescription(doc.getString("description"));
         }
 
         return user;

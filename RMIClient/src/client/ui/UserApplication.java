@@ -73,7 +73,7 @@ public class UserApplication {
             if (session != null) {
                 System.out.println("✅ Login successful!");
                 System.out.println("   Welcome, " + session.getUserEmail() + "!");
-                System.out. println("   Role: " + session.getRole());
+                System.out.println("   Role: " + session.getRole());
 
                 InputHelper.pause();
 
@@ -87,8 +87,8 @@ public class UserApplication {
                 }
 
             } else {
-                System. out.println("❌ Login failed!");
-                System.out. println("   Invalid email or password.");
+                System.out.println("❌ Login failed!");
+                System.out.println("   Invalid email or password.");
             }
 
         } catch (Exception e) {
@@ -106,15 +106,15 @@ public class UserApplication {
             String email = "";
             boolean validEmail = false;
             while (!validEmail) {
-                System.out. print("Email: ");
+                System.out.print("Email: ");
                 email = InputHelper.getString();
 
                 if (email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
                     validEmail = true;
                 } else {
-                    System. out.println("❌ Invalid email format!");
-                    System. out.println("   Example: user@example.com");
-                    if (!InputHelper.confirm("\nTry again?")) {
+                    System.out.println("❌ Invalid email format!");
+                    System.out.println("   Example: user@example.com");
+                    if (!InputHelper.confirm("\nTry again? ")) {
                         return;
                     }
                 }
@@ -125,13 +125,13 @@ public class UserApplication {
             boolean validPassword = false;
             while (!validPassword) {
                 System.out.print("Password (min 6 characters): ");
-                password = InputHelper. getString();
+                password = InputHelper.getString();
 
-                if (password. length() >= 6) {
+                if (password.length() >= 6) {
                     System.out.print("Confirm Password: ");
                     String confirmPassword = InputHelper.getString();
 
-                    if (password. equals(confirmPassword)) {
+                    if (password.equals(confirmPassword)) {
                         validPassword = true;
                     } else {
                         System.out.println("❌ Passwords don't match!");
@@ -140,7 +140,7 @@ public class UserApplication {
                         }
                     }
                 } else {
-                    System.out. println("❌ Password must be at least 6 characters!");
+                    System.out.println("❌ Password must be at least 6 characters!");
                     if (!InputHelper.confirm("\nTry again?")) {
                         return;
                     }
@@ -148,15 +148,15 @@ public class UserApplication {
             }
 
             // Get name
-            System. out.print("Full Name: ");
-            String name = InputHelper. getString();
+            System.out.print("Full Name: ");
+            String name = InputHelper.getString();
 
             // Get role
             System.out.println("\nSelect Role:");
             System.out.println("1. Applicant (Job Seeker)");
             System.out.println("2. Recruiter (HR)");
             System.out.print("Choice (1-2): ");
-            int roleChoice = InputHelper. getInt();
+            int roleChoice = InputHelper.getInt();
 
             String role;
             String phone = "";
@@ -168,80 +168,91 @@ public class UserApplication {
             user.setPassword(password);
 
             if (roleChoice == 1) {
+                // ========================================
+                // APPLICANT REGISTRATION
+                // ========================================
                 role = "APPLICANT";
                 user.setRole(role);
 
-                System. out.println("\n--- Applicant Profile Setup ---");
+                System.out.println("\n--- Applicant Profile Setup ---");
 
-                // Get phone (required for applicants)
+                // Get phone (REQUIRED for applicants)
                 boolean validPhone = false;
                 while (!validPhone) {
                     System.out.print("Phone Number (must start with 0 and be 11 digits): ");
                     System.out.println("   Example: 01234567890");
                     phone = InputHelper.getString();
 
-                    // Validate phone format
                     if (phone.matches("^0\\d{10}$")) {
                         validPhone = true;
                         user.setPhone(phone);
                     } else {
-                        System.out. println("❌ Invalid phone format!");
-                        System.out. println("   Phone must:");
+                        System.out.println("❌ Invalid phone format!");
+                        System.out.println("   Phone must:");
                         System.out.println("   • Start with 0");
                         System.out.println("   • Be exactly 11 digits");
                         System.out.println("   • Example: 01234567890");
 
-                        if (! InputHelper.confirm("\nTry again?")) {
+                        if (!InputHelper.confirm("\nTry again?")) {
                             return;
                         }
                     }
                 }
 
-                // Optional: Get skills and experience
-                System.out.print("Skills (comma-separated, optional): ");
+                // Optional: Get skills
+                System.out.print("Skills (comma-separated) [Optional, press Enter to skip]: ");
                 String skills = InputHelper.getString();
                 if (!skills.isEmpty()) {
                     user.setSkills(skills);
                 }
 
-                System.out.print("Experience (optional): ");
+                // Optional: Get experience
+                System.out.print("Experience (e.g., '3 years in Java') [Optional, press Enter to skip]: ");
                 String experience = InputHelper.getString();
                 if (!experience.isEmpty()) {
                     user.setExperience(experience);
                 }
 
             } else if (roleChoice == 2) {
+                // ========================================
+                // RECRUITER REGISTRATION
+                // ========================================
                 role = "RECRUITER";
-                user. setRole(role);
+                user.setRole(role);
 
                 System.out.println("\n--- Recruiter Profile Setup ---");
 
-                // Get department
-                System.out.print("Department (e.g., HR, IT, Sales): ");
-                String department = InputHelper. getString();
-                if (!department. isEmpty()) {
-                    user. setDepartment(department);
-                } else {
-                    user.setDepartment("General");
-                }
+                // Get department (REQUIRED)
+                String department = "";
+                while (department.isEmpty()) {
+                    System.out.print("Department (e.g., HR, IT, Sales): ");
+                    department = InputHelper.getString();
 
-                // Optional fields
-                System.out.print("Company (optional): ");
-                String company = InputHelper.getString();
-                if (!company.isEmpty()) {
-                    user.setCompany(company);
+                    if (department.isEmpty()) {
+                        System.out.println("❌ Department is required!");
+                    }
                 }
+                user.setDepartment(department);
 
-                System.out.print("Position (e.g., HR Manager, optional): ");
+                // ✅ Company - REMOVED (not required)
+
+                // Position (OPTIONAL)
+                System.out.print("Position (e.g., HR Manager) [Optional, press Enter to skip]: ");
                 String position = InputHelper.getString();
-                if (! position.isEmpty()) {
+                if (!position.isEmpty()) {
                     user.setPosition(position);
                 }
 
-                System.out. print("Phone (optional): ");
+                // Phone (OPTIONAL)
+                System.out.print("Phone (11 digits starting with 0) [Optional, press Enter to skip]: ");
                 phone = InputHelper.getString();
                 if (!phone.isEmpty()) {
-                    user.setPhone(phone);
+                    // Validate phone format if provided
+                    if (phone.matches("^0\\d{10}$")) {
+                        user.setPhone(phone);
+                    } else {
+                        System.out.println("⚠️  Invalid phone format, skipping phone number...");
+                    }
                 }
 
             } else {
@@ -249,18 +260,21 @@ public class UserApplication {
                 return;
             }
 
-            System.out.println("\n📤 Registering...");
+            System.out.println("\n📤 Registering.. .");
 
-            // ✅ Use new register method with User object
+            // Register with new User-based method
             Session session = authService.register(user);
 
             if (session != null) {
-                System.out.println("✅ Registration successful!");
-                System.out.println("   User ID: " + session.getUserId());
-                System.out.println("   Email: " + session.getUserEmail());
-                System.out. println("   Role: " + session.getRole());
+                System.out.println("\n✅ Registration successful!");
+                System.out.println("╔════════════════════════════════════════╗");
+                System.out.println("║         Account Created                ║");
+                System.out.println("╚════════════════════════════════════════╝");
+                System.out.println("   User ID:   " + session.getUserId());
+                System.out.println("   Email:    " + session.getUserEmail());
+                System.out.println("   Role:     " + session.getRole());
                 if (!phone.isEmpty()) {
-                    System.out.println("   Phone: " + phone);
+                    System.out.println("   Phone:    " + phone);
                 }
 
                 System.out.println("\n💡 You are now logged in!");
@@ -273,12 +287,12 @@ public class UserApplication {
 
                 if (currentSession.getRole().equals("APPLICANT")) {
                     new ApplicantMenu(client, currentSession).run();
-                } else if (currentSession. getRole().equals("RECRUITER")) {
+                } else if (currentSession.getRole().equals("RECRUITER")) {
                     new RecruiterMenu(client, currentSession).run();
                 }
 
             } else {
-                System.out. println("❌ Registration failed!");
+                System.out.println("❌ Registration failed!");
                 System.out.println("   Please try again.");
             }
 

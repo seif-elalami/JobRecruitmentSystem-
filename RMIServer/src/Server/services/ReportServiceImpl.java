@@ -4,7 +4,6 @@ import shared.interfaces.IReportService;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
-import java.util.function.Predicate;
 
 public class ReportServiceImpl extends UnicastRemoteObject implements IReportService {
 
@@ -35,11 +34,20 @@ public class ReportServiceImpl extends UnicastRemoteObject implements IReportSer
     }
 
     @Override
-    public String generateFilteredReport(List<?> items, String title, Predicate<?> filter) throws RemoteException {
+    public String generateFilteredReportBySalary(List<?> items, String title, double minSalary, double maxSalary) throws RemoteException {
         try {
-            @SuppressWarnings("unchecked")
-            FilteredReport<Object> report = new FilteredReport<>((List<Object>) items, title, (Predicate<Object>) filter);
-            return report.generate();
+            FilteredReport<?> report = new FilteredReport<>(items, title);
+            return report.generateBySalary(minSalary, maxSalary);
+        } catch (Exception e) {
+            throw new RemoteException("Error generating filtered report", e);
+        }
+    }
+
+    @Override
+    public String generateFilteredReportByLocation(List<?> items, String title, String location) throws RemoteException {
+        try {
+            FilteredReport<?> report = new FilteredReport<>(items, title);
+            return report.generateByLocation(location);
         } catch (Exception e) {
             throw new RemoteException("Error generating filtered report", e);
         }

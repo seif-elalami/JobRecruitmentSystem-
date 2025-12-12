@@ -4,7 +4,6 @@ import shared.models.*;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
-import java.util.function.Predicate;
 
 public interface IReportService extends Remote {
 
@@ -19,7 +18,12 @@ public interface IReportService extends Remote {
     String generateDetailedReport(List<?> items, String title) throws RemoteException;
 
     /**
-     * Generate a filtered report with custom filter predicate
+    * Generate a filtered report - salary range (for jobs)
      */
-    String generateFilteredReport(List<?> items, String title, Predicate<?> filter) throws RemoteException;
+    String generateFilteredReportBySalary(List<?> items, String title, double minSalary, double maxSalary) throws RemoteException;
+
+    /**
+    * Generate a filtered report - location (for jobs)
+    */
+    String generateFilteredReportByLocation(List<?> items, String title, String location) throws RemoteException;
 }

@@ -2,8 +2,9 @@ package shared.models;
 
 import java.io.Serializable;
 import java.util.Date;
+import shared.observer.NotificationSubject;
 
-public class Interview implements Serializable {
+public class Interview extends NotificationSubject implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -84,6 +85,7 @@ public class Interview implements Serializable {
 
     public void setStatus(String status) {
         this.status = status;
+        this.notifyObservers("Interview " + interviewId + " status changed to: " + status);
     }
 
     public String getNotes() {

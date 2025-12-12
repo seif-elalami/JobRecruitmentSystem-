@@ -8,7 +8,6 @@ import shared.models.Interview;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.Date;
 import java.util.List;
 
 public interface IRecruiterService extends Remote {

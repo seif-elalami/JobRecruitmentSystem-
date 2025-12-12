@@ -9,7 +9,6 @@ public class ApplicationState implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String currentStateName;
-    private Application application;
 
     // State enum for internal state management
     public enum State {
@@ -37,8 +36,6 @@ public class ApplicationState implements Serializable {
      * @param app The application to handle
      */
     public void handle(Application app) {
-        this.application = app;
-        
         switch (currentState) {
             case APPLIED:
                 System.out.println("📝 Application is in APPLIED state");

@@ -69,7 +69,9 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
             Document doc = new Document();
             doc.append("username", user.getUsername());
             doc.append("email", user.getEmail());
-            doc.append("password", user.getPassword());  // Store plain password (or hash it)
+            // ✅ Hash password with BCrypt before storing
+            String hashedPassword = PasswordUtil.hashPassword(user.getPassword());
+            doc.append("password", hashedPassword);
             doc.append("role", user.getRole());
             doc.append("phone", user.getPhone());
             doc.append("createdAt", new Date());
@@ -341,6 +343,7 @@ public Session login(String email, String password) throws RemoteException {
     /**
      * Helper method to update last login time
      */
+    @SuppressWarnings("unused")
     private void updateLastLogin(String userId) {
         try {
             Document query = new Document("_id", new ObjectId(userId));

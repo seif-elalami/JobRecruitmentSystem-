@@ -3,7 +3,6 @@ package client.ui;
 import client.RMIClient;
 import shared.interfaces.IAuthService;
 import shared.models.Session;
-import shared.models.User;
 
 import javax.swing.*;
 import java.awt.*;
@@ -172,6 +171,14 @@ public class SignInPage extends JFrame {
 
     /**
      * Handle sign in action
+     * 
+     * Password Verification Flow:
+     * 1. GUI: User enters email and plain password
+     * 2. GUI: Plain password sent to server via RMI
+     * 3. Server: Fetches BCrypt hash from MongoDB
+     * 4. Server: PasswordUtil.verifyPassword() calls BCrypt.checkpw()
+     * 5. Server: Compares plain password against BCrypt hash
+     * 6. Server: Returns Session if password matches, error otherwise
      */
     private void handleSignIn() {
         String email = emailField.getText().trim();
@@ -249,11 +256,8 @@ public class SignInPage extends JFrame {
             // Open Recruiter Menu
             new RecruiterMenuGUI(rmiClient, session);
         } else if (role.contains("admin")) {
-            // Open Admin Menu (to be created)
-            JOptionPane.showMessageDialog(null,
-                    "✅ Admin login successful!\nAdmin menu coming soon...",
-                    "Login Success",
-                    JOptionPane.INFORMATION_MESSAGE);
+            // Open Admin Menu
+            new AdminMenuGUI(rmiClient, session);
         }
     }
 

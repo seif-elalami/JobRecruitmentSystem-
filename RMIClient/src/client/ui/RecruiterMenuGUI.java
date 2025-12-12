@@ -12,12 +12,7 @@ import java.awt.*;
  */
 public class RecruiterMenuGUI extends JFrame {
 
-    private RMIClient rmiClient;
-    private Session session;
-
     public RecruiterMenuGUI(RMIClient rmiClient, Session session) {
-        this.rmiClient = rmiClient;
-        this.session = session;
 
         // Frame setup
         setTitle("Recruiter Dashboard - Job Recruitment System");

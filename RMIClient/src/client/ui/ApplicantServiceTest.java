@@ -272,11 +272,11 @@ public class ApplicantServiceTest {
     }
 
     private void printApplicant(Applicant a) {
-        System.out. println("  ID: " + a.getId());
+        System.out.println("  ID: " + a.getId());
         System.out.println("  Name: " + a.getName());
         System.out.println("  Email: " + a.getEmail());
         System.out.println("  Phone: " + a.getPhone());
-        System.out. println("  Education: " + a.getEducation());
+        System.out.println("  Education: " + a.getEducation());
         System.out.println("  Experience: " + a.getExperience() + " years");
         System.out.println("  Skills: " + a.getSkills());
     }

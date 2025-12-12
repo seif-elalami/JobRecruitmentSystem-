@@ -2,7 +2,7 @@ package shared. interfaces;
 
 import shared.models. Job;                    // model import for job
 import java.rmi.Remote;
-import java. rmi.RemoteException;
+import java.rmi.RemoteException;
 import java.util.List;
 
 public interface IJobService extends Remote {

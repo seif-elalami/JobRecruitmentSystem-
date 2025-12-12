@@ -18,9 +18,9 @@ public class Main {
         if (! checkMongoDB()) {
             System. err.println("\n❌ Cannot start server:  MongoDB is not running!");
             System.err.println("\n💡 Start MongoDB first:");
-            System.err.println("   mongod --port 27020 --dbpath <your-path>");
+            System.err.println("   mongod --port 27017 --dbpath <your-path>");
             System.err.println("\nExample:");
-            System.err.println("   mongod --port 27020 --dbpath D:\\mongodb-data\\JobRecruitmentDB");
+            System.err.println("   mongod --port 27017 --dbpath D:\\mongodb-data\\JobRecruitmentDB");
             System.err.println();
             System.err.println("Press Enter to exit...");
             try {
@@ -51,7 +51,7 @@ public class Main {
         MongoClient testClient = null;
         try {
             System.out.print("🔍 Checking MongoDB connection...   ");
-            testClient = new MongoClient("localhost", 27020);
+            testClient = new MongoClient("localhost", 27017);
             MongoDatabase database = testClient.getDatabase("JobRecruitmentDB");
 
             // Ping the database to verify connection

@@ -2,14 +2,16 @@ package client.ui;
 
 import client.RMIClient;
 import shared.interfaces.IAuthService;
-import shared.models.User;
 import shared.models.Session;
+import shared.models.User;
 import shared.utils.ValidationUtil;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class RegisterPage extends JFrame {
 
@@ -17,286 +19,259 @@ public class RegisterPage extends JFrame {
     private IAuthService authService;
     private JTextField nameField;
     private JTextField emailField;
+    private JTextField phoneField;
     private JPasswordField passwordField;
     private JPasswordField confirmPasswordField;
-    private JTextField phoneField;
     private JComboBox<String> roleComboBox;
-    private JTextArea termsArea;
 
     public RegisterPage(RMIClient rmiClient) {
         this.rmiClient = rmiClient;
         this.authService = rmiClient.getAuthService();
 
         // Frame setup
-        setTitle("Register - Job Recruitment System");
+        setTitle("Create Account - Job Recruitment System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(550, 750);
+        setSize(1000, 900);
         setLocationRelativeTo(null);
         setResizable(false);
+        setUndecorated(true);
 
-        // Create scroll pane for main content
+        // Main panel with modern gradient
         JPanel mainPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-                GradientPaint gradient = new GradientPaint(0, 0, new Color(41, 128, 185), 0, getHeight(),
-                        new Color(52, 73, 94));
+                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                GradientPaint gradient = new GradientPaint(0, 0, new Color(155, 89, 182), 
+                        getWidth(), getHeight(), new Color(52, 152, 219));
                 g2d.setPaint(gradient);
                 g2d.fillRect(0, 0, getWidth(), getHeight());
+                
+                // Subtle overlay pattern
+                g2d.setColor(new Color(255, 255, 255, 5));
+                for (int i = 0; i < getWidth(); i += 50) {
+                    g2d.drawLine(i, 0, i, getHeight());
+                }
             }
         };
-
         mainPanel.setLayout(null);
+        add(mainPanel);
 
-        // Create scrollable panel
-        JScrollPane scrollPane = new JScrollPane(mainPanel);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setOpaque(false);
-        scrollPane.getViewport().setOpaque(false);
-        mainPanel.setPreferredSize(new Dimension(550, 850));
+        // Close button
+        JButton closeBtn = new JButton("✕");
+        closeBtn.setBounds(960, 10, 30, 30);
+        closeBtn.setFont(new Font("Arial", Font.BOLD, 20));
+        closeBtn.setBackground(Color.WHITE);
+        closeBtn.setForeground(new Color(155, 89, 182));
+        closeBtn.setBorderPainted(false);
+        closeBtn.setFocusPainted(false);
+        closeBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        closeBtn.addActionListener(e -> System.exit(0));
+        mainPanel.add(closeBtn);
 
-        add(scrollPane);
+        // Card panel (white container)
+        JPanel cardPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setColor(Color.WHITE);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
+                g2d.setColor(new Color(236, 240, 241));
+                g2d.setStroke(new BasicStroke(1));
+                g2d.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 25, 25);
+            }
+        };
+        cardPanel.setLayout(null);
+        cardPanel.setBounds(50, 40, 900, 820);
+        cardPanel.setOpaque(false);
+        mainPanel.add(cardPanel);
 
-        // Title Label
+        // Pencil icon
+        JLabel iconLabel = new JLabel("✏️");
+        iconLabel.setFont(new Font("Arial", Font.PLAIN, 50));
+        iconLabel.setBounds(425, 15, 50, 50);
+        cardPanel.add(iconLabel);
+
+        // Title
         JLabel titleLabel = new JLabel("Create Account");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 32));
-        titleLabel.setForeground(Color.WHITE);
-        titleLabel.setBounds(50, 20, 450, 40);
-        mainPanel.add(titleLabel);
+        titleLabel.setForeground(new Color(155, 89, 182));
+        titleLabel.setBounds(30, 65, 840, 40);
+        cardPanel.add(titleLabel);
 
         // Subtitle
-        JLabel subtitleLabel = new JLabel("Join our platform today");
-        subtitleLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        subtitleLabel.setForeground(new Color(236, 240, 241));
-        subtitleLabel.setBounds(50, 65, 450, 20);
-        mainPanel.add(subtitleLabel);
+        JLabel subtitleLabel = new JLabel("Join our job recruitment platform");
+        subtitleLabel.setFont(new Font("Arial", Font.PLAIN, 13));
+        subtitleLabel.setForeground(new Color(127, 140, 141));
+        subtitleLabel.setBounds(30, 105, 840, 20);
+        cardPanel.add(subtitleLabel);
 
-        int yPos = 110;
-        int fieldHeight = 40;
-        int labelHeight = 20;
-        int spacing = 10;
-        int fieldWidth = 450;
+        int yPos = 140;
+        int spacing = 80;
 
-        // Name Label
-        JLabel nameLabel = new JLabel("Full Name:");
-        nameLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        nameLabel.setForeground(Color.WHITE);
-        nameLabel.setBounds(50, yPos, fieldWidth, labelHeight);
-        mainPanel.add(nameLabel);
-        yPos += labelHeight + 5;
+        // Full Name
+        JLabel nameLabel = new JLabel("👤 Full Name");
+        nameLabel.setFont(new Font("Arial", Font.BOLD, 12));
+        nameLabel.setForeground(new Color(44, 62, 80));
+        nameLabel.setBounds(30, yPos, 400, 20);
+        cardPanel.add(nameLabel);
 
-        // Name Field
-        nameField = createStyledTextField();
-        nameField.setBounds(50, yPos, fieldWidth, fieldHeight);
-        mainPanel.add(nameField);
-        yPos += fieldHeight + spacing;
+        nameField = createModernTextField();
+        nameField.setBounds(30, yPos + 25, 820, 40);
+        nameField.setText("Enter your full name");
+        nameField.setForeground(new Color(189, 195, 199));
+        nameField.addFocusListener(createPlaceholderFocusListener(nameField, "Enter your full name"));
+        cardPanel.add(nameField);
+        yPos += spacing;
 
-        // Email Label
-        JLabel emailLabel = new JLabel("Email Address:");
-        emailLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        emailLabel.setForeground(Color.WHITE);
-        emailLabel.setBounds(50, yPos, fieldWidth, labelHeight);
-        mainPanel.add(emailLabel);
-        yPos += labelHeight + 5;
+        // Email
+        JLabel emailLabel = new JLabel("📧 Email Address");
+        emailLabel.setFont(new Font("Arial", Font.BOLD, 12));
+        emailLabel.setForeground(new Color(44, 62, 80));
+        emailLabel.setBounds(30, yPos, 400, 20);
+        cardPanel.add(emailLabel);
 
-        // Email Field
-        emailField = createStyledTextField();
-        emailField.setBounds(50, yPos, fieldWidth, fieldHeight);
-        mainPanel.add(emailField);
-        yPos += fieldHeight + spacing;
+        emailField = createModernTextField();
+        emailField.setBounds(30, yPos + 25, 820, 40);
+        emailField.setText("Enter your email");
+        emailField.setForeground(new Color(189, 195, 199));
+        emailField.addFocusListener(createPlaceholderFocusListener(emailField, "Enter your email"));
+        cardPanel.add(emailField);
+        yPos += spacing;
 
-        // Phone Label
-        JLabel phoneLabel = new JLabel("Phone Number (01234567890):");
-        phoneLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        phoneLabel.setForeground(Color.WHITE);
-        phoneLabel.setBounds(50, yPos, fieldWidth, labelHeight);
-        mainPanel.add(phoneLabel);
-        yPos += labelHeight + 5;
+        // Phone
+        JLabel phoneLabel = new JLabel("📱 Phone Number");
+        phoneLabel.setFont(new Font("Arial", Font.BOLD, 12));
+        phoneLabel.setForeground(new Color(44, 62, 80));
+        phoneLabel.setBounds(30, yPos, 400, 20);
+        cardPanel.add(phoneLabel);
 
-        // Phone Field
-        phoneField = createStyledTextField();
-        phoneField.setBounds(50, yPos, fieldWidth, fieldHeight);
-        mainPanel.add(phoneField);
-        yPos += fieldHeight + spacing;
+        JLabel phoneHint = new JLabel("Format: 01234567890 (11 digits starting with 0)");
+        phoneHint.setFont(new Font("Arial", Font.ITALIC, 10));
+        phoneHint.setForeground(new Color(189, 195, 199));
+        phoneHint.setBounds(30, yPos + 20, 400, 12);
+        cardPanel.add(phoneHint);
 
-        // Role Label
-        JLabel roleLabel = new JLabel("Select Role:");
-        roleLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        roleLabel.setForeground(Color.WHITE);
-        roleLabel.setBounds(50, yPos, fieldWidth, labelHeight);
-        mainPanel.add(roleLabel);
-        yPos += labelHeight + 5;
+        phoneField = createModernTextField();
+        phoneField.setBounds(30, yPos + 33, 820, 40);
+        phoneField.setText("Enter your phone number");
+        phoneField.setForeground(new Color(189, 195, 199));
+        phoneField.addFocusListener(createPlaceholderFocusListener(phoneField, "Enter your phone number"));
+        cardPanel.add(phoneField);
+        yPos += spacing;
 
-        // Role ComboBox
+        // Password
+        JLabel passwordLabel = new JLabel("🔒 Password");
+        passwordLabel.setFont(new Font("Arial", Font.BOLD, 12));
+        passwordLabel.setForeground(new Color(44, 62, 80));
+        passwordLabel.setBounds(30, yPos, 400, 20);
+        cardPanel.add(passwordLabel);
+
+        JLabel passHint = new JLabel("Minimum 6 characters");
+        passHint.setFont(new Font("Arial", Font.ITALIC, 10));
+        passHint.setForeground(new Color(189, 195, 199));
+        passHint.setBounds(30, yPos + 20, 400, 12);
+        cardPanel.add(passHint);
+
+        passwordField = new JPasswordField();
+        passwordField.setBounds(30, yPos + 33, 820, 40);
+        passwordField.setFont(new Font("Arial", Font.PLAIN, 14));
+        passwordField.setBackground(new Color(236, 240, 241));
+        passwordField.setForeground(Color.BLACK);
+        passwordField.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(236, 240, 241), 2),
+                BorderFactory.createEmptyBorder(10, 15, 10, 15)));
+        passwordField.setCaretColor(new Color(155, 89, 182));
+        cardPanel.add(passwordField);
+        yPos += spacing;
+
+        // Confirm Password
+        JLabel confirmLabel = new JLabel("✓ Confirm Password");
+        confirmLabel.setFont(new Font("Arial", Font.BOLD, 12));
+        confirmLabel.setForeground(new Color(44, 62, 80));
+        confirmLabel.setBounds(30, yPos, 400, 20);
+        cardPanel.add(confirmLabel);
+
+        confirmPasswordField = new JPasswordField();
+        confirmPasswordField.setBounds(30, yPos + 25, 820, 40);
+        confirmPasswordField.setFont(new Font("Arial", Font.PLAIN, 14));
+        confirmPasswordField.setBackground(new Color(236, 240, 241));
+        confirmPasswordField.setForeground(Color.BLACK);
+        confirmPasswordField.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(236, 240, 241), 2),
+                BorderFactory.createEmptyBorder(10, 15, 10, 15)));
+        confirmPasswordField.setCaretColor(new Color(155, 89, 182));
+        cardPanel.add(confirmPasswordField);
+        yPos += spacing - 10;
+
+        // Role
+        JLabel roleLabel = new JLabel("👥 Select Role");
+        roleLabel.setFont(new Font("Arial", Font.BOLD, 12));
+        roleLabel.setForeground(new Color(44, 62, 80));
+        roleLabel.setBounds(30, yPos, 400, 20);
+        cardPanel.add(roleLabel);
+
         roleComboBox = new JComboBox<>(new String[]{"Applicant", "Recruiter"});
-        roleComboBox.setBounds(50, yPos, fieldWidth, fieldHeight);
+        roleComboBox.setBounds(30, yPos + 25, 820, 40);
         roleComboBox.setFont(new Font("Arial", Font.PLAIN, 14));
         roleComboBox.setBackground(new Color(236, 240, 241));
         roleComboBox.setForeground(Color.BLACK);
-        mainPanel.add(roleComboBox);
-        yPos += fieldHeight + spacing;
-
-        // Password Label
-        JLabel passwordLabel = new JLabel("Password:");
-        passwordLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        passwordLabel.setForeground(Color.WHITE);
-        passwordLabel.setBounds(50, yPos, fieldWidth, labelHeight);
-        mainPanel.add(passwordLabel);
-        yPos += labelHeight + 5;
-
-        // Password Field
-        passwordField = createStyledPasswordField();
-        passwordField.setBounds(50, yPos, fieldWidth, fieldHeight);
-        mainPanel.add(passwordField);
-        yPos += fieldHeight + spacing;
-
-        // Confirm Password Label
-        JLabel confirmLabel = new JLabel("Confirm Password:");
-        confirmLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        confirmLabel.setForeground(Color.WHITE);
-        confirmLabel.setBounds(50, yPos, fieldWidth, labelHeight);
-        mainPanel.add(confirmLabel);
-        yPos += labelHeight + 5;
-
-        // Confirm Password Field
-        confirmPasswordField = createStyledPasswordField();
-        confirmPasswordField.setBounds(50, yPos, fieldWidth, fieldHeight);
-        mainPanel.add(confirmPasswordField);
-        yPos += fieldHeight + spacing + 10;
-
-        // Terms and Conditions
-        JLabel termsLabel = new JLabel("Terms & Conditions:");
-        termsLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        termsLabel.setForeground(Color.WHITE);
-        termsLabel.setBounds(50, yPos, fieldWidth, labelHeight);
-        mainPanel.add(termsLabel);
-        yPos += labelHeight + 5;
-
-        // Terms Text Area
-        termsArea = new JTextArea(
-                "By registering, you agree to:\n" +
-                "• Our Terms of Service\n" +
-                "• Privacy Policy\n" +
-                "• Responsible use of the platform\n" +
-                "• All content must be truthful and accurate");
-        termsArea.setEditable(false);
-        termsArea.setLineWrap(true);
-        termsArea.setWrapStyleWord(true);
-        termsArea.setFont(new Font("Arial", Font.PLAIN, 11));
-        termsArea.setBackground(new Color(52, 73, 94));
-        termsArea.setForeground(new Color(236, 240, 241));
-        termsArea.setBorder(BorderFactory.createLineBorder(new Color(52, 152, 219), 1));
-        termsArea.setBounds(50, yPos, fieldWidth, 80);
-        mainPanel.add(termsArea);
-        yPos += 90;
+        roleComboBox.setBorder(BorderFactory.createLineBorder(new Color(236, 240, 241), 2));
+        cardPanel.add(roleComboBox);
 
         // Register Button
-        JButton registerButton = new JButton("Register");
-        registerButton.setBounds(50, yPos, fieldWidth, 45);
-        registerButton.setFont(new Font("Arial", Font.BOLD, 16));
-        registerButton.setBackground(new Color(46, 204, 113));
-        registerButton.setForeground(Color.WHITE);
-        registerButton.setBorderPainted(false);
-        registerButton.setFocusPainted(false);
-        registerButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        AnimatedButton registerButton = new AnimatedButton("Create Account", new Color(155, 89, 182), new Color(142, 68, 173));
+        registerButton.setBounds(30, 725, 820, 50);
+        registerButton.addActionListener(e -> handleRegister());
+        cardPanel.add(registerButton);
 
-        registerButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                handleRegister();
-            }
+        // Back button
+        AnimatedButton backButton = new AnimatedButton("← Back", new Color(149, 165, 166), new Color(120, 144, 156));
+        backButton.setBounds(30, 785, 390, 30);
+        backButton.addActionListener(e -> {
+            dispose();
+            new SignInPage(rmiClient);
         });
-
-        mainPanel.add(registerButton);
-        yPos += 50;
-
-        // Back Button
-        JButton backButton = new JButton("Back");
-        backButton.setBounds(50, yPos, 217, 40);
-        backButton.setFont(new Font("Arial", Font.PLAIN, 14));
-        backButton.setBackground(new Color(149, 165, 166));
-        backButton.setForeground(Color.WHITE);
-        backButton.setBorderPainted(false);
-        backButton.setFocusPainted(false);
-        backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-                new WelcomePage(rmiClient);
-            }
-        });
-
-        mainPanel.add(backButton);
-
-        // Sign In Link
-        JButton signInLink = new JButton("Already have an account? Sign In");
-        signInLink.setBounds(283, yPos, 217, 40);
-        signInLink.setFont(new Font("Arial", Font.PLAIN, 12));
-        signInLink.setBackground(new Color(52, 152, 219));
-        signInLink.setForeground(Color.WHITE);
-        signInLink.setBorderPainted(false);
-        signInLink.setFocusPainted(false);
-        signInLink.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        signInLink.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-                new SignInPage(rmiClient);
-            }
-        });
-
-        mainPanel.add(signInLink);
+        cardPanel.add(backButton);
 
         setVisible(true);
     }
 
-    /**
-     * Create styled text field
-     */
-    private JTextField createStyledTextField() {
+    private JTextField createModernTextField() {
         JTextField field = new JTextField();
         field.setFont(new Font("Arial", Font.PLAIN, 14));
         field.setBackground(new Color(236, 240, 241));
         field.setForeground(Color.BLACK);
-        field.setBorder(BorderFactory.createLineBorder(new Color(52, 152, 219), 2));
+        field.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(236, 240, 241), 2),
+                BorderFactory.createEmptyBorder(10, 15, 10, 15)));
+        field.setCaretColor(new Color(155, 89, 182));
         return field;
     }
 
-    /**
-     * Create styled password field
-     */
-    private JPasswordField createStyledPasswordField() {
-        JPasswordField field = new JPasswordField();
-        field.setFont(new Font("Arial", Font.PLAIN, 14));
-        field.setBackground(new Color(236, 240, 241));
-        field.setForeground(Color.BLACK);
-        field.setBorder(BorderFactory.createLineBorder(new Color(52, 152, 219), 2));
-        return field;
+    private FocusAdapter createPlaceholderFocusListener(JTextField field, String placeholder) {
+        return new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (field.getText().equals(placeholder)) {
+                    field.setText("");
+                    field.setForeground(Color.BLACK);
+                }
+            }
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (field.getText().isEmpty()) {
+                    field.setText(placeholder);
+                    field.setForeground(new Color(189, 195, 199));
+                }
+            }
+        };
     }
 
-    /**
-     * Handle registration action
-     * 
-     * Password Flow:
-     * 1. GUI: User enters plain password in password field
-     * 2. GUI: Plain password sent to server via RMI (should use HTTPS in production)
-     * 3. Server: AuthServiceImpl.register() receives plain password
-     * 4. Server: PasswordUtil.hashPassword() hashes with BCrypt (auto-generates salt)
-     * 5. Database: Only BCrypt hash is stored (never plain password)
-     * 
-     * Login Verification:
-     * 1. GUI: User enters plain password
-     * 2. Server: AuthServiceImpl.login() receives plain password
-     * 3. Server: PasswordUtil.verifyPassword() uses BCrypt.checkpw() to verify
-     * 4. Server: Compares plain password against stored BCrypt hash
-     */
     private void handleRegister() {
         String name = nameField.getText().trim();
         String email = emailField.getText().trim();
@@ -305,105 +280,146 @@ public class RegisterPage extends JFrame {
         String confirmPassword = new String(confirmPasswordField.getPassword());
         String role = (String) roleComboBox.getSelectedItem();
 
-        // Validation
-        if (name.isEmpty()) {
-            showError("Please enter your full name");
+        if (name.isEmpty() || name.equals("Enter your full name")) {
+            JOptionPane.showMessageDialog(this, "❌ Please enter your full name", "Validation Error", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        if (email.isEmpty()) {
-            showError("Please enter your email address");
+        if (!ValidationUtil.isValidName(name)) {
+            JOptionPane.showMessageDialog(this, "❌ Name must be 2-100 characters", "Validation Error", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        if (!email.contains("@")) {
-            showError("Please enter a valid email address");
+        if (email.isEmpty() || email.equals("Enter your email")) {
+            JOptionPane.showMessageDialog(this, "❌ Please enter your email", "Validation Error", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        if (phone.isEmpty()) {
-            showError("Please enter your phone number");
+        if (!ValidationUtil.isValidEmail(email)) {
+            JOptionPane.showMessageDialog(this, "❌ Invalid email format", "Validation Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        if (phone.isEmpty() || phone.equals("Enter your phone number")) {
+            JOptionPane.showMessageDialog(this, "❌ Please enter your phone number", "Validation Error", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         if (!ValidationUtil.validatePhone(phone)) {
-            showError("Invalid phone number. Must start with 0 and be exactly 11 digits.\nExample: 01234567890");
+            JOptionPane.showMessageDialog(this, "❌ Invalid phone format. Use: 01234567890", "Validation Error", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         if (password.isEmpty()) {
-            showError("Please enter a password");
+            JOptionPane.showMessageDialog(this, "❌ Please enter a password", "Validation Error", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        if (password.length() < 6) {
-            showError("Password must be at least 6 characters long");
+        if (!ValidationUtil.isValidPassword(password)) {
+            JOptionPane.showMessageDialog(this, "❌ Password must be at least 6 characters", "Validation Error", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         if (!password.equals(confirmPassword)) {
-            showError("Passwords do not match");
+            JOptionPane.showMessageDialog(this, "❌ Passwords do not match", "Validation Error", JOptionPane.WARNING_MESSAGE);
             confirmPasswordField.setText("");
             return;
         }
 
         try {
-            // Show loading message
-            JOptionPane.showMessageDialog(this,
-                    "⏳ Creating account...",
-                    "Registration",
-                    JOptionPane.INFORMATION_MESSAGE);
+            User user = new User(name, password, email, role);
+            user.setPhone(phone);
+            Session session = authService.register(user);
 
-            // Create user object
-            User newUser = new User(name, password, email, role);
-            newUser.setPhone(phone);
-
-            // Call registration service
-            Session registered = authService.register(newUser);
-
-            if (registered != null) {
-                JOptionPane.showMessageDialog(this,
-                        "✅ Registration successful!\n\nYour account has been created.\nPlease sign in now.",
-                        "Registration Complete",
-                        JOptionPane.INFORMATION_MESSAGE);
-
-                // Open sign in page
+            if (session != null) {
+                JOptionPane.showMessageDialog(this, "✅ Registration successful! Welcome " + name + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 dispose();
-                new SignInPage(rmiClient);
-
+                new ApplicantMenuGUI(rmiClient, session);
             } else {
-                showError("Registration failed. Please try again or contact support.");
+                JOptionPane.showMessageDialog(this, "❌ Registration failed. Email may already exist.", "Error", JOptionPane.ERROR_MESSAGE);
             }
-
         } catch (Exception e) {
-            showError("Error: " + e.getMessage());
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "❌ Error: " + e.getMessage(), "Registration Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    /**
-     * Show error message
-     */
-    private void showError(String message) {
-        JOptionPane.showMessageDialog(this,
-                "❌ " + message,
-                "Registration Error",
-                JOptionPane.ERROR_MESSAGE);
+    // Animated Button Class
+    private static class AnimatedButton extends JButton {
+        private Color baseColor;
+        private Color hoverColor;
+        private float scale = 1.0f;
+        private boolean isHovered = false;
+
+        public AnimatedButton(String text, Color baseColor, Color hoverColor) {
+            this.baseColor = baseColor;
+            this.hoverColor = hoverColor;
+            setText(text);
+            setFont(new Font("Arial", Font.BOLD, 16));
+            setForeground(Color.WHITE);
+            setBackground(baseColor);
+            setBorderPainted(false);
+            setContentAreaFilled(false);
+            setFocusPainted(false);
+            setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+            addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    isHovered = true;
+                    scale = 1.03f;
+                    repaint();
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    isHovered = false;
+                    scale = 1.0f;
+                    repaint();
+                }
+            });
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            int width = getWidth();
+            int height = getHeight();
+            int x = (int) ((width - width * scale) / 2);
+            int y = (int) ((height - height * scale) / 2);
+            int scaledWidth = (int) (width * scale);
+            int scaledHeight = (int) (height * scale);
+
+            g2d.setColor(isHovered ? hoverColor : baseColor);
+            g2d.fillRoundRect(x, y, scaledWidth, scaledHeight, 12, 12);
+
+            g2d.setColor(new Color(255, 255, 255, isHovered ? 150 : 100));
+            g2d.setStroke(new BasicStroke(2));
+            g2d.drawRoundRect(x, y, scaledWidth, scaledHeight, 12, 12);
+
+            if (isHovered) {
+                g2d.setColor(new Color(0, 0, 0, 30));
+                g2d.fillRoundRect(x + 2, y + 2, scaledWidth - 4, scaledHeight - 4, 12, 12);
+            }
+
+            FontMetrics fm = g2d.getFontMetrics();
+            int textX = (width - fm.stringWidth(getText())) / 2;
+            int textY = ((height - fm.getHeight()) / 2) + fm.getAscent();
+
+            g2d.setColor(Color.WHITE);
+            g2d.setFont(getFont());
+            g2d.drawString(getText(), textX, textY);
+        }
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    RMIClient rmiClient = new RMIClient();
-                    new RegisterPage(rmiClient);
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(null,
-                            "Failed to connect to server: " + e.getMessage(),
-                            "Connection Error",
-                            JOptionPane.ERROR_MESSAGE);
-                }
+        SwingUtilities.invokeLater(() -> {
+            try {
+                RMIClient rmiClient = new RMIClient();
+                new RegisterPage(rmiClient);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Failed to connect: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
     }

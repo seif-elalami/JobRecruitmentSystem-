@@ -3,8 +3,9 @@ package client.ui;
 import client.RMIClient;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.RoundRectangle2D;
 
 public class WelcomePage extends JFrame {
 
@@ -17,198 +18,221 @@ public class WelcomePage extends JFrame {
         // Frame setup
         setTitle("Job Recruitment System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(900, 600);
+        setSize(1200, 800);
         setLocationRelativeTo(null);
         setResizable(false);
-        setUndecorated(false);
+        setUndecorated(true);
+        setShape(new RoundRectangle2D.Double(0, 0, 1200, 800, 0, 0));
 
-        // Create main panel with gradient background
+        // Create main panel with animated gradient background
         mainPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
-                // Gradient background
-                GradientPaint gradient = new GradientPaint(0, 0, new Color(41, 128, 185), 0, getHeight(),
-                        new Color(52, 73, 94));
+                // Modern gradient background (Deep blue to purple to teal)
+                GradientPaint gradient = new GradientPaint(0, 0, new Color(20, 33, 61), 
+                        getWidth(), getHeight(), new Color(52, 152, 219));
                 g2d.setPaint(gradient);
                 g2d.fillRect(0, 0, getWidth(), getHeight());
+                
+                // Add subtle overlay pattern
+                g2d.setColor(new Color(255, 255, 255, 5));
+                for (int i = 0; i < getWidth(); i += 50) {
+                    g2d.drawLine(i, 0, i, getHeight());
+                }
             }
         };
 
         mainPanel.setLayout(null);
         add(mainPanel);
 
+        // Logo/Icon area
+        JLabel logoLabel = new JLabel("💼");
+        logoLabel.setFont(new Font("Arial", Font.PLAIN, 80));
+        logoLabel.setBounds(550, 80, 100, 100);
+        logoLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        mainPanel.add(logoLabel);
+
         // Title Label
         JLabel titleLabel = new JLabel("Job Recruitment System");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 48));
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 52));
         titleLabel.setForeground(Color.WHITE);
-        titleLabel.setBounds(100, 80, 700, 60);
+        titleLabel.setBounds(150, 170, 900, 70);
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         mainPanel.add(titleLabel);
 
         // Subtitle Label
-        JLabel subtitleLabel = new JLabel("Find your perfect job or hire the best talent");
-        subtitleLabel.setFont(new Font("Arial", Font.PLAIN, 20));
+        JLabel subtitleLabel = new JLabel("Find Your Perfect Job or Hire Exceptional Talent");
+        subtitleLabel.setFont(new Font("Arial", Font.PLAIN, 18));
         subtitleLabel.setForeground(new Color(236, 240, 241));
-        subtitleLabel.setBounds(100, 150, 700, 30);
+        subtitleLabel.setBounds(150, 245, 900, 30);
         subtitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         mainPanel.add(subtitleLabel);
 
-        // Sign In Button
-        JButton signInButton = createStyledButton("Sign In", new Color(46, 204, 113), 200, 280, 250, 60);
-        signInButton.addActionListener(new ActionListener() {
+        // Divider line
+        JPanel dividerPanel = new JPanel() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                openSignInPage();
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setColor(new Color(52, 152, 219));
+                g2d.setStroke(new BasicStroke(3));
+                g2d.drawLine(0, getHeight() / 2, getWidth(), getHeight() / 2);
             }
-        });
+        };
+        dividerPanel.setBounds(350, 290, 500, 3);
+        dividerPanel.setOpaque(false);
+        mainPanel.add(dividerPanel);
+
+        // Sign In Button with animation
+        AnimatedButton signInButton = new AnimatedButton("🔐 Sign In", new Color(52, 152, 219), new Color(41, 128, 185));
+        signInButton.setBounds(250, 360, 280, 70);
+        signInButton.addActionListener(e -> openSignInPage());
         mainPanel.add(signInButton);
 
-        // Register Button
-        JButton registerButton = createStyledButton("Register", new Color(231, 76, 60), 450, 280, 250, 60);
-        registerButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                openRegisterPage();
-            }
-        });
+        // Register Button with animation
+        AnimatedButton registerButton = new AnimatedButton("✏️ Register", new Color(46, 204, 113), new Color(39, 174, 96));
+        registerButton.setBounds(670, 360, 280, 70);
+        registerButton.addActionListener(e -> openRegisterPage());
         mainPanel.add(registerButton);
 
-        // Features Panel
-        JPanel featuresPanel = new JPanel();
-        featuresPanel.setBackground(new Color(52, 73, 94));
-        featuresPanel.setLayout(new GridLayout(1, 3, 20, 20));
-        featuresPanel.setBounds(50, 400, 800, 120);
-
-        // Feature 1
-        addFeature(featuresPanel, "💼", "For Applicants", "Browse and apply to exciting job opportunities");
-
-        // Feature 2
-        addFeature(featuresPanel, "👥", "For Recruiters", "Post jobs and find the perfect candidates");
-
-        // Feature 3
-        addFeature(featuresPanel, "🔐", "Secure Platform", "Your data is protected and confidential");
-
-        mainPanel.add(featuresPanel);
+        // Feature Cards
+        createFeatureCard(mainPanel, "👤", "For Applicants", "Discover exciting opportunities\nand manage your applications", 100, 520);
+        createFeatureCard(mainPanel, "👔", "For Recruiters", "Post jobs and connect with\nqualified candidates", 450, 520);
+        createFeatureCard(mainPanel, "🛡️", "Secure & Reliable", "Your data is protected with\nmodern security measures", 800, 520);
 
         // Footer
-        JLabel footerLabel = new JLabel("© 2025 Job Recruitment System. All rights reserved.");
-        footerLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        JLabel footerLabel = new JLabel("© 2025 Job Recruitment System | Secure • Reliable • Innovative");
+        footerLabel.setFont(new Font("Arial", Font.PLAIN, 11));
         footerLabel.setForeground(new Color(149, 165, 166));
-        footerLabel.setBounds(0, 550, 900, 20);
+        footerLabel.setBounds(0, 760, 1200, 20);
         footerLabel.setHorizontalAlignment(SwingConstants.CENTER);
         mainPanel.add(footerLabel);
 
         setVisible(true);
     }
 
-    /**
-     * Create a styled button with custom appearance
-     */
-    private JButton createStyledButton(String text, Color bgColor, int x, int y, int width, int height) {
-        JButton button = new JButton(text) {
+    private void createFeatureCard(JPanel parent, String icon, String title, String description, int x, int y) {
+        JPanel cardPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-                // Draw button background
-                g2d.setColor(bgColor);
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
-
-                // Draw text
-                FontMetrics fm = g2d.getFontMetrics();
-                int textX = (getWidth() - fm.stringWidth(getText())) / 2;
-                int textY = ((getHeight() - fm.getHeight()) / 2) + fm.getAscent();
-
-                g2d.setColor(Color.WHITE);
-                g2d.setFont(getFont());
-                g2d.drawString(getText(), textX, textY);
-            }
-        };
-
-        button.setFont(new Font("Arial", Font.BOLD, 18));
-        button.setForeground(Color.WHITE);
-        button.setBackground(bgColor);
-        button.setBounds(x, y, width, height);
-        button.setBorderPainted(false);
-        button.setContentAreaFilled(false);
-        button.setFocusPainted(false);
-        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        // Add hover effect
-        button.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(bgColor.darker());
-            }
-
-            @Override
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(bgColor);
-            }
-        });
-
-        return button;
-    }
-
-    /**
-     * Add feature card to the features panel
-     */
-    private void addFeature(JPanel parent, String icon, String title, String description) {
-        JPanel featureCard = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-                // Card background
                 g2d.setColor(new Color(44, 62, 80));
                 g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
-
-                // Card border
                 g2d.setColor(new Color(52, 152, 219));
                 g2d.setStroke(new BasicStroke(2));
                 g2d.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 15, 15);
             }
         };
+        cardPanel.setLayout(null);
+        cardPanel.setBounds(x, y, 280, 150);
+        cardPanel.setOpaque(false);
 
-        featureCard.setLayout(new BoxLayout(featureCard, BoxLayout.Y_AXIS));
-        featureCard.setOpaque(false);
-
-        // Icon
         JLabel iconLabel = new JLabel(icon);
         iconLabel.setFont(new Font("Arial", Font.PLAIN, 40));
-        iconLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        iconLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        iconLabel.setBounds(10, 15, 50, 50);
+        cardPanel.add(iconLabel);
 
-        // Title
         JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
         titleLabel.setForeground(Color.WHITE);
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titleLabel.setBounds(70, 15, 200, 25);
+        cardPanel.add(titleLabel);
 
-        // Description
-        JLabel descLabel = new JLabel("<html><center>" + description + "</center></html>");
-        descLabel.setFont(new Font("Arial", Font.PLAIN, 11));
-        descLabel.setForeground(new Color(189, 195, 199));
-        descLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        descLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel descLabel = new JLabel("<html>" + description + "</html>");
+        descLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        descLabel.setForeground(new Color(236, 240, 241));
+        descLabel.setBounds(70, 40, 200, 100);
+        cardPanel.add(descLabel);
 
-        featureCard.add(Box.createVerticalStrut(10));
-        featureCard.add(iconLabel);
-        featureCard.add(Box.createVerticalStrut(5));
-        featureCard.add(titleLabel);
-        featureCard.add(Box.createVerticalStrut(5));
-        featureCard.add(descLabel);
-        featureCard.add(Box.createVerticalStrut(10));
+        parent.add(cardPanel);
+    }
 
-        parent.add(featureCard);
+    private static class AnimatedButton extends JButton {
+        private Color baseColor;
+        private Color hoverColor;
+        private float scale = 1.0f;
+        private boolean isHovered = false;
+
+        public AnimatedButton(String text, Color baseColor, Color hoverColor) {
+            this.baseColor = baseColor;
+            this.hoverColor = hoverColor;
+            setText(text);
+            setFont(new Font("Arial", Font.BOLD, 18));
+            setForeground(Color.WHITE);
+            setBackground(baseColor);
+            setBorderPainted(false);
+            setContentAreaFilled(false);
+            setFocusPainted(false);
+            setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+            // Mouse listener for hover animation
+            addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    isHovered = true;
+                    animateButton(true);
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    isHovered = false;
+                    animateButton(false);
+                }
+            });
+        }
+
+        private void animateButton(boolean hover) {
+            if (hover) {
+                scale = 1.05f;
+                setBackground(hoverColor);
+            } else {
+                scale = 1.0f;
+                setBackground(baseColor);
+            }
+            repaint();
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            int width = getWidth();
+            int height = getHeight();
+            int x = (int) ((width - width * scale) / 2);
+            int y = (int) ((height - height * scale) / 2);
+            int scaledWidth = (int) (width * scale);
+            int scaledHeight = (int) (height * scale);
+
+            // Draw button background with rounded corners
+            g2d.setColor(isHovered ? hoverColor : baseColor);
+            g2d.fillRoundRect(x, y, scaledWidth, scaledHeight, 15, 15);
+
+            // Draw border
+            g2d.setColor(new Color(255, 255, 255, 100));
+            g2d.setStroke(new BasicStroke(2));
+            g2d.drawRoundRect(x, y, scaledWidth, scaledHeight, 15, 15);
+
+            // Draw shadow effect when hovered
+            if (isHovered) {
+                g2d.setColor(new Color(0, 0, 0, 50));
+                g2d.fillRoundRect(x + 2, y + 2, scaledWidth - 4, scaledHeight - 4, 15, 15);
+            }
+
+            // Draw text
+            FontMetrics fm = g2d.getFontMetrics();
+            int textX = (width - fm.stringWidth(getText())) / 2;
+            int textY = ((height - fm.getHeight()) / 2) + fm.getAscent();
+
+            g2d.setColor(Color.WHITE);
+            g2d.setFont(getFont());
+            g2d.drawString(getText(), textX, textY);
+        }
     }
 
     /**
@@ -228,19 +252,16 @@ public class WelcomePage extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    RMIClient rmiClient = new RMIClient();
-                    new WelcomePage(rmiClient);
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(null,
-                            "Failed to connect to server: " + e.getMessage(),
-                            "Connection Error",
-                            JOptionPane.ERROR_MESSAGE);
-                    System.exit(1);
-                }
+        SwingUtilities.invokeLater(() -> {
+            try {
+                RMIClient rmiClient = new RMIClient();
+                new WelcomePage(rmiClient);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null,
+                        "Failed to connect to server: " + e.getMessage(),
+                        "Connection Error",
+                        JOptionPane.ERROR_MESSAGE);
+                System.exit(1);
             }
         });
     }

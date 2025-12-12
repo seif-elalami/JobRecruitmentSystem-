@@ -19,7 +19,7 @@ public class PasswordUtil {
             String hash = BCrypt.hashpw(password, BCrypt.gensalt());
 
             System.out.println("🔐 Password hashed with BCrypt");
-            System.out.println("   Hash format: " + hash. substring(0, Math.min(20, hash.length())) + "...");
+            System.out.println("   Hash format: " + hash.substring(0, Math.min(20, hash.length())) + "...");
 
             return hash;
 
@@ -97,9 +97,9 @@ public class PasswordUtil {
             System.arraycopy(combined, 16, storedPasswordHash, 0, storedPasswordHash.length);
 
             // Hash the provided password with the same salt
-            java.security.MessageDigest md = java.security.MessageDigest. getInstance("SHA-256");
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
             md.update(salt);
-            byte[] testPasswordHash = md. digest(password.getBytes("UTF-8"));
+            byte[] testPasswordHash = md.digest(password.getBytes("UTF-8"));
 
             // Compare
             boolean matches = java.security.MessageDigest.isEqual(storedPasswordHash, testPasswordHash);

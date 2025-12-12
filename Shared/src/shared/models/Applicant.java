@@ -90,9 +90,9 @@ public class Applicant implements ICandidateView {  // ← Fixed!
     }
 
     @Override
-    public int getExperience() {
-        return experience;
-    }
+   public String getExperience() {
+    return String.valueOf(experience);
+}
 
     public int getYearsExperience() {
         return yearsExperience;

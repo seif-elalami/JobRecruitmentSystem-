@@ -34,10 +34,10 @@ public class Main {
         // Start RMI Server
         try {
             System.out.println("✅ MongoDB is connected");
-            System.out.println("🚀 Starting RMI Server.. .\n");
-            RMIServer. main(null);
+            System.out.println("🚀 Starting RMI Server...\n");
+            RMIServer.main(null);
         } catch (Exception e) {
-            System.err. println("\n❌ Server startup failed!");
+            System.err.println("\n❌ Server startup failed!");
             System.err.println("Error: " + e.getMessage());
             e.printStackTrace();
             System.exit(1);

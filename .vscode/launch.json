@@ -3,6 +3,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "WelcomePage",
+            "request": "launch",
+            "mainClass": "client.ui.WelcomePage",
+            "projectName": "JobRecruitmentSystem_5ddcc0c7"
+        },
+        {
+            "type": "java",
             "name": "Main",
             "request": "launch",
             "mainClass": "client.Main",

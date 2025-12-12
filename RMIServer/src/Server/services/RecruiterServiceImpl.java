@@ -4,11 +4,11 @@ import Server.database.MongoDBConnection;
 import Server.utils.PasswordUtil;
 import Server.utils.ValidationUtil;
 import shared.interfaces.IRecruiterService;
-import shared.interfaces. IJobService;
-import shared.interfaces. IApplicationService;
+import shared.interfaces.IJobService;
+import shared.interfaces.IApplicationService;
 import shared.interfaces.ICandidateView;
-import shared.interfaces. IApplicantService;
-import shared. models. Recruiter;
+import shared.interfaces.IApplicantService;
+import shared.models.Recruiter;
 import shared.models.User;
 import shared.models.Job;
 import shared.models.Application;
@@ -171,17 +171,17 @@ public Recruiter getRecruiterByEmail(String email) throws RemoteException {
    @Override
 public boolean updateRecruiter(Recruiter recruiter) throws RemoteException {
     try {
-        System.out. println("📝 Updating recruiter: " + recruiter.getId());
+        System.out.println("📝 Updating recruiter: " + recruiter.getId());
 
         // Validation - Email Format
-        if (! ValidationUtil.isValidEmail(recruiter.getEmail())) {
+        if (!ValidationUtil.isValidEmail(recruiter.getEmail())) {
             System.err.println("❌ Invalid email format");
             throw new RemoteException(ValidationUtil.getEmailErrorMessage());
         }
 
         // Validation - Phone Number (if provided)
         if (recruiter.getPhone() != null && !recruiter.getPhone().isEmpty()) {
-            if (!ValidationUtil.isValidPhone(recruiter. getPhone())) {
+            if (!ValidationUtil.isValidPhone(recruiter.getPhone())) {
                 System.err.println("❌ Invalid phone format");
                 throw new RemoteException(ValidationUtil.getPhoneErrorMessage());
             }

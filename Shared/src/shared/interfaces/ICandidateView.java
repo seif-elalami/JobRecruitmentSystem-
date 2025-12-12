@@ -9,7 +9,7 @@ public interface ICandidateView extends Serializable {
     String getEmail();
     String getPhone();
     List<String> getSkills();
-    int getExperience();
+    String getExperience();
     String getEducation();
     String getResume();
 }

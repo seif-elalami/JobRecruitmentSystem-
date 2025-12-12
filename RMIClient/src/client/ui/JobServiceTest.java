@@ -35,27 +35,27 @@ public class JobServiceTest {
                     case 6: closeJob(); break;
                     case 7: deleteJob(); break;
                     case 0: back = true; break;
-                    default: System.out. println("❌ Invalid choice!");
+                    default: System.out.println("❌ Invalid choice!");
                 }
 
                 if (!back) InputHelper.pause();
             }
 
         } catch (Exception e) {
-            System.err. println("❌ Error: " + e.getMessage());
+            System.err.println("❌ Error: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     private void showMenu() {
         System.out.println("\n╔════════════════════════════════════════╗");
-        System.out. println("║         JOB SERVICE TEST               ║");
+        System.out.println("║         JOB SERVICE TEST               ║");
         System.out.println("╚════════════════════════════════════════╝");
         System.out.println("1. Create Job");
-        System.out. println("2. Get Job by ID");
-        System.out. println("3. Get All Jobs");
+        System.out.println("2. Get Job by ID");
+        System.out.println("3. Get All Jobs");
         System.out.println("4. Search Jobs by Title");
-        System.out. println("5. Search Jobs by Location");
+        System.out.println("5. Search Jobs by Location");
         System.out.println("6. Close Job");
         System.out.println("7. Delete Job");
         System.out.println("0. Back");
@@ -66,7 +66,7 @@ public class JobServiceTest {
         try {
             System.out.println("=== CREATE JOB ===\n");
 
-            System. out.print("Job Title: ");
+            System.out.print("Job Title: ");
             String title = InputHelper.getString();
 
             System.out.print("Description: ");
@@ -89,14 +89,14 @@ public class JobServiceTest {
             System.out.println("\n📤 Creating job...");
             String id = service.createJob(job);
 
-            System.out. println("✅ SUCCESS!");
+            System.out.println("✅ SUCCESS!");
             System.out.println("   Job ID: " + id);
             System.out.println("   Title: " + title);
             System.out.println("   Company: " + company);
             System.out.println("   Salary: $" + salary);
 
         } catch (Exception e) {
-            System.err.println("❌ Error:  " + e.getMessage());
+            System.err.println("❌ Error: " + e.getMessage());
         }
     }
 
@@ -106,8 +106,8 @@ public class JobServiceTest {
             System.out.print("Enter Job ID: ");
             String id = InputHelper.getString();
 
-            System.out.println("\n📤 Fetching.. .");
-            Job job = service. getJobById(id);
+            System.out.println("\n📤 Fetching...");
+            Job job = service.getJobById(id);
 
             if (job != null) {
                 System.out.println("✅ FOUND!\n");
@@ -124,7 +124,7 @@ public class JobServiceTest {
     private void getAllJobs() {
         try {
             System.out.println("=== GET ALL JOBS ===\n");
-            System.out.println("📤 Fetching.. .");
+            System.out.println("📤 Fetching...");
 
             List<Job> all = service.getAllJobs();
 
@@ -149,7 +149,7 @@ public class JobServiceTest {
     private void searchByTitle() {
         try {
             System.out.println("=== SEARCH BY TITLE ===\n");
-            System.out. print("Enter title keyword: ");
+            System.out.print("Enter title keyword: ");
             String keyword = InputHelper.getString();
 
             System.out.println("\n📤 Searching...");
@@ -158,14 +158,14 @@ public class JobServiceTest {
             System.out.println("✅ Found " + results.size() + " job(s)\n");
 
             if (results.isEmpty()) {
-                System.out. println("No jobs found with that title.");
+                System.out.println("No jobs found with that title.");
             } else {
                 for (int i = 0; i < results.size(); i++) {
                     System.out.println("─────────────────────────────────────");
                     System.out.println("Match " + (i + 1) + ":");
                     printJob(results.get(i));
                 }
-                System.out. println("─────────────────────────────────────");
+                System.out.println("─────────────────────────────────────");
             }
 
         } catch (Exception e) {
@@ -176,13 +176,13 @@ public class JobServiceTest {
     private void searchByLocation() {
         try {
             System.out.println("=== SEARCH BY LOCATION ===\n");
-            System.out.print("Enter location:  ");
+            System.out.print("Enter location: ");
             String location = InputHelper.getString();
 
             System.out.println("\n📤 Searching...");
             List<Job> results = service.getJobsByLocation(location);
 
-            System.out.println("✅ Found " + results. size() + " job(s)\n");
+            System.out.println("✅ Found " + results.size() + " job(s)\n");
 
             if (results.isEmpty()) {
                 System.out.println("No jobs found in that location.");
@@ -192,7 +192,7 @@ public class JobServiceTest {
                     System.out.println("Match " + (i + 1) + ":");
                     printJob(results.get(i));
                 }
-                System.out. println("─────────────────────────────────────");
+                System.out.println("─────────────────────────────────────");
             }
 
         } catch (Exception e) {
@@ -202,7 +202,7 @@ public class JobServiceTest {
 
     private void closeJob() {
         try {
-            System.out. println("=== CLOSE JOB ===\n");
+            System.out.println("=== CLOSE JOB ===\n");
             System.out.print("Enter Job ID: ");
             String id = InputHelper.getString();
 
@@ -218,7 +218,7 @@ public class JobServiceTest {
             printJob(job);
 
             if (job.getStatus().equals("CLOSED")) {
-                System.out. println("\n⚠️  This job is already closed!");
+                System.out.println("\n⚠️  This job is already closed!");
                 return;
             }
 
@@ -239,7 +239,7 @@ public class JobServiceTest {
 
     private void deleteJob() {
         try {
-            System.out. println("=== DELETE JOB ===\n");
+            System.out.println("=== DELETE JOB ===\n");
             System.out.print("Enter Job ID: ");
             String id = InputHelper.getString();
 
@@ -254,8 +254,8 @@ public class JobServiceTest {
             System.out.println("✅ Found:");
             printJob(job);
 
-            if (! InputHelper.confirm("\n⚠️  Delete this job? ")) {
-                System.out. println("❌ Cancelled.");
+            if (!InputHelper.confirm("\n⚠️  Delete this job? ")) {
+                System.out.println("❌ Cancelled.");
                 return;
             }
 
@@ -265,14 +265,14 @@ public class JobServiceTest {
             System.out.println(deleted ? "✅ Deleted!" : "❌ Failed!");
 
         } catch (Exception e) {
-            System. err.println("❌ Error: " + e.getMessage());
+            System.err.println("❌ Error: " + e.getMessage());
         }
     }
 
     private void printJob(Job j) {
-        System.out. println("  ID: " + j.getId());
+        System.out.println("  ID: " + j.getId());
         System.out.println("  Title: " + j.getTitle());
-        System.out.println("  Company: " + j. getCompany());
+        System.out.println("  Company: " + j.getCompany());
         System.out.println("  Location: " + j.getLocation());
         System.out.println("  Salary: $" + j.getSalary());
         System.out.println("  Status: " + j.getStatus());

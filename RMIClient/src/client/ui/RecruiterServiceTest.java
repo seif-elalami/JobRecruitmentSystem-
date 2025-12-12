@@ -1,12 +1,12 @@
 package client.ui;
 
 import client.RMIClient;
-import client. utils.InputHelper;
+import client.utils.InputHelper;
 import shared.interfaces.IRecruiterService;
 import shared.models.Job;
 import shared.models.Application;
-import shared.models. Applicant;
-import shared.models. Interview;
+import shared.models.Applicant;
+import shared.models.Interview;
 import shared.models.Session;
 
 import java.text.SimpleDateFormat;
@@ -27,7 +27,7 @@ public class RecruiterServiceTest {
 
     // ✅ Constructor without session (for testing)
     public RecruiterServiceTest(RMIClient client) {
-        this.service = client. getRecruiterService();
+        this.service = client.getRecruiterService();
         // Create a default test session
         this.session = createTestSession();
     }
@@ -99,8 +99,8 @@ public class RecruiterServiceTest {
     }
 
     private void showMenu() {
-        System.out. println("\n╔════════════════════════════════════════╗");
-        System.out. println("║    Recruiter Service Test Menu         ║");
+        System.out.println("\n╔════════════════════════════════════════╗");
+        System.out.println("║    Recruiter Service Test Menu         ║");
         System.out.println("╚════════════════════════════════════════╝");
         System.out.println("1. Post Job");
         System.out.println("2. View My Job Postings");
@@ -143,9 +143,9 @@ public class RecruiterServiceTest {
             }
 
             // Create job with recruiter ID from session
-            Job job = new Job(title, description, requirements, session. getUserId());
+            Job job = new Job(title, description, requirements, session.getUserId());
 
-            System.out.println("\n📤 Posting job.. .");
+            System.out.println("\n📤 Posting job...");
             String jobId = service.postJob(job);
 
             System.out.println("✅ Job posted successfully!");
@@ -154,14 +154,14 @@ public class RecruiterServiceTest {
             System.out.println("   Requirements: " + requirements.size());
 
         } catch (Exception e) {
-            System.err.println("❌ Error:  " + e.getMessage());
+            System.err.println("❌ Error: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     private void viewMyJobPostings() {
         try {
-            System. out.println("=== MY JOB POSTINGS ===\n");
+            System.out.println("=== MY JOB POSTINGS ===\n");
 
             System.out.println("📤 Fetching your job postings...");
             List<Job> jobs = service.getMyJobPostings(session.getUserId());
@@ -169,7 +169,7 @@ public class RecruiterServiceTest {
             if (jobs.isEmpty()) {
                 System.out.println("⚠️  You haven't posted any jobs yet!");
             } else {
-                System.out.println("✅ You have " + jobs. size() + " job posting(s):\n");
+                System.out.println("✅ You have " + jobs.size() + " job posting(s):\n");
                 for (int i = 0; i < jobs.size(); i++) {
                     System.out.println("--- Job " + (i + 1) + " ---");
                     displayJob(jobs.get(i));
@@ -200,11 +200,11 @@ public class RecruiterServiceTest {
                     System.out.println("❌ Failed to close job posting!");
                 }
             } else {
-                System.out. println("⚠️  Cancelled");
+                System.out.println("⚠️  Cancelled");
             }
 
         } catch (Exception e) {
-            System. err.println("❌ Error: " + e.getMessage());
+            System.err.println("❌ Error: " + e.getMessage());
         }
     }
 
@@ -219,7 +219,7 @@ public class RecruiterServiceTest {
             System.out.print("Job ID: ");
             String jobId = InputHelper.getString();
 
-            System.out.println("\n📤 Fetching applications.. .");
+            System.out.println("\n📤 Fetching applications...");
             List<Application> applications = service.getApplicationsForJob(jobId);
 
             if (applications.isEmpty()) {
@@ -234,7 +234,7 @@ public class RecruiterServiceTest {
             }
 
         } catch (Exception e) {
-            System.err. println("❌ Error: " + e.getMessage());
+            System.err.println("❌ Error: " + e.getMessage());
         }
     }
 
@@ -244,18 +244,18 @@ public class RecruiterServiceTest {
 
     private void searchApplicantsBySkills() {
         try {
-            System. out.println("=== SEARCH APPLICANTS BY SKILLS ===\n");
+            System.out.println("=== SEARCH APPLICANTS BY SKILLS ===\n");
 
             System.out.print("Skills to search for: ");
             String skills = InputHelper.getString();
 
-            System. out.println("\n📤 Searching.. .");
+            System.out.println("\n📤 Searching...");
             List<Applicant> applicants = service.searchApplicantsBySkills(skills);
 
             if (applicants.isEmpty()) {
-                System.out. println("❌ No applicants found with skills: " + skills);
+                System.out.println("❌ No applicants found with skills: " + skills);
             } else {
-                System.out. println("✅ Found " + applicants.size() + " applicant(s):\n");
+                System.out.println("✅ Found " + applicants.size() + " applicant(s):\n");
                 for (int i = 0; i < applicants.size(); i++) {
                     System.out.println("--- Applicant " + (i + 1) + " ---");
                     displayApplicant(applicants.get(i));
@@ -264,7 +264,7 @@ public class RecruiterServiceTest {
             }
 
         } catch (Exception e) {
-            System.err.println("❌ Error: " + e. getMessage());
+            System.err.println("❌ Error: " + e.getMessage());
         }
     }
 
@@ -290,18 +290,18 @@ public class RecruiterServiceTest {
             System.out.print("Location (e.g., 'Online' or address): ");
             String location = InputHelper.getString();
 
-            System. out.print("Notes [Optional]: ");
+            System.out.print("Notes [Optional]: ");
             String notes = InputHelper.getString();
 
             Interview interview = new Interview(jobId, applicantId, session.getUserId(), scheduledDate, location);
-            if (! notes.isEmpty()) {
+            if (!notes.isEmpty()) {
                 interview.setNotes(notes);
             }
 
-            System.out. println("\n📤 Creating interview...");
+            System.out.println("\n📤 Creating interview...");
             String interviewId = service.createInterview(interview);
 
-            System. out.println("✅ Interview created successfully!");
+            System.out.println("✅ Interview created successfully!");
             System.out.println("   Interview ID: " + interviewId);
             System.out.println("   Scheduled:  " + scheduledDate);
             System.out.println("   Location: " + location);
@@ -348,12 +348,12 @@ public class RecruiterServiceTest {
                 return;
             }
 
-            System. out.println("Current interview loaded.");
+            System.out.println("Current interview loaded.");
             System.out.println("Update fields (press Enter to skip):\n");
 
             System.out.print("New Date (DD/MM/YYYY HH:MM) [" + interview.getScheduledDate() + "]: ");
             String dateStr = InputHelper.getString();
-            if (! dateStr.isEmpty()) {
+            if (!dateStr.isEmpty()) {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
                 interview.setScheduledDate(sdf.parse(dateStr));
             }
@@ -388,7 +388,7 @@ public class RecruiterServiceTest {
         try {
             System.out.println("=== CANCEL INTERVIEW ===\n");
 
-            System. out.print("Interview ID: ");
+            System.out.print("Interview ID: ");
             String interviewId = InputHelper.getString();
 
             if (InputHelper.confirm("Are you sure you want to cancel this interview? ")) {
@@ -405,7 +405,7 @@ public class RecruiterServiceTest {
             }
 
         } catch (Exception e) {
-            System.err.println("❌ Error: " + e. getMessage());
+            System.err.println("❌ Error: " + e.getMessage());
         }
     }
 
@@ -414,12 +414,12 @@ public class RecruiterServiceTest {
     // ========================================
 
     private void displayJob(Job job) {
-        System.out. println("Job ID:       " + job.getJobId());
-        System.out. println("Title:       " + job.getTitle());
+        System.out.println("Job ID:       " + job.getJobId());
+        System.out.println("Title:       " + job.getTitle());
         System.out.println("Description: " + job.getDescription());
         System.out.println("Status:      " + job.getStatus());
         System.out.println("Posted:      " + job.getPostedDate());
-        System.out. println("Requirements:");
+        System.out.println("Requirements:");
         if (job.getRequirements() != null && !job.getRequirements().isEmpty()) {
             for (String req : job.getRequirements()) {
                 System.out.println("  • " + req);
@@ -432,30 +432,30 @@ public class RecruiterServiceTest {
         System.out.println("Job ID:         " + app.getJobId());
         System.out.println("Applicant ID:   " + app.getApplicantId());
         System.out.println("Status:         " + app.getStatus());
-        System.out. println("Applied Date:   " + app.getApplicationDate());
+        System.out.println("Applied Date:   " + app.getApplicationDate());
         if (app.getCoverLetter() != null && !app.getCoverLetter().isEmpty()) {
             System.out.println("Cover Letter:   " + app.getCoverLetter());
         }
     }
 
     private void displayApplicant(Applicant a) {
-        System.out. println("ID:          " + a.getId());
-        System.out.println("Name:        " + a. getName());
-        System.out. println("Email:       " + a.getEmail());
+        System.out.println("ID:          " + a.getId());
+        System.out.println("Name:        " + a.getName());
+        System.out.println("Email:       " + a.getEmail());
         System.out.println("Phone:       " + a.getPhone());
         System.out.println("Skills:      " + a.getSkills());
-        System.out. println("Experience:  " + a.getExperience());
+        System.out.println("Experience:  " + a.getExperience());
     }
 
     private void displayInterview(Interview i) {
-        System.out. println("Interview ID:    " + i.getInterviewId());
-        System.out. println("Job ID:         " + i.getJobId());
-        System.out.println("Applicant ID:   " + i. getApplicantId());
+        System.out.println("Interview ID:    " + i.getInterviewId());
+        System.out.println("Job ID:         " + i.getJobId());
+        System.out.println("Applicant ID:   " + i.getApplicantId());
         System.out.println("Scheduled:       " + i.getScheduledDate());
-        System.out. println("Location:       " + i.getLocation());
+        System.out.println("Location:       " + i.getLocation());
         System.out.println("Status:         " + i.getStatus());
         if (i.getNotes() != null && !i.getNotes().isEmpty()) {
-            System.out. println("Notes:          " + i.getNotes());
+            System.out.println("Notes:          " + i.getNotes());
         }
     }
 }

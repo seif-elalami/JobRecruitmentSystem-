@@ -225,7 +225,7 @@ public List<Applicant> searchApplicantsByExperience(String experience) throws Re
             Document query = new Document("_id", new ObjectId(id));
             applicantCollection.deleteOne(query);
 
-            System.out. println("✅ Applicant deleted: " + id);
+            System.out.println("✅ Applicant deleted: " + id);
 
             return true;
 
@@ -240,7 +240,7 @@ public List<Applicant> searchApplicantsByExperience(String experience) throws Re
         applicant.setId(doc.getObjectId("_id").toString());
         applicant.setName(doc.getString("name"));
         applicant.setEmail(doc.getString("email"));
-        applicant.setPhone(doc. getString("phone"));
+        applicant.setPhone(doc.getString("phone"));
         applicant.setResume(doc.getString("resume"));
 
         @SuppressWarnings("unchecked")

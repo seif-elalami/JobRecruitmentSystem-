@@ -283,14 +283,14 @@ public class RegisterPage extends JFrame {
 
     /**
      * Handle registration action
-     * 
+     *
      * Password Flow:
      * 1. GUI: User enters plain password in password field
      * 2. GUI: Plain password sent to server via RMI (should use HTTPS in production)
      * 3. Server: AuthServiceImpl.register() receives plain password
      * 4. Server: PasswordUtil.hashPassword() hashes with BCrypt (auto-generates salt)
      * 5. Database: Only BCrypt hash is stored (never plain password)
-     * 
+     *
      * Login Verification:
      * 1. GUI: User enters plain password
      * 2. Server: AuthServiceImpl.login() receives plain password

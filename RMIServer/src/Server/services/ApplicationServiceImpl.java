@@ -37,12 +37,12 @@ public class ApplicationServiceImpl extends UnicastRemoteObject implements IAppl
         try {
             System.out.println("\n📤 Submitting application");
             System.out.println("   Job ID: " + application.getJobId());
-            System.out. println("   Applicant ID: " + application.getApplicantId());
+            System.out.println("   Applicant ID: " + application.getApplicantId());
 
             Document doc = new Document();
             doc.append("jobId", application.getJobId());  // Store as String
             doc.append("applicantId", application.getApplicantId());  // Store as String
-            doc. append("applicationDate", application.getApplicationDate());
+            doc.append("applicationDate", application.getApplicationDate());
             doc.append("status", application.getStatus());
             doc.append("coverLetter", application.getCoverLetter());
 
@@ -54,7 +54,7 @@ public class ApplicationServiceImpl extends UnicastRemoteObject implements IAppl
             return applicationId;
 
         } catch (Exception e) {
-            System.err. println("❌ Error submitting application: " + e.getMessage());
+            System.err.println("❌ Error submitting application: " + e.getMessage());
             e.printStackTrace();
             throw new RemoteException("Failed to submit application", e);
         }
@@ -176,7 +176,7 @@ public List<Application> getApplicationsByJobId(String jobId) throws RemoteExcep
         System.out.println("   Query: " + query.toJson());
 
         long count = applicationCollection.countDocuments(query);
-        System.out. println("   Matches found: " + count);
+        System.out.println("   Matches found: " + count);
 
         for (Document doc : applicationCollection.find(query)) {
             Application app = documentToApplication(doc);
@@ -186,13 +186,13 @@ public List<Application> getApplicationsByJobId(String jobId) throws RemoteExcep
 
         // ✅ If no results, try the OTHER format
         if (applications.isEmpty()) {
-            System.out. println("\n   ⚠️ No results with first query, trying alternate format.. .");
+            System.out.println("\n   ⚠️ No results with first query, trying alternate format...");
 
             Document alternateQuery;
             if (query.get("jobId") instanceof ObjectId) {
                 // We tried ObjectId, now try String
                 alternateQuery = new Document("jobId", jobId);
-                System.out. println("   Trying as String: " + alternateQuery.toJson());
+                System.out.println("   Trying as String: " + alternateQuery.toJson());
             } else {
                 // We tried String, now try ObjectId
                 try {
@@ -244,7 +244,7 @@ public List<Application> getApplicationsByJobId(String jobId) throws RemoteExcep
             long modifiedCount = applicationCollection.updateOne(query, update).getModifiedCount();
 
             if (modifiedCount > 0) {
-                System.out. println("✅ Application status updated to: " + status);
+                System.out.println("✅ Application status updated to: " + status);
                 return true;
             } else {
                 System.out.println("❌ Application not found or not updated");

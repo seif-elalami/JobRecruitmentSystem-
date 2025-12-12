@@ -5,12 +5,14 @@ import client.RMIClient;
 import client. utils.InputHelper;
 import shared.interfaces.IJobService;
 import shared.interfaces. IApplicationService;
-import shared.interfaces. IRecruiterService;
+import shared.interfaces.IRecruiterService;
+import shared.interfaces.IAuthService;
 import shared. models.Job;
 import shared.models.Application;
 import shared.models.Session;
 import shared.models.Interview;
-import shared.models. Applicant;
+import shared.models.Applicant;
+
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -23,12 +25,14 @@ public class RecruiterMenu {
     private IJobService jobService;
     private IApplicationService applicationService;
     private IRecruiterService recruiterService;
+    private IAuthService authService;
 
     public RecruiterMenu(RMIClient client, Session session) {
         this.session = session;
         this.jobService = client.getJobService();
         this.applicationService = client.getApplicationService();
         this.recruiterService = client.getRecruiterService();
+        this.authService = client.getAuthService();
     }
 
     public void run() {
@@ -49,67 +53,70 @@ public class RecruiterMenu {
                 viewMyProfile();
                 break;
             case 2:
-                updateMyProfile();
+                updateMyProfile();  // ✅ Includes optional password update
+                break;
+            case 3:
+                changePasswordSecurely();  // ✅ Secure password change with verification
                 break;
 
             // Job Management
-            case 3:
+            case 4:
                 createJobPosting();
                 break;
-            case 4:
+            case 5:
                 viewMyJobPostings();
                 break;
-            case 5:
+            case 6:
                 closeJobPosting();
                 break;
 
             // Application Management
-            case 6:
+            case 7:
                 viewAllApplications();
                 break;
-            case 7:
+            case 8:
                 viewApplicationsForSpecificJob();
                 break;
-            case 8:
+            case 9:
                 reviewApplication();
                 break;
 
             // Candidate Matching (Read-Only)
-            case 9:
+            case 10:
                 matchCandidatesToJob();
                 break;
-            case 10:
+            case 11:
                 viewCandidateDetails();
                 break;
-            case 11:
+            case 12:
                 searchCandidatesBySkillsReadOnly();
                 break;
-            case 12:
+            case 13:
                 searchByExperienceLevel();
                 break;
 
             // Applicant Search (Full Access)
-            case 13:
+            case 14:
                 searchApplicantsBySkills();
                 break;
-            case 14:
+            case 15:
                 searchApplicantsByExperience();
                 break;
 
             // Interview Management
-            case 15:
+            case 16:
                 scheduleInterview();
                 break;
-            case 16:
+            case 17:
                 viewMyInterviews();
                 break;
-            case 17:
+            case 18:
                 viewInterviewDetails();
                 break;
-            case 18:
+            case 19:
                 updateInterview();
                 break;
-            case 19:
+            case 20:
                 cancelInterview();
                 break;
 
@@ -136,49 +143,47 @@ public class RecruiterMenu {
     System.out.println();
 
     System.out.println("👤 Recruiter Profile:");
-    System.out.println("  1.   View My Profile");
-    System.out.println("  2.  Update My Profile");
+    System.out.println("  1.  View My Profile");
+    System.out.println("  2.  Update Profile (Phone, Company, Dept, Password)");
+    System.out.println("  3.  Change Password Securely");
     System.out.println();
 
     System.out.println("📋 Job Management:");
-    System.out.println("  3.  Create Job Posting");
-    System.out.println("  4.  View My Job Postings");
-    System.out.println("  5.  Close Job Posting");
+    System.out.println("  4.  Create Job Posting");
+    System.out.println("  5.  View My Job Postings");
+    System.out.println("  6.  Close Job Posting");
     System.out.println();
 
     System.out.println("📝 Application Management:");
-    System.out.println("  6.  View All Applications");
-    System.out.println("  7.  View Applications for Specific Job");
-    System.out.println("  8.  Review Application (Accept/Reject)");
+    System.out.println("  7.  View All Applications");
+    System.out.println("  8.  View Applications for Specific Job");
+    System.out.println("  9.  Review Application (Accept/Reject)");
     System.out.println();
 
     System.out.println("🔍 Candidate Matching & Search (Read-Only):");
-    System.out.println("  9.  Match Candidates to Job (View CVs)");
-    System.out.println("  10. View Candidate Details");
-    System.out.println("  11. Search Candidates by Skills");
-    System.out.println("  12. Search by Experience Level");
+    System.out.println("  10. Match Candidates to Job (View CVs)");
+    System.out.println("  11. View Candidate Details");
+    System.out.println("  12. Search Candidates by Skills");
+    System.out.println("  13. Search by Experience Level");
     System.out.println();
 
     System.out.println("👥 Applicant Search (Full Access):");
-    System.out.println("  13. Search Applicants by Skills");
-    System.out.println("  14. Search Applicants by Experience");
+    System.out.println("  14. Search Applicants by Skills");
+    System.out.println("  15. Search Applicants by Experience");
     System.out.println();
 
     System.out.println("📅 Interview Management:");
-    System.out.println("  15. Schedule Interview");
-    System.out.println("  16. View My Interviews");
-    System.out.println("  17. View Interview Details");
-    System.out.println("  18. Update Interview");
-    System.out.println("  19. Cancel Interview");
+    System.out.println("  16. Schedule Interview");
+    System.out.println("  17. View My Interviews");
+    System.out.println("  18. View Interview Details");
+    System.out.println("  19. Update Interview");
+    System.out.println("  20. Cancel Interview");
     System.out.println();
 
-    System.out.println("  0.  Logout");
+    System.out.println("  0.   Logout");
     System.out.print("\nChoice: ");
 }
 
-    // ========================================
-    // JOB MANAGEMENT
-    // ========================================
 
     private void createJobPosting() {
         try {
@@ -933,7 +938,7 @@ private void viewInterviewDetails() {
 
 private void updateMyProfile() {
     try {
-        System.out. println("\n╔════════════════════════════════════════╗");
+        System.out.println("\n╔════════════════════════════════════════╗");
         System.out. println("║         Update My Profile              ║");
         System.out.println("╚════════════════════════════════════════╝");
 
@@ -945,15 +950,16 @@ private void updateMyProfile() {
         }
 
         System.out. println("\nCurrent Profile:");
-        System.out.println("  Name:       " + recruiter.getName());
+        System.out.println("  Name:        " + recruiter.getName());
         System.out.println("  Email:      " + recruiter. getEmail());
         System.out.println("  Phone:      " + (recruiter.getPhone() != null ? recruiter.getPhone() : "Not set"));
-        System.out.println("  Company:    " + (recruiter. getCompany() != null ? recruiter.getCompany() : "Not set"));
+        System.out. println("  Company:    " + (recruiter.getCompany() != null ? recruiter.getCompany() : "Not set"));
         System.out.println("  Department: " + (recruiter.getDepartment() != null ? recruiter.getDepartment() : "Not set"));
+        System.out. println("  Position:   " + (recruiter.getPosition() != null ? recruiter.getPosition() : "Not set"));
 
         System.out.println("\n--- Enter new details (press Enter to keep current) ---\n");
 
-        System.out.print("New Phone:  ");
+        System.out.print("New Phone: ");
         String phone = InputHelper.getString();
         if (!phone.isEmpty()) {
             recruiter.setPhone(phone);
@@ -971,12 +977,55 @@ private void updateMyProfile() {
             recruiter.setDepartment(department);
         }
 
-        System.out.println("\n📤 Updating profile...");
+        System. out.print("New Position: ");
+        String position = InputHelper. getString();
+        if (!position. isEmpty()) {
+            recruiter. setPosition(position);
+        }
+
+        // ✅ NEW: Add password update option
+        System.out.println("\n--- Password Update (Optional) ---");
+        System.out.print("Do you want to change your password? (y/n): ");
+        String changePassword = InputHelper.getString().toLowerCase();
+
+        if (changePassword.equals("y")) {
+            System.out.print("Enter new password (min 6 characters): ");
+            String newPassword = InputHelper.getString();
+
+            if (newPassword.isEmpty()) {
+                System.out. println("⚠️  Password not changed (empty input)");
+                recruiter.setPassword(null);
+            } else if (newPassword.length() < 6) {
+                System.out.println("⚠️  Password not changed (too short - min 6 characters)");
+                recruiter.setPassword(null);
+            } else {
+                System.out.print("Confirm new password: ");
+                String confirmPassword = InputHelper. getString();
+
+                if (!newPassword.equals(confirmPassword)) {
+                    System.out.println("⚠️  Passwords don't match!  Password not changed.");
+                    recruiter.setPassword(null);
+                } else {
+                    recruiter.setPassword(newPassword);
+                    System.out.println("✅ Password will be updated");
+                }
+            }
+        } else {
+            // Don't update password
+            recruiter. setPassword(null);
+        }
+
+        System.out.println("\n📤 Updating profile.. .");
 
         boolean success = recruiterService.updateRecruiter(recruiter);
 
         if (success) {
             System.out.println("✅ Profile updated successfully!");
+
+            // If password was changed, recommend re-login
+            if (recruiter.getPassword() != null && ! recruiter.getPassword().isEmpty()) {
+                System.out.println("\n💡 Password changed! Please logout and login again for security.");
+            }
         } else {
             System.out.println("❌ Failed to update profile!");
         }
@@ -986,9 +1035,104 @@ private void updateMyProfile() {
         e.printStackTrace();
     }
 }
-    // ========================================
+
+private void changePasswordSecurely() {
+    try {
+        System.out.println("\n╔════════════════════════════════════════╗");
+        System.out. println("║      Change Password Securely          ║");
+        System.out.println("╚════════════════════════════════════════╝");
+        System.out.println("\n🔒 This method verifies your current password");
+        System.out.println("   for added security.\n");
+
+        // ✅ STEP 1:  Verify current password
+        System.out.print("Enter your CURRENT password: ");
+        String currentPassword = InputHelper.getString();
+
+        System.out.println("\n🔍 Verifying current password...");
+
+        try {
+            // Verify by attempting login
+            authService.login(session. getUserEmail(), currentPassword);
+            System. out.println("✅ Current password verified!\n");
+        } catch (Exception e) {
+            System.out.println("❌ Current password is incorrect!");
+            System.out.println("   Access denied for security reasons.");
+            return;
+        }
+
+        // ✅ STEP 2: Get new password
+        System.out. print("Enter NEW password (min 6 characters): ");
+        String newPassword = InputHelper.getString();
+
+        // Validate length
+        if (newPassword.length() < 6) {
+            System.out.println("❌ Password must be at least 6 characters!");
+            return;
+        }
+
+        // Check if same as current
+        if (newPassword. equals(currentPassword)) {
+            System.out.println("⚠️  New password is the same as current password!");
+            System.out.print("Continue anyway? (y/n): ");
+            String confirm = InputHelper.getString().toLowerCase();
+            if (!confirm.equals("y")) {
+                System.out.println("❌ Password change cancelled.");
+                return;
+            }
+        }
+
+        // ✅ STEP 3: Confirm new password
+        System.out. print("CONFIRM new password: ");
+        String confirmPassword = InputHelper.getString();
+
+        if (!newPassword.equals(confirmPassword)) {
+            System.out.println("❌ Passwords don't match!  Please try again.");
+            return;
+        }
+
+        // ✅ STEP 4: Update password
+        shared.models. Recruiter recruiter = recruiterService.getRecruiterById(session.getUserId());
+
+        if (recruiter == null) {
+            System.out.println("❌ Profile not found!");
+            return;
+        }
+
+        recruiter.setPassword(newPassword);
+
+        System.out.println("\n📤 Updating password...");
+
+        boolean success = recruiterService.updateRecruiter(recruiter);
+
+        if (success) {
+            System.out.println("\n╔════════════════════════════════════════╗");
+            System.out.println("║   ✅ PASSWORD CHANGED SUCCESSFULLY!    ║");
+            System.out.println("╚════════════════════════════════════════╝");
+            System.out.println("\n🔐 Your password has been securely updated.");
+            System.out.println("💡 Please logout and login again with your");
+            System.out.println("   new password for security.");
+            System.out.println("\n📝 Password requirements met:");
+            System.out.println("   ✅ Minimum 6 characters");
+            System.out. println("   ✅ Confirmed correctly");
+            System.out.println("   ✅ Current password verified");
+            System. out.println("   ✅ Encrypted with BCrypt");
+        } else {
+            System. out.println("❌ Failed to change password!");
+            System.out.println("   Please try again or contact support.");
+        }
+
+    } catch (Exception e) {
+        System.err.println("❌ Error changing password: " + e.getMessage());
+        e.printStackTrace();
+    }
+}
+
+
+
+
+
     // DISPLAY HELPER METHODS
-    // ========================================
+
 
     private void displayJob(Job job) {
         System.out.println("Job ID:       " + job.getJobId());

@@ -14,6 +14,7 @@ public abstract class NotificationSubject {
         }
         if (!observerCollection.contains(observer)) {
             observerCollection.add(observer);
+            System.out.println("DEBUG: Observer registered: " + observer.getClass().getName());
         }
     }
 
@@ -25,9 +26,12 @@ public abstract class NotificationSubject {
 
     protected void notifyObservers(String notificationData) {
         if (observerCollection != null) {
+            System.out.println("DEBUG: Notifying " + observerCollection.size() + " observers");
             for (NotificationObserver observer : observerCollection) {
                 observer.update(notificationData);
             }
+        } else {
+            System.out.println("DEBUG: No observers to notify (collection is null)");
         }
     }
 }

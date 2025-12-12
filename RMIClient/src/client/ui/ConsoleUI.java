@@ -95,7 +95,7 @@ public class ConsoleUI {
             System.err.println("Error: " + e.getMessage());
             System.err.println("\n💡 Make sure:");
             System.err.println("   1. MongoDB is running (port 27017)");
-            System.err.println("   2. RMI Server is running (port 1099)");
+            System.err. println("   2. RMI Server is running (port 1099)");
             InputHelper.pause();
         }
     }
@@ -103,9 +103,9 @@ public class ConsoleUI {
     private void startBoth() {
         System.out.println("⚠️  Cannot start both from client!");
         System.out.println("\nPlease start server and client separately:");
-        System.out.println("\n📋 Step 1: Start MongoDB");
-        System.out.println("   mongod --port 27017 --dbpath D:\\mongodb-data\\JobRecruitmentDB");
-        System.out.println("\n📋 Step 2: Start Server");
+        System.out. println("\n📋 Step 1: Start MongoDB");
+        System.out.println("   mongod --port 27020 --dbpath D:\\mongodb-data\\JobRecruitmentDB");
+        System.out. println("\n📋 Step 2: Start Server");
         System.out.println("   Open RMIServer/src/server/Main.java and click Run");
         System.out.println("\n📋 Step 3: Start Client");
         System.out.println("   Choose option 2 from this menu");

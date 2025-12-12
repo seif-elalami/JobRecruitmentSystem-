@@ -1,10 +1,10 @@
 package client.ui;
 
 import client.RMIClient;
-import client. utils.InputHelper;
+import client.utils.InputHelper;
 import shared.models.Session;
 import shared.models.Job;
-import shared.models. Applicant;
+import shared.models.Applicant;
 import shared.models.Application;
 import shared.interfaces.*;
 
@@ -31,7 +31,7 @@ public class ApplicantMenu {
             while (!logout) {
                 showMenu();
                 int choice = InputHelper.getInt();
-                System. out.println();
+                System.out.println();
 
                 switch (choice) {
                     case 1:
@@ -57,7 +57,7 @@ public class ApplicantMenu {
                         System.out.println("❌ Invalid choice!");
                 }
 
-                if (! logout) InputHelper.pause();
+                if (!logout) InputHelper.pause();
             }
 
         } catch (Exception e) {
@@ -76,8 +76,8 @@ public class ApplicantMenu {
         System.out.println("2. Apply to Job");
         System.out.println("3. View My Applications");
         System.out.println("4. Update My Profile");
-        System.out. println("5. View My Profile");
-        System.out. println("0. Logout");
+        System.out.println("5. View My Profile");
+        System.out.println("0. Logout");
         System.out.print("\nChoice: ");
     }
 

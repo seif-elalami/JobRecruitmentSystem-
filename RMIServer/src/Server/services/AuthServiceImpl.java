@@ -1,16 +1,16 @@
 package Server.services;
 
 import Server.database.MongoDBConnection;
-import Server.utils. PasswordUtil;
+import Server.utils.PasswordUtil;
 import Server.utils.ValidationUtil;
 import shared.interfaces.IAuthService;
-import shared.models. Session;
+import shared.models.Session;
 import shared.models.User;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
-import org. bson.types.ObjectId;
+import org.bson.types.ObjectId;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -69,35 +69,35 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
             Document doc = new Document();
             doc.append("username", user.getUsername());
             doc.append("email", user.getEmail());
-            doc.append("password", user.getPassword());  // Store plain password (or hash it)
+            // ✅ Hash password with BCrypt before storing
+            String hashedPassword = PasswordUtil.hashPassword(user.getPassword());
+            doc.append("password", hashedPassword);
             doc.append("role", user.getRole());
             doc.append("phone", user.getPhone());
             doc.append("createdAt", new Date());
             doc.append("lastLogin", null);
             doc.append("isActive", true);
 
-            // Add role-specific fields
-            if ("APPLICANT".equals(user.getRole())) {
-                doc.append("skills", user.getSkills());
-                doc.append("experience", user.getExperience());
-            } else if ("RECRUITER".equals(user.getRole())) {
-                doc.append("department", user.getDepartment() != null ? user.getDepartment() : "General");
-                doc.append("company", user.getCompany());
-                doc.append("position", user.getPosition());
-                doc.append("description", user.getDescription());
-            }
+        // Role-specific fields
+        if ("APPLICANT".equals(user.getRole())) {
+            doc.append("skills", user.getSkills());
+            doc.append("experience", user.getExperience());
+        } else if ("RECRUITER".equals(user.getRole())) {
+            doc.append("department", user.getDepartment());
+            doc.append("company", user.getCompany());
+            doc.append("position", user.getPosition());
+            doc.append("description", user. getDescription());
+        }
 
-            userCollection.insertOne(doc);
+        userCollection.insertOne(doc);
 
-            String userId = doc.getObjectId("_id").toString();
-            user.setUserId(userId);
+        String userId = doc.getObjectId("_id").toString();
+        System.out.println("✅ User registered with ID: " + userId);
 
-            // Create session
-            Session session = new Session(userId, user.getEmail(), user.getRole());
+        // Create session
+        Session session = new Session(userId, user.getEmail(), user.getRole());
 
-            System.out.println("✅ Registration successful:  " + user.getEmail() + " (ID: " + userId + ", Role: " + user.getRole() + ")");
-
-            return session;
+        return session;
 
         } catch (RemoteException e) {
             throw e;
@@ -108,43 +108,68 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
         }
     }
 
-    @Override
-    public Session login(String email, String password) throws RemoteException {
-        try {
-            System.out.println("🔐 Login attempt: " + email);
+  @Override
+public Session login(String email, String password) throws RemoteException {
+    try {
+        System.out.println("🔐 Login attempt for: " + email);
 
-            // Get user by email
-            User user = getUserByEmail(email);
+        // Find user by email
+        Document query = new Document("email", email);
+        Document userDoc = userCollection.find(query).first();
 
-            if (user == null) {
-                System.out.println("❌ Login failed: User not found - " + email);
-                throw new RemoteException("Invalid email or password");
-            }
-
-            // Verify password
-            if (!user.getPassword().equals(password)) {
-                System.out.println("❌ Login failed: Invalid password - " + email);
-                throw new RemoteException("Invalid email or password");
-            }
-
-            // Update last login time
-            updateLastLogin(user.getUserId());
-
-            // Create session with userId, email, and role
-            Session session = new Session(user.getUserId(), user.getEmail(), user.getRole());
-
-            System.out.println("✅ Login successful: " + email + " (Role: " + user.getRole() + ")");
-
-            return session;
-
-        } catch (RemoteException e) {
-            throw e;
-        } catch (Exception e) {
-            System.err.println("❌ Login error: " + e.getMessage());
-            e.printStackTrace();
-            throw new RemoteException("Login failed", e);
+        if (userDoc == null) {
+            System.out.println("❌ User not found:  " + email);
+            throw new RemoteException("Invalid email or password");
         }
+
+        // Get stored hashed password
+        String storedHashedPassword = userDoc.getString("password");
+
+        System.out.println("   Stored password (first 20 chars): " + storedHashedPassword.substring(0, Math.min(20, storedHashedPassword.length())) + "...");
+        System.out.println("   Provided password: " + password);
+
+        // ✅ CRITICAL FIX:   Use PasswordUtil.verifyPassword() to compare
+        boolean passwordMatches = PasswordUtil.verifyPassword(password, storedHashedPassword);
+
+        System.out.println("   Password matches?  " + passwordMatches);
+
+        if (! passwordMatches) {
+            System.out.println("❌ Invalid password for: " + email);
+            throw new RemoteException("Invalid email or password");
+        }
+
+        // Check if account is active
+        Boolean isActive = userDoc.getBoolean("isActive");
+        if (isActive != null && !isActive) {
+            System.out.println("❌ Account is inactive: " + email);
+            throw new RemoteException("Account is inactive.  Please contact support.");
+        }
+
+        // Get user details
+        String userId = userDoc.getObjectId("_id").toString();
+        String role = userDoc.getString("role");
+
+        System.out.println("✅ Login successful!");
+        System.out.println("   User ID: " + userId);
+        System.out.println("   Role: " + role);
+
+        // Update last login time
+        Document updateDoc = new Document("$set", new Document("lastLogin", new Date()));
+        userCollection.updateOne(query, updateDoc);
+
+        // Create and return session
+        Session session = new Session(userId, email, role);
+
+        return session;
+
+    } catch (RemoteException e) {
+        throw e;
+    } catch (Exception e) {
+        System.err.println("❌ Login error: " + e.getMessage());
+        e.printStackTrace();
+        throw new RemoteException("Login failed", e);
     }
+}
 
 
 
@@ -176,7 +201,7 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
             }
 
             if (session.isExpired()) {
-                activeSessions. remove(sessionToken);
+                activeSessions.remove(sessionToken);
                 return null;
             }
 
@@ -242,7 +267,7 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
     public boolean changePassword(String email, String oldPassword, String newPassword) throws RemoteException {
         try {
             // Validate new password
-            if (newPassword == null || newPassword. length() < 6) {
+            if (newPassword == null || newPassword.length() < 6) {
                 System.err.println("❌ Password change failed: Password must be at least 6 characters");
                 return false;
             }
@@ -257,7 +282,7 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
 
             // Verify old password
             if (!user.getPassword().equals(oldPassword)) {
-                System.err. println("❌ Password change failed: Old password incorrect");
+                System.err.println("❌ Password change failed: Old password incorrect");
                 return false;
             }
 
@@ -303,7 +328,7 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
 
         for (Document doc : userCollection.find()) {  // ✅ Use existing userCollection
             User user = documentToUser(doc);
-            users. add(user);
+            users.add(user);
         }
 
         System.out.println("   ✅ Found " + users.size() + " user(s)");
@@ -318,6 +343,7 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
     /**
      * Helper method to update last login time
      */
+    @SuppressWarnings("unused")
     private void updateLastLogin(String userId) {
         try {
             Document query = new Document("_id", new ObjectId(userId));
@@ -337,23 +363,23 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
         // Common fields
         user.setUserId(doc.getObjectId("_id").toString());
         user.setUsername(doc.getString("username"));
-        user.setEmail(doc. getString("email"));
+        user.setEmail(doc.getString("email"));
         user.setPassword(doc.getString("password"));
-        user.setRole(doc. getString("role"));
+        user.setRole(doc.getString("role"));
         user.setPhone(doc.getString("phone"));
         user.setCreatedAt(doc.getDate("createdAt"));
-        user.setLastLogin(doc. getDate("lastLogin"));
+        user.setLastLogin(doc.getDate("lastLogin"));
         user.setActive(doc.getBoolean("isActive", true));
 
         // Role-specific fields
         if ("APPLICANT".equals(user.getRole())) {
-            user.setSkills(doc. getString("skills"));
+            user.setSkills(doc.getString("skills"));
             user.setExperience(doc.getString("experience"));
-        } else if ("RECRUITER".equals(user. getRole())) {
-            user.setDepartment(doc. getString("department"));
+        } else if ("RECRUITER".equals(user.getRole())) {
+            user.setDepartment(doc.getString("department"));
             user.setCompany(doc.getString("company"));
             user.setPosition(doc.getString("position"));
-            user.setDescription(doc. getString("description"));
+            user.setDescription(doc.getString("description"));
         }
 
         return user;

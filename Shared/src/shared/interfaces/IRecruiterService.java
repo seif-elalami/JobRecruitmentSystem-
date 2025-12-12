@@ -3,12 +3,11 @@ package shared.interfaces;
 import shared.models.Recruiter;
 import shared.models.Job;
 import shared.models.Application;
-import shared.models. Applicant;
-import shared. models.Interview;
+import shared.models.Applicant;
+import shared.models.Interview;
 
-import java. rmi.Remote;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.Date;
 import java.util.List;
 
 public interface IRecruiterService extends Remote {

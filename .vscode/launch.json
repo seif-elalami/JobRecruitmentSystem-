@@ -1,0 +1,52 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "client.Main",
+            "projectName": "JobRecruitmentSystem_5ddcc0c7"
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "Server.Main",
+            "projectName": "JobRecruitmentSystem_5ddcc0c7"
+        },
+        {
+            "type": "java",
+            "name": "RMIServer",
+            "request": "launch",
+            "mainClass": "Server.RMIServer",
+            "projectName": "JobRecruitmentSystem_5ddcc0c7"
+        },
+        {
+            "type": "java",
+            "name": "▶️ Run RMI Server",
+            "request": "launch",
+            "mainClass": "server.Main",
+            "projectName": "RMIServer",
+            "classPaths": [
+                "${workspaceFolder}/RMIServer/bin",
+                "${workspaceFolder}/Shared/bin",
+                "${workspaceFolder}/RMIServer/lib/*"
+            ],
+            "console": "integratedTerminal"
+        },
+        {
+            "type": "java",
+            "name": "▶️ Run RMI Client",
+            "request": "launch",
+            "mainClass": "client.Main",
+            "projectName": "RMIClient",
+            "classPaths": [
+                "${workspaceFolder}/RMIClient/bin",
+                "${workspaceFolder}/Shared/bin",
+                "${workspaceFolder}/RMIClient/lib/*"
+            ],
+            "console": "integratedTerminal"
+        }
+    ]
+}

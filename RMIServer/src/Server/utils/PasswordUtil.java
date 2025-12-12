@@ -1,66 +1,115 @@
 package Server.utils;
 
-import java.security. MessageDigest;
-import java. security.SecureRandom;
-import java. util.Base64;
+import org.mindrot.jbcrypt.BCrypt;
+
 
 public class PasswordUtil {
 
-    private static final int SALT_LENGTH = 16;
-
     /**
-     * Hash a password with a random salt
+     * Hash a password using BCrypt
+     * @param password Plain text password
+     * @return BCrypt hashed password (starts with $2a$)
      */
     public static String hashPassword(String password) {
+        if (password == null || password.isEmpty()) {
+            throw new IllegalArgumentException("Password cannot be null or empty");
+        }
+
         try {
-            // Generate random salt
-            SecureRandom random = new SecureRandom();
-            byte[] salt = new byte[SALT_LENGTH];
-            random.nextBytes(salt);
+            // BCrypt automatically generates a salt and hashes the password
+            String hash = BCrypt.hashpw(password, BCrypt.gensalt());
 
-            // Hash password with salt
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            md.update(salt);
-            byte[] hashedPassword = md.digest(password.getBytes("UTF-8"));
+            System.out.println("🔐 Password hashed with BCrypt");
+            System.out.println("   Hash format: " + hash. substring(0, Math.min(20, hash.length())) + "...");
 
-            // Combine salt + hash
-            byte[] combined = new byte[salt.length + hashedPassword.length];
-            System.arraycopy(salt, 0, combined, 0, salt.length);
-            System.arraycopy(hashedPassword, 0, combined, salt.length, hashedPassword.length);
-
-            // Encode as Base64 string
-            return Base64.getEncoder().encodeToString(combined);
+            return hash;
 
         } catch (Exception e) {
+            System.err.println("❌ Error hashing password: " + e.getMessage());
             throw new RuntimeException("Error hashing password", e);
         }
     }
 
     /**
-     * Verify a password against a stored hash
+     * Verify a password against a BCrypt hash
+     * @param password Plain text password to verify
+     * @param storedHash BCrypt hash from database
+     * @return true if password matches, false otherwise
      */
     public static boolean verifyPassword(String password, String storedHash) {
+        if (password == null || storedHash == null) {
+            System.err.println("❌ Password or hash is null");
+            return false;
+        }
+
         try {
-            // Decode stored hash
-            byte[] combined = Base64.getDecoder(). decode(storedHash);
+            System.out.println("🔍 Verifying password with BCrypt");
+            System.out.println("   Hash format: " + storedHash.substring(0, Math.min(20, storedHash.length())) + "...");
 
-            // Extract salt
-            byte[] salt = new byte[SALT_LENGTH];
-            System.arraycopy(combined, 0, salt, 0, SALT_LENGTH);
+            // Check if it's a valid BCrypt hash
+            if (! isValidBCryptHash(storedHash)) {
+                System.err.println("❌ Invalid BCrypt hash format!");
+                System.err.println("   Expected: $2a$10$...");
+                System.err.println("   Actual:   " + storedHash.substring(0, Math.min(20, storedHash.length())));
 
-            // Extract stored password hash
-            byte[] storedPasswordHash = new byte[combined.length - SALT_LENGTH];
-            System.arraycopy(combined, SALT_LENGTH, storedPasswordHash, 0, storedPasswordHash.length);
+                // ⚠️ FALLBACK: Try SHA-256 verification for old passwords
+                System.out.println("⚠️  Attempting legacy SHA-256 verification.. .");
+                return verifyPasswordLegacy(password, storedHash);
+            }
 
-            // Hash the provided password with the same salt
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            md.update(salt);
-            byte[] testPasswordHash = md.digest(password. getBytes("UTF-8"));
+            // Use BCrypt to verify
+            boolean matches = BCrypt.checkpw(password, storedHash);
+            System.out.println("   Result: " + (matches ? "✅ MATCH" : "❌ NO MATCH"));
 
-            // Compare
-            return MessageDigest.isEqual(storedPasswordHash, testPasswordHash);
+            return matches;
 
         } catch (Exception e) {
+            System.err.println("❌ Error verifying password: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Check if a hash is a valid BCrypt format
+     */
+    public static boolean isValidBCryptHash(String hash) {
+        return hash != null &&
+               hash.length() >= 60 &&
+               (hash.startsWith("$2a$") || hash.startsWith("$2b$") || hash.startsWith("$2y$"));
+    }
+
+    /**
+     * LEGACY:  Verify passwords hashed with old SHA-256 method
+     * This is temporary to support existing users
+     * Once all users re-register, this can be removed
+     */
+    private static boolean verifyPasswordLegacy(String password, String storedHash) {
+        try {
+            // Decode stored hash
+            byte[] combined = java.util.Base64.getDecoder().decode(storedHash);
+
+            // Extract salt (first 16 bytes)
+            byte[] salt = new byte[16];
+            System.arraycopy(combined, 0, salt, 0, 16);
+
+            // Extract stored password hash
+            byte[] storedPasswordHash = new byte[combined.length - 16];
+            System.arraycopy(combined, 16, storedPasswordHash, 0, storedPasswordHash.length);
+
+            // Hash the provided password with the same salt
+            java.security.MessageDigest md = java.security.MessageDigest. getInstance("SHA-256");
+            md.update(salt);
+            byte[] testPasswordHash = md. digest(password.getBytes("UTF-8"));
+
+            // Compare
+            boolean matches = java.security.MessageDigest.isEqual(storedPasswordHash, testPasswordHash);
+            System.out.println("   Legacy SHA-256 result: " + (matches ? "✅ MATCH" : "❌ NO MATCH"));
+
+            return matches;
+
+        } catch (Exception e) {
+            System.err.println("❌ Legacy verification failed: " + e.getMessage());
             return false;
         }
     }
@@ -72,10 +121,6 @@ public class PasswordUtil {
         if (password == null || password.length() < 6) {
             return false;
         }
-        // Add more rules if needed:
-        // - At least one uppercase
-        // - At least one number
-        // - At least one special character
         return true;
     }
 
@@ -86,7 +131,6 @@ public class PasswordUtil {
         if (email == null || email.isEmpty()) {
             return false;
         }
-        // Simple email validation
         return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     }
 }

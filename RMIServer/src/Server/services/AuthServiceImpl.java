@@ -34,117 +34,120 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
         System.out.println("✅ AuthService initialized");
     }
 
-    @Override
-    public Session register(User user) throws RemoteException {
-        try {
-            System.out.println("📝 Registration attempt:  " + user.getEmail());
+   @Override
+public Session register(User user) throws RemoteException {
+    try {
+        System.out.println("📤 Registering new user: " + user.getEmail());
 
-            // Validate email format
-            if (!ValidationUtil.isValidEmail(user. getEmail())) {
-                System.err.println("❌ Registration failed: " + ValidationUtil.getEmailErrorMessage());
-                throw new RemoteException(ValidationUtil.getEmailErrorMessage());
-            }
-
-            // Check if email already exists
-            User existingUser = getUserByEmail(user.getEmail());
-            if (existingUser != null) {
-                System.out.println("❌ Registration failed: Email already exists - " + user.getEmail());
-                throw new RemoteException("Email already exists");
-            }
-
-            // Validate password length
-            if (user.getPassword() == null || user.getPassword().length() < 6) {
-                throw new RemoteException("Password must be at least 6 characters");
-            }
-
-            // Validate phone if provided
-            if (user.getPhone() != null && !user.getPhone().isEmpty()) {
-                if (!ValidationUtil.isValidPhone(user.getPhone())) {
-                    System.err.println("❌ Registration failed: " + ValidationUtil. getPhoneErrorMessage());
-                    throw new RemoteException(ValidationUtil.getPhoneErrorMessage());
-                }
-            }
-
-            // Create user document
-            Document doc = new Document();
-            doc.append("username", user.getUsername());
-            doc.append("email", user.getEmail());
-            doc.append("password", user.getPassword());  // Store plain password (or hash it)
-            doc.append("role", user.getRole());
-            doc.append("phone", user.getPhone());
-            doc.append("createdAt", new Date());
-            doc.append("lastLogin", null);
-            doc.append("isActive", true);
-
-            // Add role-specific fields
-            if ("APPLICANT".equals(user.getRole())) {
-                doc.append("skills", user.getSkills());
-                doc.append("experience", user.getExperience());
-            } else if ("RECRUITER".equals(user.getRole())) {
-                doc.append("department", user.getDepartment() != null ? user.getDepartment() : "General");
-                doc.append("company", user.getCompany());
-                doc.append("position", user.getPosition());
-                doc.append("description", user.getDescription());
-            }
-
-            userCollection.insertOne(doc);
-
-            String userId = doc.getObjectId("_id").toString();
-            user.setUserId(userId);
-
-            // Create session
-            Session session = new Session(userId, user.getEmail(), user.getRole());
-
-            System.out.println("✅ Registration successful:  " + user.getEmail() + " (ID: " + userId + ", Role: " + user.getRole() + ")");
-
-            return session;
-
-        } catch (RemoteException e) {
-            throw e;
-        } catch (Exception e) {
-            System.err. println("❌ Registration error:  " + e.getMessage());
-            e.printStackTrace();
-            throw new RemoteException("Registration failed", e);
+        // Check if user already exists
+        Document existingUser = userCollection.find(new Document("email", user. getEmail())).first();
+        if (existingUser != null) {
+            System.out.println("❌ Email already exists!");
+            throw new RemoteException("Email already registered!");
         }
-    }
 
-    @Override
-    public Session login(String email, String password) throws RemoteException {
-        try {
-            System.out.println("🔐 Login attempt: " + email);
+        // ✅ CRITICAL: Hash the password before storing
+        String hashedPassword = PasswordUtil.hashPassword(user.getPassword());
 
-            // Get user by email
-            User user = getUserByEmail(email);
+        Document doc = new Document();
+        doc.append("username", user.getUsername());
+        doc.append("email", user. getEmail());
+        doc.append("password", hashedPassword);  // ✅ Store HASHED password
+        doc.append("role", user.getRole());
+        doc.append("phone", user.getPhone());
+        doc.append("createdAt", new Date());
+        doc.append("isActive", true);
 
-            if (user == null) {
-                System.out.println("❌ Login failed: User not found - " + email);
-                throw new RemoteException("Invalid email or password");
-            }
-
-            // Verify password
-            if (!user.getPassword().equals(password)) {
-                System.out.println("❌ Login failed: Invalid password - " + email);
-                throw new RemoteException("Invalid email or password");
-            }
-
-            // Update last login time
-            updateLastLogin(user.getUserId());
-
-            // Create session with userId, email, and role
-            Session session = new Session(user.getUserId(), user.getEmail(), user.getRole());
-
-            System.out.println("✅ Login successful: " + email + " (Role: " + user.getRole() + ")");
-
-            return session;
-
-        } catch (RemoteException e) {
-            throw e;
-        } catch (Exception e) {
-            System.err.println("❌ Login error: " + e.getMessage());
-            e.printStackTrace();
-            throw new RemoteException("Login failed", e);
+        // Role-specific fields
+        if ("APPLICANT".equals(user.getRole())) {
+            doc.append("skills", user.getSkills());
+            doc.append("experience", user.getExperience());
+        } else if ("RECRUITER".equals(user.getRole())) {
+            doc.append("department", user.getDepartment());
+            doc.append("company", user.getCompany());
+            doc.append("position", user.getPosition());
+            doc.append("description", user. getDescription());
         }
+
+        userCollection.insertOne(doc);
+
+        String userId = doc.getObjectId("_id").toString();
+        System.out.println("✅ User registered with ID: " + userId);
+
+        // Create session
+        Session session = new Session(userId, user.getEmail(), user.getRole());
+
+        return session;
+
+    } catch (Exception e) {
+        System.err.println("❌ Error during registration: " + e.getMessage());
+        e.printStackTrace();
+        throw new RemoteException("Registration failed", e);
     }
+}
+
+  @Override
+public Session login(String email, String password) throws RemoteException {
+    try {
+        System.out.println("🔐 Login attempt for: " + email);
+
+        // Find user by email
+        Document query = new Document("email", email);
+        Document userDoc = userCollection.find(query).first();
+
+        if (userDoc == null) {
+            System.out.println("❌ User not found:  " + email);
+            throw new RemoteException("Invalid email or password");
+        }
+
+        // Get stored hashed password
+        String storedHashedPassword = userDoc.getString("password");
+
+        System.out.println("   Stored password (first 20 chars): " + storedHashedPassword.substring(0, Math.min(20, storedHashedPassword.length())) + "...");
+        System.out.println("   Provided password: " + password);
+
+        // ✅ CRITICAL FIX:   Use PasswordUtil.verifyPassword() to compare
+        boolean passwordMatches = PasswordUtil.verifyPassword(password, storedHashedPassword);
+
+        System.out.println("   Password matches?  " + passwordMatches);
+
+        if (! passwordMatches) {
+            System.out.println("❌ Invalid password for: " + email);
+            throw new RemoteException("Invalid email or password");
+        }
+
+        // Check if account is active
+        Boolean isActive = userDoc.getBoolean("isActive");
+        if (isActive != null && !isActive) {
+            System.out.println("❌ Account is inactive: " + email);
+            throw new RemoteException("Account is inactive.  Please contact support.");
+        }
+
+        // Get user details
+        String userId = userDoc.getObjectId("_id").toString();
+        String role = userDoc.getString("role");
+
+        System.out.println("✅ Login successful!");
+        System.out.println("   User ID: " + userId);
+        System.out.println("   Role: " + role);
+
+        // Update last login time
+        Document updateDoc = new Document("$set", new Document("lastLogin", new Date()));
+        userCollection.updateOne(query, updateDoc);
+
+        // Create and return session
+        Session session = new Session(userId, email, role);
+
+        return session;
+
+    } catch (RemoteException e) {
+        throw e;
+    } catch (Exception e) {
+        System.err.println("❌ Login error: " + e.getMessage());
+        e.printStackTrace();
+        throw new RemoteException("Login failed", e);
+    }
+}
 
 
 

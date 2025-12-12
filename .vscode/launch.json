@@ -1,0 +1,27 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Server (Java 21)",
+            "type": "java",
+            "name": "Server.Main",
+            "request": "launch",
+            "mainClass": "Server.Main",
+            "projectName": "JobRecruitmentSystem-",
+            "cwd": "${workspaceFolder}",
+            "runtimeExecutable": "C:\\Java\\jdk-21\\bin\\java",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Client (Java 21)",
+            "type": "java",
+            "name": "client.Main",
+            "request": "launch",
+            "mainClass": "client.Main",
+            "projectName": "JobRecruitmentSystem-",
+            "cwd": "${workspaceFolder}",
+            "runtimeExecutable": "C:\\Java\\jdk-21\\bin\\java",
+            "console": "integratedTerminal"
+        }
+    ]
+}

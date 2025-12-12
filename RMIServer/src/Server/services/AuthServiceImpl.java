@@ -1,10 +1,10 @@
 package Server.services;
 
 import Server.database.MongoDBConnection;
-import Server.utils. PasswordUtil;
+import Server.utils.PasswordUtil;
 import Server.utils.ValidationUtil;
 import shared.interfaces.IAuthService;
-import shared.models. Session;
+import shared.models.Session;
 import shared.models.User;
 
 import com.mongodb.client.MongoCollection;
@@ -34,29 +34,49 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
         System.out.println("✅ AuthService initialized");
     }
 
-   @Override
-public Session register(User user) throws RemoteException {
-    try {
-        System.out.println("📤 Registering new user: " + user.getEmail());
+    @Override
+    public Session register(User user) throws RemoteException {
+        try {
+            System.out.println("📝 Registration attempt:  " + user.getEmail());
 
-        // Check if user already exists
-        Document existingUser = userCollection.find(new Document("email", user. getEmail())).first();
-        if (existingUser != null) {
-            System.out.println("❌ Email already exists!");
-            throw new RemoteException("Email already registered!");
-        }
+            // Validate email format
+            if (!ValidationUtil.isValidEmail(user. getEmail())) {
+                System.err.println("❌ Registration failed: " + ValidationUtil.getEmailErrorMessage());
+                throw new RemoteException(ValidationUtil.getEmailErrorMessage());
+            }
 
-        // ✅ CRITICAL: Hash the password before storing
-        String hashedPassword = PasswordUtil.hashPassword(user.getPassword());
+            // Check if email already exists
+            User existingUser = getUserByEmail(user.getEmail());
+            if (existingUser != null) {
+                System.out.println("❌ Registration failed: Email already exists - " + user.getEmail());
+                throw new RemoteException("Email already exists");
+            }
 
-        Document doc = new Document();
-        doc.append("username", user.getUsername());
-        doc.append("email", user. getEmail());
-        doc.append("password", hashedPassword);  // ✅ Store HASHED password
-        doc.append("role", user.getRole());
-        doc.append("phone", user.getPhone());
-        doc.append("createdAt", new Date());
-        doc.append("isActive", true);
+            // Validate password length
+            if (user.getPassword() == null || user.getPassword().length() < 6) {
+                throw new RemoteException("Password must be at least 6 characters");
+            }
+
+            // Validate phone if provided
+            if (user.getPhone() != null && !user.getPhone().isEmpty()) {
+                if (!ValidationUtil.isValidPhone(user.getPhone())) {
+                    System.err.println("❌ Registration failed: " + ValidationUtil. getPhoneErrorMessage());
+                    throw new RemoteException(ValidationUtil.getPhoneErrorMessage());
+                }
+            }
+
+            // Create user document
+            Document doc = new Document();
+            doc.append("username", user.getUsername());
+            doc.append("email", user.getEmail());
+            // ✅ Hash password with BCrypt before storing
+            String hashedPassword = PasswordUtil.hashPassword(user.getPassword());
+            doc.append("password", hashedPassword);
+            doc.append("role", user.getRole());
+            doc.append("phone", user.getPhone());
+            doc.append("createdAt", new Date());
+            doc.append("lastLogin", null);
+            doc.append("isActive", true);
 
         // Role-specific fields
         if ("APPLICANT".equals(user.getRole())) {
@@ -79,12 +99,14 @@ public Session register(User user) throws RemoteException {
 
         return session;
 
-    } catch (Exception e) {
-        System.err.println("❌ Error during registration: " + e.getMessage());
-        e.printStackTrace();
-        throw new RemoteException("Registration failed", e);
+        } catch (RemoteException e) {
+            throw e;
+        } catch (Exception e) {
+            System.err. println("❌ Registration error:  " + e.getMessage());
+            e.printStackTrace();
+            throw new RemoteException("Registration failed", e);
+        }
     }
-}
 
   @Override
 public Session login(String email, String password) throws RemoteException {
@@ -179,7 +201,7 @@ public Session login(String email, String password) throws RemoteException {
             }
 
             if (session.isExpired()) {
-                activeSessions. remove(sessionToken);
+                activeSessions.remove(sessionToken);
                 return null;
             }
 
@@ -245,7 +267,7 @@ public Session login(String email, String password) throws RemoteException {
     public boolean changePassword(String email, String oldPassword, String newPassword) throws RemoteException {
         try {
             // Validate new password
-            if (newPassword == null || newPassword. length() < 6) {
+            if (newPassword == null || newPassword.length() < 6) {
                 System.err.println("❌ Password change failed: Password must be at least 6 characters");
                 return false;
             }
@@ -260,7 +282,7 @@ public Session login(String email, String password) throws RemoteException {
 
             // Verify old password
             if (!user.getPassword().equals(oldPassword)) {
-                System.err. println("❌ Password change failed: Old password incorrect");
+                System.err.println("❌ Password change failed: Old password incorrect");
                 return false;
             }
 
@@ -306,7 +328,7 @@ public Session login(String email, String password) throws RemoteException {
 
         for (Document doc : userCollection.find()) {  // ✅ Use existing userCollection
             User user = documentToUser(doc);
-            users. add(user);
+            users.add(user);
         }
 
         System.out.println("   ✅ Found " + users.size() + " user(s)");
@@ -321,6 +343,7 @@ public Session login(String email, String password) throws RemoteException {
     /**
      * Helper method to update last login time
      */
+    @SuppressWarnings("unused")
     private void updateLastLogin(String userId) {
         try {
             Document query = new Document("_id", new ObjectId(userId));
@@ -340,23 +363,23 @@ public Session login(String email, String password) throws RemoteException {
         // Common fields
         user.setUserId(doc.getObjectId("_id").toString());
         user.setUsername(doc.getString("username"));
-        user.setEmail(doc. getString("email"));
+        user.setEmail(doc.getString("email"));
         user.setPassword(doc.getString("password"));
-        user.setRole(doc. getString("role"));
+        user.setRole(doc.getString("role"));
         user.setPhone(doc.getString("phone"));
         user.setCreatedAt(doc.getDate("createdAt"));
-        user.setLastLogin(doc. getDate("lastLogin"));
+        user.setLastLogin(doc.getDate("lastLogin"));
         user.setActive(doc.getBoolean("isActive", true));
 
         // Role-specific fields
         if ("APPLICANT".equals(user.getRole())) {
-            user.setSkills(doc. getString("skills"));
+            user.setSkills(doc.getString("skills"));
             user.setExperience(doc.getString("experience"));
-        } else if ("RECRUITER".equals(user. getRole())) {
-            user.setDepartment(doc. getString("department"));
+        } else if ("RECRUITER".equals(user.getRole())) {
+            user.setDepartment(doc.getString("department"));
             user.setCompany(doc.getString("company"));
             user.setPosition(doc.getString("position"));
-            user.setDescription(doc. getString("description"));
+            user.setDescription(doc.getString("description"));
         }
 
         return user;

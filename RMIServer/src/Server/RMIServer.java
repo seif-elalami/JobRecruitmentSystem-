@@ -1,18 +1,18 @@
 package Server;
 
 import Server.database.MongoDBConnection;
-import Server. services.ApplicantServiceImpl;
-import Server.services. JobServiceImpl;
+import Server.services.ApplicantServiceImpl;
+import Server.services.JobServiceImpl;
 import Server.services.ApplicationServiceImpl;
 import Server.services.AuthServiceImpl;
 import Server.services.RecruiterServiceImpl;
 import shared.interfaces.IApplicantService;
-import shared. interfaces.IJobService;
+import shared.interfaces.IJobService;
 import shared.interfaces.IApplicationService;
-import shared.interfaces. IAuthService;
-import shared. interfaces.IRecruiterService;
+import shared.interfaces.IAuthService;
+import shared.interfaces.IRecruiterService;
 
-import java.rmi. Naming;
+import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
 
 public class RMIServer {
@@ -24,7 +24,7 @@ public class RMIServer {
             System.out.println("╔════════════════════════════════════════╗");
             System.out.println("║     Job Recruitment System - SERVER   ║");
             System.out.println("╚════════════════════════════════════════╝");
-            System.out. println();
+            System.out.println();
 
             // Step 1: Test MongoDB Connection
             System.out.println("📦 Step 1: Checking MongoDB connection...");
@@ -35,12 +35,12 @@ public class RMIServer {
             // Step 2: Start RMI Registry
             System.out.println("🔧 Step 2: Starting RMI Registry on port " + RMI_PORT + "...");
             try {
-                LocateRegistry. createRegistry(RMI_PORT);  // ← FIX: No variable
+                LocateRegistry.createRegistry(RMI_PORT);
                 System.out.println("   ✅ RMI Registry started");
             } catch (Exception e) {
                 System.out.println("   ⚠️  RMI Registry already running");
             }
-            System. out.println();
+            System.out.println();
 
             // Step 3: Create Service Instances
             System.out.println("🏗️  Step 3: Creating service instances...");
@@ -66,9 +66,9 @@ public class RMIServer {
             System.out.println("   ✅ RecruiterService bound");
 
             Naming.rebind(serverURL + "JobService", jobService);
-            System.out. println("   ✅ JobService bound");
+            System.out.println("   ✅ JobService bound");
 
-            Naming. rebind(serverURL + "ApplicationService", applicationService);
+            Naming.rebind(serverURL + "ApplicationService", applicationService);
             System.out.println("   ✅ ApplicationService bound");
 
             Naming.rebind(serverURL + "AuthService", authService);
@@ -78,11 +78,11 @@ public class RMIServer {
             System.out.println("╔════════════════════════════════════════╗");
             System.out.println("║     ✅ SERVER RUNNING!                    ║");
             System.out.println("╚════════════════════════════════════════╝");
-            System.out. println();
+            System.out.println();
             System.out.println("Server Details:");
             System.out.println("  • RMI Port: " + RMI_PORT);
-            System.out.println("  • MongoDB:   localhost:27020");
-            System. out.println("  • Status:  Ready to accept connections");
+            System.out.println("  • MongoDB:  localhost:27017");
+            System.out.println("  • Status: Ready to accept connections");
             System.out.println();
             System.out.println("Available Services:");
             System.out.println("  • " + serverURL + "ApplicantService");
@@ -92,10 +92,10 @@ public class RMIServer {
             System.out.println("  • " + serverURL + "AuthService");
             System.out.println();
             System.out.println("Press Ctrl+C to stop the server...");
-            System. out.println("═══════════════════════════════════════════");
+            System.out.println("═══════════════════════════════════════════");
 
             // Keep server running
-            Thread. currentThread().join();
+            Thread.currentThread().join();
 
         } catch (Exception e) {
             System.err.println("\n❌ Server failed to start!");

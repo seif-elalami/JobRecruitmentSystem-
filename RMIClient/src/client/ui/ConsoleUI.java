@@ -94,7 +94,7 @@ public class ConsoleUI {
             System.err.println("❌ Client connection failed!");
             System.err.println("Error: " + e.getMessage());
             System.err.println("\n💡 Make sure:");
-            System.err.println("   1. MongoDB is running (port 27020)");
+            System.err.println("   1. MongoDB is running (port 27017)");
             System.err. println("   2. RMI Server is running (port 1099)");
             InputHelper.pause();
         }

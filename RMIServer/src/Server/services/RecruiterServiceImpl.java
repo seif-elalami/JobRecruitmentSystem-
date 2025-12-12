@@ -1,6 +1,7 @@
 package Server.services;
 
 import Server.database.MongoDBConnection;
+import Server.utils.PasswordUtil;
 import Server.utils.ValidationUtil;
 import shared.interfaces.IRecruiterService;
 import shared.interfaces. IJobService;
@@ -27,8 +28,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class RecruiterServiceImpl extends UnicastRemoteObject implements IRecruiterService {
-
-    private MongoCollection<Document> recruiterCollection;
+    private MongoDatabase database;
+    private MongoCollection<Document> userCollection;
     private IJobService jobService;
     private IApplicationService applicationService;
     private IApplicantService applicantService;
@@ -36,19 +37,23 @@ public class RecruiterServiceImpl extends UnicastRemoteObject implements IRecrui
     private AuthServiceImpl authService;
 
     public RecruiterServiceImpl() throws RemoteException {
-    super();
-    MongoDatabase database = MongoDBConnection.getInstance().getDatabase();
-    recruiterCollection = database.getCollection("recruiters");
+        super();
+        this.database = MongoDBConnection.getInstance().getDatabase();
+        this.userCollection = database.getCollection("users"); // ✅ NOT recruiterCollection
 
-    // Initialize other services
-    this.jobService = new JobServiceImpl();
-    this.applicationService = new ApplicationServiceImpl();
-    this.applicantService = new ApplicantServiceImpl();
-    this.interviewService = new InterviewServiceImpl();
-    this.authService = new AuthServiceImpl();  // ✅ FIXED!
+        System.out.println("✅ RecruiterService initialized");
+        System.out.println("   Database: " + database.getName());
+        System.out.println("   Collection: users");
 
-    System.out.println("✅ RecruiterService initialized");
-}
+        // Initialize other services
+        this.jobService = new JobServiceImpl();
+        this.applicationService = new ApplicationServiceImpl();
+        this.applicantService = new ApplicantServiceImpl();
+        this.interviewService = new InterviewServiceImpl();
+        this.authService = new AuthServiceImpl(); // ✅ FIXED!
+
+        System.out.println("✅ RecruiterService initialized");
+    }
 
     // ========================================
     // Recruiter Profile Management (for Auth)
@@ -64,15 +69,15 @@ public class RecruiterServiceImpl extends UnicastRemoteObject implements IRecrui
             }
 
             // Validation - Phone Number (if provided)
-            if (recruiter. getPhone() != null && !recruiter.getPhone().isEmpty()) {
+            if (recruiter.getPhone() != null && !recruiter.getPhone().isEmpty()) {
                 if (!ValidationUtil.isValidPhone(recruiter.getPhone())) {
-                    System. err.println("❌ Create recruiter failed: " + ValidationUtil.getPhoneErrorMessage());
+                    System.err.println("❌ Create recruiter failed: " + ValidationUtil.getPhoneErrorMessage());
                     throw new RemoteException(ValidationUtil.getPhoneErrorMessage());
                 }
             }
 
             // Check if email already exists
-            Document existingDoc = recruiterCollection.find(new Document("email", recruiter.getEmail())).first();
+            Document existingDoc = userCollection.find(new Document("email", recruiter.getEmail())).first();
             if (existingDoc != null) {
                 throw new RemoteException("❌ Email already exists");
             }
@@ -89,21 +94,21 @@ public class RecruiterServiceImpl extends UnicastRemoteObject implements IRecrui
             doc.append("position", recruiter.getPosition());
             doc.append("description", recruiter.getDescription());
 
-            recruiterCollection.insertOne(doc);
+            userCollection.insertOne(doc);
 
             String id = doc.getObjectId("_id").toString();
             recruiter.setId(id);
 
             System.out.println("✅ Recruiter created:  " + recruiter.getName() +
-                              " from " + recruiter.getCompany() +
-                              " (Dept: " + recruiter.getDepartment() + ", ID: " + id + ")");
+                    " from " + recruiter.getCompany() +
+                    " (Dept: " + recruiter.getDepartment() + ", ID: " + id + ")");
 
             return id;
 
         } catch (RemoteException e) {
             throw e;
         } catch (Exception e) {
-            System.err. println("❌ Error creating recruiter: " + e.getMessage());
+            System.err.println("❌ Error creating recruiter: " + e.getMessage());
             e.printStackTrace();
             throw new RemoteException("Failed to create recruiter", e);
         }
@@ -112,86 +117,118 @@ public class RecruiterServiceImpl extends UnicastRemoteObject implements IRecrui
     @Override
     public Recruiter getRecruiterById(String id) throws RemoteException {
         try {
-            Document doc = recruiterCollection. find(new Document("_id", new ObjectId(id))).first();
+            System.out.println("📋 Getting recruiter by ID: " + id);
+
+            // ✅ Search in users collection
+            Document query = new Document("_id", new ObjectId(id))
+                    .append("role", "RECRUITER"); // ✅ Ensure it's a recruiter
+
+            Document doc = userCollection.find(query).first();
 
             if (doc == null) {
+                System.out.println("⚠️  Recruiter not found with ID: " + id);
                 return null;
             }
 
-            return documentToRecruiter(doc);
-
-        } catch (Exception e) {
-            System. err.println("❌ Error getting recruiter: " + e. getMessage());
-            throw new RemoteException("Failed to get recruiter", e);
-        }
-    }
-
-    @Override
-    public Recruiter getRecruiterByEmail(String email) throws RemoteException {
-        try {
-            Document doc = recruiterCollection.find(new Document("email", email)).first();
-
-            if (doc == null) {
-                return null;
-            }
+            System.out.println("✅ Found recruiter:  " + doc.getString("email"));
 
             return documentToRecruiter(doc);
 
         } catch (Exception e) {
             System.err.println("❌ Error getting recruiter: " + e.getMessage());
+            e.printStackTrace();
             throw new RemoteException("Failed to get recruiter", e);
         }
     }
 
-    @Override
-    public boolean updateRecruiter(Recruiter recruiter) throws RemoteException {
-        try {
-            // Validation - Email Format
-            if (!ValidationUtil.isValidEmail(recruiter.getEmail())) {
-                System.err.println("❌ Update recruiter failed:  " + ValidationUtil.getEmailErrorMessage());
-                throw new RemoteException(ValidationUtil. getEmailErrorMessage());
+   @Override
+public Recruiter getRecruiterByEmail(String email) throws RemoteException {
+    try {
+        System. out.println("📋 Getting recruiter by email: " + email);
+
+        // ✅ Search in users collection
+        Document query = new Document("email", email)
+                        .append("role", "RECRUITER");
+
+        Document doc = userCollection.find(query).first();
+
+        if (doc == null) {
+            System.out.println("⚠️  Recruiter not found with email: " + email);
+            return null;
+        }
+
+        System. out.println("✅ Found recruiter: " + doc.getString("username"));
+
+        return documentToRecruiter(doc);
+
+    } catch (Exception e) {
+        System.err.println("❌ Error getting recruiter by email: " + e.getMessage());
+        e.printStackTrace();
+        throw new RemoteException("Failed to get recruiter by email", e);
+    }
+}
+
+   @Override
+public boolean updateRecruiter(Recruiter recruiter) throws RemoteException {
+    try {
+        System.out. println("📝 Updating recruiter: " + recruiter.getId());
+
+        // Validation - Email Format
+        if (! ValidationUtil.isValidEmail(recruiter.getEmail())) {
+            System.err.println("❌ Invalid email format");
+            throw new RemoteException(ValidationUtil.getEmailErrorMessage());
+        }
+
+        // Validation - Phone Number (if provided)
+        if (recruiter.getPhone() != null && !recruiter.getPhone().isEmpty()) {
+            if (!ValidationUtil.isValidPhone(recruiter. getPhone())) {
+                System.err.println("❌ Invalid phone format");
+                throw new RemoteException(ValidationUtil.getPhoneErrorMessage());
             }
+        }
 
-            // Validation - Phone Number (if provided)
-            if (recruiter.getPhone() != null && !recruiter.getPhone().isEmpty()) {
-                if (!ValidationUtil.isValidPhone(recruiter.getPhone())) {
-                    System.err.println("❌ Update recruiter failed: " + ValidationUtil.getPhoneErrorMessage());
-                    throw new RemoteException(ValidationUtil. getPhoneErrorMessage());
-                }
-            }
+        // ✅ Query:  Find by ID and ensure role is RECRUITER
+        Document query = new Document("_id", new ObjectId(recruiter.getId()))
+                        .append("role", "RECRUITER");
 
-            Document query = new Document("_id", new ObjectId(recruiter.getId()));
+        // ✅ Build update document
+        Document update = new Document();
+        update.append("username", recruiter.getUsername());
+        update.append("email", recruiter.getEmail());
+        update.append("phone", recruiter.getPhone());
+        update.append("company", recruiter.getCompany());
+        update.append("department", recruiter.getDepartment());
+        update.append("position", recruiter.getPosition());
+        update.append("description", recruiter.getDescription());
+        update.append("role", "RECRUITER");  // ✅ Keep role as RECRUITER
 
-            Document update = new Document();
-            update.append("username", recruiter.getUsername());
-            update.append("email", recruiter.getEmail());
-            update.append("department", recruiter.getDepartment());
-            update.append("phone", recruiter.getPhone());
-            update.append("company", recruiter.getCompany());
-            update.append("position", recruiter. getPosition());
-            update.append("description", recruiter.getDescription());
+        // Only update password if provided
+        if (recruiter.getPassword() != null && !recruiter. getPassword().isEmpty()) {
+            String hashedPassword = PasswordUtil.hashPassword(recruiter.getPassword());
+            update.append("password", hashedPassword);
+        }
 
-            // Only update password if it's provided and not empty
-            if (recruiter.getPassword() != null && !recruiter.getPassword().isEmpty()) {
-                update.append("password", recruiter.getPassword());
-            }
+        Document updateDoc = new Document("$set", update);
 
-            Document updateDoc = new Document("$set", update);
+        // ✅ Update in users collection
+        long modifiedCount = userCollection.updateOne(query, updateDoc).getModifiedCount();
 
-            recruiterCollection.updateOne(query, updateDoc);
-
-            System.out.println("✅ Recruiter updated: " + recruiter.getName());
-
+        if (modifiedCount > 0) {
+            System.out.println("✅ Recruiter updated successfully:  " + recruiter.getName());
             return true;
-
-        } catch (RemoteException e) {
-            throw e;
-        } catch (Exception e) {
-            System.err.println("❌ Error updating recruiter: " + e.getMessage());
-            e.printStackTrace();
+        } else {
+            System.out.println("⚠️  No changes made (recruiter not found or no changes)");
             return false;
         }
+
+    } catch (RemoteException e) {
+        throw e;
+    } catch (Exception e) {
+        System.err.println("❌ Error updating recruiter: " + e.getMessage());
+        e.printStackTrace();
+        return false;
     }
+}
 
     // ========================================
     // 1. Job Posting Management
@@ -218,7 +255,7 @@ public class RecruiterServiceImpl extends UnicastRemoteObject implements IRecrui
                 return false;
             }
 
-            if (! job.getRecruiterId().equals(recruiterId)) {
+            if (!job.getRecruiterId().equals(recruiterId)) {
                 System.err.println("❌ Close job failed: Unauthorized - job belongs to another recruiter");
                 return false;
             }
@@ -237,7 +274,7 @@ public class RecruiterServiceImpl extends UnicastRemoteObject implements IRecrui
 
     @Override
     public List<Application> getApplicationsForJob(String jobId) throws RemoteException {
-        return applicationService. getApplicationsByJobId(jobId);
+        return applicationService.getApplicationsByJobId(jobId);
     }
 
     @Override
@@ -288,266 +325,265 @@ public class RecruiterServiceImpl extends UnicastRemoteObject implements IRecrui
         return interviewService.getInterviewById(interviewId);
     }
 
-
     // ========================================
-// ✅ MATCH CV FEATURE IMPLEMENTATION
-// ========================================
-@Override
-public List<ICandidateView> getCandidatesForJob(String jobId) throws RemoteException {
-    try {
-        System.out.println("\n╔════════════════════════════════════════╗");
-        System.out.println("║  DEBUG: Get Candidates For Job        ║");
-        System.out.println("╚════════════════════════════════════════╝");
-        System.out.println("Job ID: " + jobId);
-        System.out.println("AuthService null?  " + (authService == null));
+    // ✅ MATCH CV FEATURE IMPLEMENTATION
+    // ========================================
+    @Override
+    public List<ICandidateView> getCandidatesForJob(String jobId) throws RemoteException {
+        try {
+            System.out.println("\n╔════════════════════════════════════════╗");
+            System.out.println("║  DEBUG: Get Candidates For Job        ║");
+            System.out.println("╚════════════════════════════════════════╝");
+            System.out.println("Job ID: " + jobId);
+            System.out.println("AuthService null?  " + (authService == null));
 
-        List<ICandidateView> candidates = new ArrayList<>();
+            List<ICandidateView> candidates = new ArrayList<>();
 
-        // Get applications
-        System.out.println("\n--- Fetching Applications ---");
-        List<Application> applications = applicationService.getApplicationsByJobId(jobId);
-        System.out.println("Applications found: " + applications.size());
+            // Get applications
+            System.out.println("\n--- Fetching Applications ---");
+            List<Application> applications = applicationService.getApplicationsByJobId(jobId);
+            System.out.println("Applications found: " + applications.size());
 
-        if (applications.isEmpty()) {
-            System.out.println("⚠️  No applications - exiting");
+            if (applications.isEmpty()) {
+                System.out.println("⚠️  No applications - exiting");
+                return candidates;
+            }
+
+            // Process each application
+            System.out.println("\n--- Processing Applications ---");
+            for (int i = 0; i < applications.size(); i++) {
+                Application app = applications.get(i);
+
+                System.out.println("\nApplication #" + (i + 1) + ":");
+                System.out.println("  App ID: " + app.getApplicationId());
+                System.out.println("  Applicant ID: " + app.getApplicantId());
+                System.out.println("  Status: " + app.getStatus());
+
+                try {
+                    System.out.println("  Fetching user.. .");
+                    User user = authService.getUserById(app.getApplicantId());
+
+                    if (user == null) {
+                        System.out.println("  ❌ User is NULL");
+                        continue;
+                    }
+
+                    System.out.println("  ✅ User found:  " + user.getEmail());
+                    System.out.println("     User ID: " + user.getUserId());
+                    System.out.println("     Role: " + user.getRole());
+
+                    if (!"APPLICANT".equals(user.getRole())) {
+                        System.out.println("  ⚠️  User is not an APPLICANT");
+                        continue;
+                    }
+
+                    System.out.println("  Converting to Applicant...");
+                    Applicant applicant = convertUserToApplicant(user);
+                    candidates.add(applicant);
+                    System.out.println("  ✅ Added to candidates list");
+
+                } catch (Exception e) {
+                    System.out.println("  ❌ Error processing application: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+
+            System.out.println("\n╔════════════════════════════════════════╗");
+            System.out.println("║  RESULT: " + candidates.size() + " candidates                 ║");
+            System.out.println("╚════════════════════════════════════════╝\n");
+
             return candidates;
+
+        } catch (Exception e) {
+            System.err.println("❌ FATAL ERROR in getCandidatesForJob:");
+            e.printStackTrace();
+            throw new RemoteException("Failed to get candidates", e);
         }
-
-        // Process each application
-        System.out.println("\n--- Processing Applications ---");
-        for (int i = 0; i < applications.size(); i++) {
-            Application app = applications.get(i);
-
-            System.out.println("\nApplication #" + (i + 1) + ":");
-            System.out.println("  App ID: " + app.getApplicationId());
-            System.out.println("  Applicant ID: " + app.getApplicantId());
-            System.out.println("  Status: " + app.getStatus());
-
-            try {
-                System.out.println("  Fetching user.. .");
-                User user = authService.getUserById(app.getApplicantId());
-
-                if (user == null) {
-                    System.out.println("  ❌ User is NULL");
-                    continue;
-                }
-
-                System.out.println("  ✅ User found:  " + user.getEmail());
-                System.out.println("     User ID: " + user.getUserId());
-                System.out.println("     Role: " + user.getRole());
-
-                if (!"APPLICANT".equals(user.getRole())) {
-                    System.out.println("  ⚠️  User is not an APPLICANT");
-                    continue;
-                }
-
-                System.out.println("  Converting to Applicant...");
-                Applicant applicant = convertUserToApplicant(user);
-                candidates.add(applicant);
-                System.out.println("  ✅ Added to candidates list");
-
-            } catch (Exception e) {
-                System.out.println("  ❌ Error processing application: " + e.getMessage());
-                e.printStackTrace();
-            }
-        }
-
-        System.out.println("\n╔════════════════════════════════════════╗");
-        System.out.println("║  RESULT: " + candidates.size() + " candidates                 ║");
-        System.out.println("╚════════════════════════════════════════╝\n");
-
-        return candidates;
-
-    } catch (Exception e) {
-        System.err.println("❌ FATAL ERROR in getCandidatesForJob:");
-        e.printStackTrace();
-        throw new RemoteException("Failed to get candidates", e);
     }
-}
 
-@Override
-public ICandidateView getCandidateById(String candidateId) throws RemoteException {
-    try {
-        System.out.println("📋 Getting candidate:  " + candidateId);
+    @Override
+    public ICandidateView getCandidateById(String candidateId) throws RemoteException {
+        try {
+            System.out.println("📋 Getting candidate:  " + candidateId);
 
-        // ✅ Try getting from users collection first (unified system)
-        if (authService != null) {
-            User user = authService.getUserById(candidateId);
+            // ✅ Try getting from users collection first (unified system)
+            if (authService != null) {
+                User user = authService.getUserById(candidateId);
 
-            if (user != null && "APPLICANT".equals(user. getRole())) {
-                System.out.println("✅ Found candidate in users collection:  " + user.getUsername());
+                if (user != null && "APPLICANT".equals(user.getRole())) {
+                    System.out.println("✅ Found candidate in users collection:  " + user.getUsername());
 
-                // Convert User to Applicant
-                Applicant applicant = new Applicant();
+                    // Convert User to Applicant
+                    Applicant applicant = new Applicant();
 
-                // Map User fields to Applicant fields
-                applicant.setId(user.getUserId());  // ✅ User has getUserId()
-                applicant.setName(user.getUsername());  // ✅ User has getUsername()
-                applicant.setEmail(user.getEmail());
-                applicant.setPhone(user.getPhone() != null ? user.getPhone() : "");
+                    // Map User fields to Applicant fields
+                    applicant.setId(user.getUserId()); // ✅ User has getUserId()
+                    applicant.setName(user.getUsername()); // ✅ User has getUsername()
+                    applicant.setEmail(user.getEmail());
+                    applicant.setPhone(user.getPhone() != null ? user.getPhone() : "");
 
-                // Education - User doesn't have this, set default
-                applicant.setEducation("Not specified");
+                    // Education - User doesn't have this, set default
+                    applicant.setEducation("Not specified");
 
-                // Experience - User has it as String, convert to int
-                if (user.getExperience() != null && !user.getExperience().isEmpty()) {
-                    try {
-                        // Try to extract number from "5 years" or just "5"
-                        String expStr = user.getExperience().replaceAll("[^0-9]", "");
-                        int expYears = expStr.isEmpty() ? 0 : Integer.parseInt(expStr);
-                        applicant.setExperience(expYears);
-                    } catch (NumberFormatException e) {
-                        applicant.setExperience(0);
-                    }
-                } else {
-                    applicant. setExperience(0);
-                }
-
-                // Skills - User has it as String, convert to List
-                if (user.getSkills() != null && !user.getSkills().isEmpty()) {
-                    List<String> skillsList = Arrays.asList(user.getSkills().split(",\\s*"));
-                    applicant.setSkills(skillsList);
-                } else {
-                    applicant.setSkills(new ArrayList<>());
-                }
-
-                // Resume - User doesn't have this field, set empty
-                applicant.setResume("");
-
-                return applicant;  // Automatically casts to ICandidateView
-            }
-        }
-
-        // ✅ Fallback to applicants collection (if exists)
-        Applicant applicant = applicantService.getApplicantById(candidateId);
-
-        if (applicant != null) {
-            System.out.println("✅ Found candidate in applicants collection: " + applicant. getName());
-            return applicant;
-        }
-
-        System.out.println("⚠️  Candidate not found in any collection");
-        return null;
-
-    } catch (Exception e) {
-        System.err.println("❌ Error getting candidate: " + e.getMessage());
-        e.printStackTrace();
-        throw new RemoteException("Failed to get candidate", e);
-    }
-}
-
-@Override
-public List<ICandidateView> searchCandidatesBySkillsReadOnly(String skills) throws RemoteException {
-    try {
-        System.out.println("🔍 Searching candidates by skills (read-only): " + skills);
-
-        List<ICandidateView> candidates = new ArrayList<>();
-
-        // Get all users with APPLICANT role from users collection
-        if (authService != null) {
-            List<User> allUsers = authService.getAllUsers();
-
-            for (User user : allUsers) {
-                if ("APPLICANT".equals(user.getRole())) {
-                    // Check if user has matching skills
-                    if (user. getSkills() != null && user.getSkills().toLowerCase().contains(skills.toLowerCase())) {
-                        // Convert to Applicant
-                        Applicant applicant = convertUserToApplicant(user);
-                        candidates.add(applicant);
-                    }
-                }
-            }
-        }
-
-        System. out.println("✅ Found " + candidates.size() + " candidate(s)");
-        return candidates;
-
-    } catch (Exception e) {
-        System.err.println("❌ Error searching candidates:  " + e.getMessage());
-        e.printStackTrace();
-        throw new RemoteException("Failed to search candidates", e);
-    }
-}
-
-
-@Override
-public List<ICandidateView> searchCandidatesByMinExperience(int minYears) throws RemoteException {
-    try {
-        System.out.println("🔍 Searching candidates with min " + minYears + " years experience");
-
-        List<ICandidateView> candidates = new ArrayList<>();
-
-        // Get all users with APPLICANT role
-        if (authService != null) {
-            List<User> allUsers = authService.getAllUsers();
-
-            for (User user : allUsers) {
-                if ("APPLICANT".equals(user.getRole())) {
-                    // Parse experience
+                    // Experience - User has it as String, convert to int
                     if (user.getExperience() != null && !user.getExperience().isEmpty()) {
                         try {
+                            // Try to extract number from "5 years" or just "5"
                             String expStr = user.getExperience().replaceAll("[^0-9]", "");
                             int expYears = expStr.isEmpty() ? 0 : Integer.parseInt(expStr);
-
-                            if (expYears >= minYears) {
-                                Applicant applicant = convertUserToApplicant(user);
-                                candidates.add(applicant);
-                                System.out
-                                        .println("   ✅ Matched:  " + user.getUsername() + " (" + expYears + " years)");
-                            }
+                            applicant.setExperience(expYears);
                         } catch (NumberFormatException e) {
-                            // Skip if can't parse
+                            applicant.setExperience(0);
+                        }
+                    } else {
+                        applicant.setExperience(0);
+                    }
+
+                    // Skills - User has it as String, convert to List
+                    if (user.getSkills() != null && !user.getSkills().isEmpty()) {
+                        List<String> skillsList = Arrays.asList(user.getSkills().split(",\\s*"));
+                        applicant.setSkills(skillsList);
+                    } else {
+                        applicant.setSkills(new ArrayList<>());
+                    }
+
+                    // Resume - User doesn't have this field, set empty
+                    applicant.setResume("");
+
+                    return applicant; // Automatically casts to ICandidateView
+                }
+            }
+
+            // ✅ Fallback to applicants collection (if exists)
+            Applicant applicant = applicantService.getApplicantById(candidateId);
+
+            if (applicant != null) {
+                System.out.println("✅ Found candidate in applicants collection: " + applicant.getName());
+                return applicant;
+            }
+
+            System.out.println("⚠️  Candidate not found in any collection");
+            return null;
+
+        } catch (Exception e) {
+            System.err.println("❌ Error getting candidate: " + e.getMessage());
+            e.printStackTrace();
+            throw new RemoteException("Failed to get candidate", e);
+        }
+    }
+
+    @Override
+    public List<ICandidateView> searchCandidatesBySkillsReadOnly(String skills) throws RemoteException {
+        try {
+            System.out.println("🔍 Searching candidates by skills (read-only): " + skills);
+
+            List<ICandidateView> candidates = new ArrayList<>();
+
+            // Get all users with APPLICANT role from users collection
+            if (authService != null) {
+                List<User> allUsers = authService.getAllUsers();
+
+                for (User user : allUsers) {
+                    if ("APPLICANT".equals(user.getRole())) {
+                        // Check if user has matching skills
+                        if (user.getSkills() != null && user.getSkills().toLowerCase().contains(skills.toLowerCase())) {
+                            // Convert to Applicant
+                            Applicant applicant = convertUserToApplicant(user);
+                            candidates.add(applicant);
                         }
                     }
                 }
             }
+
+            System.out.println("✅ Found " + candidates.size() + " candidate(s)");
+            return candidates;
+
+        } catch (Exception e) {
+            System.err.println("❌ Error searching candidates:  " + e.getMessage());
+            e.printStackTrace();
+            throw new RemoteException("Failed to search candidates", e);
         }
-
-        System.out.println("✅ Found " + candidates.size() + " candidate(s) with " + minYears + "+ years experience");
-        return candidates;
-
-    } catch (Exception e) {
-        System.err.println("❌ Error searching candidates: " + e.getMessage());
-        e.printStackTrace();
-        throw new RemoteException("Failed to search candidates", e);
     }
-}
 
-
-private Applicant convertUserToApplicant(User user) {
-    Applicant applicant = new Applicant();
-
-    applicant.setId(user.getUserId());
-    applicant.setName(user.getUsername());
-    applicant.setEmail(user.getEmail());
-    applicant.setPhone(user. getPhone() != null ? user.getPhone() : "");
-    applicant.setEducation("Not specified");
-
-    // Experience - convert String to int
-    if (user.getExperience() != null && !user.getExperience().isEmpty()) {
+    @Override
+    public List<ICandidateView> searchCandidatesByMinExperience(int minYears) throws RemoteException {
         try {
-            String expStr = user.getExperience().replaceAll("[^0-9]", "");
-            int expYears = expStr.isEmpty() ? 0 : Integer.parseInt(expStr);
-            applicant.setExperience(expYears);
-        } catch (NumberFormatException e) {
+            System.out.println("🔍 Searching candidates with min " + minYears + " years experience");
+
+            List<ICandidateView> candidates = new ArrayList<>();
+
+            // Get all users with APPLICANT role
+            if (authService != null) {
+                List<User> allUsers = authService.getAllUsers();
+
+                for (User user : allUsers) {
+                    if ("APPLICANT".equals(user.getRole())) {
+                        // Parse experience
+                        if (user.getExperience() != null && !user.getExperience().isEmpty()) {
+                            try {
+                                String expStr = user.getExperience().replaceAll("[^0-9]", "");
+                                int expYears = expStr.isEmpty() ? 0 : Integer.parseInt(expStr);
+
+                                if (expYears >= minYears) {
+                                    Applicant applicant = convertUserToApplicant(user);
+                                    candidates.add(applicant);
+                                    System.out
+                                            .println("   ✅ Matched:  " + user.getUsername() + " (" + expYears
+                                                    + " years)");
+                                }
+                            } catch (NumberFormatException e) {
+                                // Skip if can't parse
+                            }
+                        }
+                    }
+                }
+            }
+
+            System.out
+                    .println("✅ Found " + candidates.size() + " candidate(s) with " + minYears + "+ years experience");
+            return candidates;
+
+        } catch (Exception e) {
+            System.err.println("❌ Error searching candidates: " + e.getMessage());
+            e.printStackTrace();
+            throw new RemoteException("Failed to search candidates", e);
+        }
+    }
+
+    private Applicant convertUserToApplicant(User user) {
+        Applicant applicant = new Applicant();
+
+        applicant.setId(user.getUserId());
+        applicant.setName(user.getUsername());
+        applicant.setEmail(user.getEmail());
+        applicant.setPhone(user.getPhone() != null ? user.getPhone() : "");
+        applicant.setEducation("Not specified");
+
+        // Experience - convert String to int
+        if (user.getExperience() != null && !user.getExperience().isEmpty()) {
+            try {
+                String expStr = user.getExperience().replaceAll("[^0-9]", "");
+                int expYears = expStr.isEmpty() ? 0 : Integer.parseInt(expStr);
+                applicant.setExperience(expYears);
+            } catch (NumberFormatException e) {
+                applicant.setExperience(0);
+            }
+        } else {
             applicant.setExperience(0);
         }
-    } else {
-        applicant.setExperience(0);
+
+        // Skills - convert String to List
+        if (user.getSkills() != null && !user.getSkills().isEmpty()) {
+            List<String> skillsList = Arrays.asList(user.getSkills().split(",\\s*"));
+            applicant.setSkills(skillsList);
+        } else {
+            applicant.setSkills(new ArrayList<>());
+        }
+
+        applicant.setResume("");
+
+        return applicant;
     }
-
-    // Skills - convert String to List
-    if (user.getSkills() != null && !user.getSkills().isEmpty()) {
-        List<String> skillsList = Arrays.asList(user.getSkills().split(",\\s*"));
-        applicant.setSkills(skillsList);
-    } else {
-        applicant.setSkills(new ArrayList<>());
-    }
-
-    applicant.setResume("");
-
-    return applicant;
-}
     // ========================================
     // Helper Methods
     // ========================================
@@ -555,21 +591,30 @@ private Applicant convertUserToApplicant(User user) {
     private Recruiter documentToRecruiter(Document doc) {
         Recruiter recruiter = new Recruiter();
 
-        // From User (inherited)
-        recruiter.setId(doc.getObjectId("_id").toString());
-        recruiter.setName(doc.getString("username"));
-        recruiter.setPassword(doc.getString("password"));
+        // Map from User fields
+        recruiter.setUserId(doc.getObjectId("_id").toString());
+        recruiter.setUsername(doc.getString("username"));
         recruiter.setEmail(doc.getString("email"));
+        recruiter.setPassword(doc.getString("password"));
         recruiter.setRole(doc.getString("role"));
 
-        // From Recruiter
-        recruiter.setDepartment(doc.getString("department"));
+        // Map Recruiter-specific fields
         recruiter.setPhone(doc.getString("phone"));
         recruiter.setCompany(doc.getString("company"));
-        recruiter.setPosition(doc. getString("position"));
+        recruiter.setDepartment(doc.getString("department"));
+        recruiter.setPosition(doc.getString("position"));
         recruiter.setDescription(doc.getString("description"));
+
+        // Map dates if they exist
+        recruiter.setCreatedAt(doc.getDate("createdAt"));
+        recruiter.setLastLogin(doc.getDate("lastLogin"));
+
+        // Map active status
+        Boolean isActive = doc.getBoolean("isActive");
+        if (isActive != null) {
+            recruiter.setActive(isActive);
+        }
 
         return recruiter;
     }
 }
-

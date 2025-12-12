@@ -2,11 +2,11 @@ package Server.services;
 
 import Server.database.MongoDBConnection;
 import Server.utils.ValidationUtil;
-import shared.interfaces. IApplicantService;
+import shared.interfaces.IApplicantService;
 import shared.models.Applicant;
 
-import com.mongodb.client. MongoCollection;
-import com. mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bson. types.ObjectId;
 
@@ -22,7 +22,7 @@ public class ApplicantServiceImpl extends UnicastRemoteObject implements IApplic
     public ApplicantServiceImpl() throws RemoteException {
         super();
         MongoDatabase database = MongoDBConnection.getInstance().getDatabase();
-        applicantCollection = database. getCollection("applicants");
+        applicantCollection = database.getCollection("applicants");
         System.out.println("✅ ApplicantService initialized");
     }
 
@@ -32,7 +32,7 @@ public class ApplicantServiceImpl extends UnicastRemoteObject implements IApplic
             // ============================================
             // VALIDATION - Phone Number (if provided)
             // ============================================
-            if (applicant. getPhone() != null && !applicant.getPhone().isEmpty()) {
+            if (applicant.getPhone() != null && !applicant.getPhone().isEmpty()) {
                 if (!ValidationUtil.isValidPhone(applicant.getPhone())) {
                     System. err.println("❌ Create applicant failed: " + ValidationUtil.getPhoneErrorMessage());
                     throw new RemoteException(ValidationUtil.getPhoneErrorMessage());
@@ -69,7 +69,7 @@ public class ApplicantServiceImpl extends UnicastRemoteObject implements IApplic
         } catch (RemoteException e) {
             throw e;  // Re-throw validation errors
         } catch (Exception e) {
-            System.err. println("❌ Error creating applicant: " + e. getMessage());
+            System.err.println("❌ Error creating applicant: " + e.getMessage());
             e.printStackTrace();
             throw new RemoteException("Failed to create applicant", e);
         }
@@ -104,7 +104,7 @@ public class ApplicantServiceImpl extends UnicastRemoteObject implements IApplic
             return documentToApplicant(doc);
 
         } catch (Exception e) {
-            System. err.println("❌ Error getting applicant: " + e. getMessage());
+            System.err.println("❌ Error getting applicant: " + e.getMessage());
             throw new RemoteException("Failed to get applicant", e);
         }
     }
@@ -114,8 +114,8 @@ public class ApplicantServiceImpl extends UnicastRemoteObject implements IApplic
         try {
             List<Applicant> applicants = new ArrayList<>();
 
-            for (Document doc : applicantCollection. find()) {
-                applicants. add(documentToApplicant(doc));
+            for (Document doc : applicantCollection.find()) {
+                applicants.add(documentToApplicant(doc));
             }
 
             System.out.println("✅ Retrieved " + applicants.size() + " applicants");

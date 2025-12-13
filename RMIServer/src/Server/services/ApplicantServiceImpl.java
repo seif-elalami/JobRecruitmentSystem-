@@ -210,7 +210,12 @@ public class ApplicantServiceImpl extends UnicastRemoteObject implements IApplic
                 applicant.setId(objectId.toString());
             }
 
+            // Update applicants collection
             upsertApplicantDocument(objectId, applicant);
+            
+            // Also update users collection with the same data
+            updateUserDocument(objectId, applicant);
+            
             System.out.println("✅ Applicant updated: " + applicant.getEmail());
             return true;
         } catch (RemoteException e) {
@@ -337,6 +342,29 @@ public class ApplicantServiceImpl extends UnicastRemoteObject implements IApplic
         }
         payload.append("experience", Integer.toString(years));
         applicantCollection.replaceOne(new Document("_id", objectId), payload, new UpdateOptions().upsert(true));
+    }
+
+    private void updateUserDocument(ObjectId objectId, Applicant applicant) {
+        try {
+            Document update = new Document();
+            update.append("phone", applicant.getPhone());
+            update.append("skills", normalizeSkillsToString(applicant.getSkills()));
+            update.append("experience", parseExperience(applicant.getExperience()));
+            
+            if (applicant.getEducation() != null && !applicant.getEducation().isEmpty()) {
+                update.append("education", applicant.getEducation());
+            }
+            
+            if (applicant.getResume() != null && !applicant.getResume().isEmpty()) {
+                update.append("resume", applicant.getResume());
+            }
+            
+            Document updateDoc = new Document("$set", update);
+            userCollection.updateOne(new Document("_id", objectId), updateDoc);
+            System.out.println("✅ User document updated in users collection");
+        } catch (Exception e) {
+            System.err.println("⚠️ Warning: Could not update user document: " + e.getMessage());
+        }
     }
 
     private String normalizeSkillsToString(Object rawSkills) {

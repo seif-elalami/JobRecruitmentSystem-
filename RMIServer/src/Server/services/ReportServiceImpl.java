@@ -11,6 +11,7 @@ public class ReportServiceImpl extends UnicastRemoteObject implements IReportSer
 
     public ReportServiceImpl() throws RemoteException {
         super();
+        System.out.println("✅ ReportService initialized");
     }
 
     @Override

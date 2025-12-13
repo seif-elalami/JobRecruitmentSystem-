@@ -8,7 +8,6 @@ public class Main {
 
 
     public static void main(String[] args) {
-        RMIServer.main(null);
         System.out.println("╔════════════════════════════════════════╗");
         System.out.println("║    Job Recruitment System - Server    ║");
         System.out.println("╚════════════════════════════════════════╝");

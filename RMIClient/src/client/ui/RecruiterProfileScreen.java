@@ -3,6 +3,7 @@ package client.ui;
 import client.RMIClient;
 import shared.models.Session;
 import shared.models.Recruiter;
+import shared.interfaces.IAuthService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -115,8 +116,72 @@ public class RecruiterProfileScreen extends JFrame {
     }
 
     private void changePassword(RMIClient rmiClient, Session session) {
-        // You can show a dialog to enter old password, new password, confirm new password
-        // On submit, call a backend method to update the password
-        JOptionPane.showMessageDialog(this, "Change Password feature not implemented yet.", "Info", JOptionPane.INFORMATION_MESSAGE);
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    
+        JLabel oldPassLabel = new JLabel("Current password:");
+        JPasswordField oldPassField = new JPasswordField(15);
+    
+        JLabel newPassLabel = new JLabel("New password:");
+        JPasswordField newPassField = new JPasswordField(15);
+    
+        JLabel confirmPassLabel = new JLabel("Confirm new password:");
+        JPasswordField confirmPassField = new JPasswordField(15);
+    
+        panel.add(oldPassLabel);
+        panel.add(oldPassField);
+        panel.add(new JLabel(" "));
+        panel.add(newPassLabel);
+        panel.add(newPassField);
+        panel.add(new JLabel(" "));
+        panel.add(confirmPassLabel);
+        panel.add(confirmPassField);
+    
+        int result = JOptionPane.showConfirmDialog(
+            this,
+            panel,
+            "Change Password",
+            JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.PLAIN_MESSAGE
+        );
+    
+        if(result == JOptionPane.OK_OPTION) {
+            String oldPassword = new String(oldPassField.getPassword());
+            String newPassword = new String(newPassField.getPassword());
+            String confirmPassword = new String(confirmPassField.getPassword());
+    
+            if(!newPassword.equals(confirmPassword)) {
+                JOptionPane.showMessageDialog(this, "New passwords do not match!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if(newPassword.length() < 6) {
+                JOptionPane.showMessageDialog(this, "Password must be at least 6 characters.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+    
+            try {
+                // (1) Verify old password is correct
+                IAuthService authService = rmiClient.getAuthService();
+                Session loginSession = authService.login(session.getUserEmail(), oldPassword);
+                if (loginSession == null) {
+                    JOptionPane.showMessageDialog(this, "Current password is incorrect.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+    
+                // (2) Update password using recruiter profile update
+                Recruiter recruiter = rmiClient.getRecruiterService().getRecruiterById(session.getUserId());
+                recruiter.setPassword(newPassword);
+                boolean updated = rmiClient.getRecruiterService().updateRecruiter(recruiter);
+    
+                if(updated) {
+                    JOptionPane.showMessageDialog(this, "Password changed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Failed to change password. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch(Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 }

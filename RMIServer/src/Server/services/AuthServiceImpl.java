@@ -112,21 +112,52 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
 public Session login(String email, String password) throws RemoteException {
     try {
         System.out.println("🔐 Login attempt for: " + email);
+        System.out.println("   Database: " + MongoDBConnection.getInstance().getDatabase().getName());
+        System.out.println("   Collection: users");
 
-        // Find user by email
+        // Find user by email (case-insensitive search)
+        // Try exact match first
         Document query = new Document("email", email);
         Document userDoc = userCollection.find(query).first();
 
+        // If not found, try case-insensitive search
+        if (userDoc == null) {
+            System.out.println("   ⚠️  Exact email match not found, trying case-insensitive search...");
+            query = new Document("email", new Document("$regex", "^" + email + "$").append("$options", "i"));
+            userDoc = userCollection.find(query).first();
+        }
+
         if (userDoc == null) {
             System.out.println("❌ User not found:  " + email);
+            System.out.println("   Checking if database connection is working...");
+            
+            // Debug: List all emails in database
+            long userCount = userCollection.countDocuments();
+            System.out.println("   Total users in database: " + userCount);
+            
+            if (userCount > 0) {
+                System.out.println("   Sample emails in database:");
+                for (Document doc : userCollection.find().limit(5)) {
+                    System.out.println("      - " + doc.getString("email"));
+                }
+            }
+            
             throw new RemoteException("Invalid email or password");
         }
+        
+        System.out.println("   ✅ User found in database!");
+        System.out.println("   Stored email: " + userDoc.getString("email"));
 
         // Get stored hashed password
         String storedHashedPassword = userDoc.getString("password");
+        
+        if (storedHashedPassword == null || storedHashedPassword.isEmpty()) {
+            System.err.println("❌ User account has no password set: " + email);
+            throw new RemoteException("Invalid email or password");
+        }
 
         System.out.println("   Stored password (first 20 chars): " + storedHashedPassword.substring(0, Math.min(20, storedHashedPassword.length())) + "...");
-        System.out.println("   Provided password: " + password);
+        System.out.println("   Provided password length: " + (password != null ? password.length() : 0));
 
         // ✅ CRITICAL FIX:   Use PasswordUtil.verifyPassword() to compare
         boolean passwordMatches = PasswordUtil.verifyPassword(password, storedHashedPassword);

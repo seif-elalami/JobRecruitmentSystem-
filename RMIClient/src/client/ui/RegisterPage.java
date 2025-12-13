@@ -354,8 +354,18 @@ public class RegisterPage extends JFrame {
                     "Registration",
                     JOptionPane.INFORMATION_MESSAGE);
 
+            // Normalize role to uppercase for consistency
+            String normalizedRole = role.toUpperCase().trim();
+            if (normalizedRole.equals("RECRUITER") || normalizedRole.contains("RECRUIT")) {
+                normalizedRole = "RECRUITER";
+            } else if (normalizedRole.equals("APPLICANT") || normalizedRole.contains("APPLICANT")) {
+                normalizedRole = "APPLICANT";
+            } else if (normalizedRole.equals("ADMIN") || normalizedRole.contains("ADMIN")) {
+                normalizedRole = "ADMIN";
+            }
+
             // Create user object
-            User newUser = new User(name, password, email, role);
+            User newUser = new User(name, password, email, normalizedRole);
             newUser.setPhone(phone);
 
             // Call registration service

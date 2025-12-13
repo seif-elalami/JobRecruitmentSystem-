@@ -64,10 +64,7 @@ public interface IRecruiterService extends Remote {
 
     Interview getInterviewById(String interviewId) throws RemoteException;
 
-    // ========================================
-    // ✅ MATCH CV FEATURE - READ-ONLY CANDIDATE VIEWS
-    // ========================================
-
+ 
     /**
      * Get read-only candidate views for all applicants who applied to a specific job
      * @param jobId The job ID
@@ -75,6 +72,7 @@ public interface IRecruiterService extends Remote {
      */
     List<ICandidateView> getCandidatesForJob(String jobId) throws RemoteException;
 
+    boolean matchFinalCandidateToJob(String jobId, String applicantId) throws RemoteException;
     /**
      * Get a single candidate's read-only profile by ID
      * @param candidateId The candidate/applicant ID

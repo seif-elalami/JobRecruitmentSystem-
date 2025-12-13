@@ -118,22 +118,38 @@ public class RecruiterServiceImpl extends UnicastRemoteObject implements IRecrui
     public Recruiter getRecruiterById(String id) throws RemoteException {
         try {
             System.out.println("📋 Getting recruiter by ID: " + id);
+            System.out.println("   Database: " + database.getName());
+            System.out.println("   Collection: users");
 
-            // ✅ Search in users collection
-            Document query = new Document("_id", new ObjectId(id))
-                    .append("role", "RECRUITER"); // ✅ Ensure it's a recruiter
-
+            // ✅ First, find by ID only
+            Document query = new Document("_id", new ObjectId(id));
             Document doc = userCollection.find(query).first();
 
             if (doc == null) {
-                System.out.println("⚠️  Recruiter not found with ID: " + id);
+                System.out.println("⚠️  User not found with ID: " + id);
                 return null;
             }
 
-            System.out.println("✅ Found recruiter:  " + doc.getString("email"));
+            // ✅ Check if role is recruiter (case-insensitive)
+            String role = doc.getString("role");
+            if (role == null) {
+                System.err.println("❌ User has no role assigned!");
+                return null;
+            }
+
+            String normalizedRole = role.toUpperCase().trim();
+            if (!normalizedRole.contains("RECRUITER") && !normalizedRole.contains("RECRUIT")) {
+                System.err.println("❌ User is not a recruiter! Role: " + role);
+                return null;
+            }
+
+            System.out.println("✅ Found recruiter:  " + doc.getString("email") + " (Role: " + role + ")");
 
             return documentToRecruiter(doc);
 
+        } catch (IllegalArgumentException e) {
+            System.err.println("❌ Invalid ID format: " + id);
+            return null;
         } catch (Exception e) {
             System.err.println("❌ Error getting recruiter: " + e.getMessage());
             e.printStackTrace();
@@ -144,20 +160,37 @@ public class RecruiterServiceImpl extends UnicastRemoteObject implements IRecrui
    @Override
 public Recruiter getRecruiterByEmail(String email) throws RemoteException {
     try {
-        System. out.println("📋 Getting recruiter by email: " + email);
+        System.out.println("📋 Getting recruiter by email: " + email);
 
-        // ✅ Search in users collection
-        Document query = new Document("email", email)
-                        .append("role", "RECRUITER");
-
+        // ✅ Search in users collection (try exact match first)
+        Document query = new Document("email", email);
         Document doc = userCollection.find(query).first();
 
+        // If not found, try case-insensitive
         if (doc == null) {
-            System.out.println("⚠️  Recruiter not found with email: " + email);
+            query = new Document("email", new Document("$regex", "^" + email + "$").append("$options", "i"));
+            doc = userCollection.find(query).first();
+        }
+
+        if (doc == null) {
+            System.out.println("⚠️  User not found with email: " + email);
             return null;
         }
 
-        System. out.println("✅ Found recruiter: " + doc.getString("username"));
+        // ✅ Check if role is recruiter (case-insensitive)
+        String role = doc.getString("role");
+        if (role == null) {
+            System.err.println("❌ User has no role assigned!");
+            return null;
+        }
+
+        String normalizedRole = role.toUpperCase().trim();
+        if (!normalizedRole.contains("RECRUITER") && !normalizedRole.contains("RECRUIT")) {
+            System.err.println("❌ User is not a recruiter! Role: " + role);
+            return null;
+        }
+
+        System.out.println("✅ Found recruiter: " + doc.getString("username") + " (Role: " + role + ")");
 
         return documentToRecruiter(doc);
 
@@ -556,6 +589,33 @@ public List<Applicant> matchCandidatesToJob(String jobId) throws RemoteException
         }
     }
 
+    @Override
+public boolean matchFinalCandidateToJob(String jobId, String applicantId) throws RemoteException {
+    try {
+        MongoCollection<Document> jobCollection = database.getCollection("jobs");
+
+        Document query;
+        if (ObjectId.isValid(jobId)) {
+            query = new Document("_id", new ObjectId(jobId));
+        } else {
+            query = new Document("jobId", jobId); // fallback if stored as string
+        }
+
+        Document update = new Document("$set", new Document("matchedApplicantId", applicantId));
+
+        long modified = jobCollection.updateOne(query, update).getModifiedCount();
+
+        System.out.println("[matchFinalCandidateToJob] jobId=" + jobId
+                + ", applicantId=" + applicantId
+                + ", modified=" + modified);
+
+        return modified > 0;
+    } catch (Exception e) {
+        e.printStackTrace();
+        throw new RemoteException("Failed to match candidate to job", e);
+    }
+}
+
     private Applicant convertUserToApplicant(User user) {
         Applicant applicant = new Applicant();
 
@@ -624,6 +684,8 @@ public List<Applicant> matchCandidatesToJob(String jobId) throws RemoteException
         return recruiter;
 
     }
+
+
 }
 
 

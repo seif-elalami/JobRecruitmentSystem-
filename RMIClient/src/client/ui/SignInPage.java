@@ -6,10 +6,8 @@ import shared.models.Session;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class SignInPage extends JFrame {
 
@@ -26,362 +24,309 @@ public class SignInPage extends JFrame {
         // Frame setup
         setTitle("Sign In - Job Recruitment System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1000, 750);
+        setSize(500, 550);
         setLocationRelativeTo(null);
         setResizable(false);
-        setUndecorated(true);
 
-        // Main panel with modern gradient
+        // Main panel with gradient background
         JPanel mainPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-                GradientPaint gradient = new GradientPaint(0, 0, new Color(20, 33, 61), 
-                        getWidth(), getHeight(), new Color(52, 152, 219));
+
+                GradientPaint gradient = new GradientPaint(0, 0, new Color(41, 128, 185), 0, getHeight(),
+                        new Color(52, 73, 94));
                 g2d.setPaint(gradient);
                 g2d.fillRect(0, 0, getWidth(), getHeight());
-                
-                // Subtle overlay pattern
-                g2d.setColor(new Color(255, 255, 255, 5));
-                for (int i = 0; i < getWidth(); i += 50) {
-                    g2d.drawLine(i, 0, i, getHeight());
-                }
             }
         };
+
         mainPanel.setLayout(null);
         add(mainPanel);
 
-        // Close button
-        JButton closeBtn = new JButton("✕");
-        closeBtn.setBounds(960, 10, 30, 30);
-        closeBtn.setFont(new Font("Arial", Font.BOLD, 20));
-        closeBtn.setBackground(Color.WHITE);
-        closeBtn.setForeground(new Color(20, 33, 61));
-        closeBtn.setBorderPainted(false);
-        closeBtn.setFocusPainted(false);
-        closeBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        closeBtn.addActionListener(e -> System.exit(0));
-        mainPanel.add(closeBtn);
-
-        // Card panel (white container)
-        JPanel cardPanel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setColor(Color.WHITE);
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
-                g2d.setColor(new Color(236, 240, 241));
-                g2d.setStroke(new BasicStroke(1));
-                g2d.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 25, 25);
-            }
-        };
-        cardPanel.setLayout(null);
-        cardPanel.setBounds(100, 60, 800, 630);
-        cardPanel.setOpaque(false);
-        mainPanel.add(cardPanel);
-
-        // Lock icon
-        JLabel iconLabel = new JLabel("🔐");
-        iconLabel.setFont(new Font("Arial", Font.PLAIN, 60));
-        iconLabel.setBounds(375, 30, 50, 60);
-        cardPanel.add(iconLabel);
-
-        // Title
+        // Title Label
         JLabel titleLabel = new JLabel("Welcome Back");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 36));
-        titleLabel.setForeground(new Color(20, 33, 61));
-        titleLabel.setBounds(50, 95, 700, 50);
-        cardPanel.add(titleLabel);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 32));
+        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setBounds(50, 40, 400, 40);
+        mainPanel.add(titleLabel);
 
         // Subtitle
         JLabel subtitleLabel = new JLabel("Sign in to your account");
         subtitleLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        subtitleLabel.setForeground(new Color(127, 140, 141));
-        subtitleLabel.setBounds(50, 145, 700, 25);
-        cardPanel.add(subtitleLabel);
+        subtitleLabel.setForeground(new Color(236, 240, 241));
+        subtitleLabel.setBounds(50, 85, 400, 20);
+        mainPanel.add(subtitleLabel);
 
         // Email Label
-        JLabel emailLabel = new JLabel("📧 Email Address");
-        emailLabel.setFont(new Font("Arial", Font.BOLD, 12));
-        emailLabel.setForeground(new Color(44, 62, 80));
-        emailLabel.setBounds(50, 190, 400, 20);
-        cardPanel.add(emailLabel);
+        JLabel emailLabel = new JLabel("Email Address:");
+        emailLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        emailLabel.setForeground(Color.WHITE);
+        emailLabel.setBounds(50, 130, 400, 20);
+        mainPanel.add(emailLabel);
 
         // Email Field
-        emailField = createModernTextField();
-        emailField.setBounds(50, 215, 700, 45);
-        emailField.setText("Enter your email");
-        emailField.setForeground(new Color(189, 195, 199));
-        emailField.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (emailField.getText().equals("Enter your email")) {
-                    emailField.setText("");
-                    emailField.setForeground(Color.BLACK);
-                }
-            }
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (emailField.getText().isEmpty()) {
-                    emailField.setText("Enter your email");
-                    emailField.setForeground(new Color(189, 195, 199));
-                }
-            }
-        });
-        cardPanel.add(emailField);
+        emailField = new JTextField();
+        emailField.setBounds(50, 155, 400, 40);
+        emailField.setFont(new Font("Arial", Font.PLAIN, 14));
+        emailField.setBackground(new Color(236, 240, 241));
+        emailField.setForeground(Color.BLACK);
+        emailField.setBorder(BorderFactory.createLineBorder(new Color(52, 152, 219), 2));
+        mainPanel.add(emailField);
 
         // Password Label
-        JLabel passwordLabel = new JLabel("🔒 Password");
-        passwordLabel.setFont(new Font("Arial", Font.BOLD, 12));
-        passwordLabel.setForeground(new Color(44, 62, 80));
-        passwordLabel.setBounds(50, 275, 400, 20);
-        cardPanel.add(passwordLabel);
+        JLabel passwordLabel = new JLabel("Password:");
+        passwordLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        passwordLabel.setForeground(Color.WHITE);
+        passwordLabel.setBounds(50, 210, 400, 20);
+        mainPanel.add(passwordLabel);
 
         // Password Field
         passwordField = new JPasswordField();
-        passwordField.setBounds(50, 300, 700, 45);
+        passwordField.setBounds(50, 235, 400, 40);
         passwordField.setFont(new Font("Arial", Font.PLAIN, 14));
         passwordField.setBackground(new Color(236, 240, 241));
         passwordField.setForeground(Color.BLACK);
-        passwordField.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(236, 240, 241), 2),
-                BorderFactory.createEmptyBorder(10, 15, 10, 15)));
-        passwordField.setCaretColor(new Color(52, 152, 219));
-        cardPanel.add(passwordField);
+        passwordField.setBorder(BorderFactory.createLineBorder(new Color(52, 152, 219), 2));
+        mainPanel.add(passwordField);
 
         // Role Label
-        JLabel roleLabel = new JLabel("👤 Select Role");
-        roleLabel.setFont(new Font("Arial", Font.BOLD, 12));
-        roleLabel.setForeground(new Color(44, 62, 80));
-        roleLabel.setBounds(50, 360, 400, 20);
-        cardPanel.add(roleLabel);
+        JLabel roleLabel = new JLabel("Select Role:");
+        roleLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        roleLabel.setForeground(Color.WHITE);
+        roleLabel.setBounds(50, 290, 400, 20);
+        mainPanel.add(roleLabel);
 
         // Role ComboBox
         roleComboBox = new JComboBox<>(new String[]{"Applicant", "Recruiter", "Admin"});
-        roleComboBox.setBounds(50, 385, 700, 45);
+        roleComboBox.setBounds(50, 315, 400, 40);
         roleComboBox.setFont(new Font("Arial", Font.PLAIN, 14));
         roleComboBox.setBackground(new Color(236, 240, 241));
         roleComboBox.setForeground(Color.BLACK);
-        roleComboBox.setBorder(BorderFactory.createLineBorder(new Color(236, 240, 241), 2));
-        cardPanel.add(roleComboBox);
+        mainPanel.add(roleComboBox);
 
         // Sign In Button
-        AnimatedButton signInButton = new AnimatedButton("Sign In", new Color(52, 152, 219), new Color(41, 128, 185));
-        signInButton.setBounds(50, 460, 700, 55);
-        signInButton.addActionListener(e -> handleSignIn());
-        cardPanel.add(signInButton);
+        JButton signInButton = new JButton("Sign In");
+        signInButton.setBounds(50, 390, 400, 45);
+        signInButton.setFont(new Font("Arial", Font.BOLD, 16));
+        signInButton.setBackground(new Color(46, 204, 113));
+        signInButton.setForeground(Color.WHITE);
+        signInButton.setBorderPainted(false);
+        signInButton.setFocusPainted(false);
+        signInButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        // Bottom links panel
-        JPanel linksPanel = new JPanel() {
+        signInButton.addActionListener(new ActionListener() {
             @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setColor(new Color(236, 240, 241));
-                g2d.fillRect(0, 0, getWidth(), getHeight());
+            public void actionPerformed(ActionEvent e) {
+                handleSignIn();
             }
-        };
-        linksPanel.setLayout(null);
-        linksPanel.setBounds(0, 540, 800, 90);
-        linksPanel.setOpaque(false);
-        cardPanel.add(linksPanel);
+        });
 
-        // Divider
-        JSeparator separator = new JSeparator();
-        separator.setBounds(0, 0, 800, 1);
-        linksPanel.add(separator);
+        mainPanel.add(signInButton);
+
+        // Back Button
+        JButton backButton = new JButton("Back");
+        backButton.setBounds(50, 450, 190, 40);
+        backButton.setFont(new Font("Arial", Font.PLAIN, 14));
+        backButton.setBackground(new Color(149, 165, 166));
+        backButton.setForeground(Color.WHITE);
+        backButton.setBorderPainted(false);
+        backButton.setFocusPainted(false);
+        backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                new WelcomePage(rmiClient);
+            }
+        });
+
+        mainPanel.add(backButton);
 
         // Register Link
-        JLabel registerLabel = new JLabel("Don't have an account?");
-        registerLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        registerLabel.setForeground(new Color(127, 140, 141));
-        registerLabel.setBounds(50, 20, 200, 20);
-        linksPanel.add(registerLabel);
-
-        JButton registerLink = new JButton("Create one");
-        registerLink.setBounds(240, 15, 100, 30);
-        registerLink.setFont(new Font("Arial", Font.BOLD, 12));
-        registerLink.setForeground(new Color(52, 152, 219));
-        registerLink.setBackground(Color.WHITE);
+        JButton registerLink = new JButton("Don't have an account? Register here");
+        registerLink.setBounds(260, 450, 190, 40);
+        registerLink.setFont(new Font("Arial", Font.PLAIN, 12));
+        registerLink.setBackground(new Color(52, 152, 219));
+        registerLink.setForeground(Color.WHITE);
         registerLink.setBorderPainted(false);
-        registerLink.setContentAreaFilled(false);
         registerLink.setFocusPainted(false);
         registerLink.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        registerLink.addActionListener(e -> {
-            dispose();
-            new RegisterPage(rmiClient);
-        });
-        linksPanel.add(registerLink);
 
-        // Admin passkey shortcut
-        JButton adminPasskeyBtn = new JButton("👑 Admin Passkey");
-        adminPasskeyBtn.setBounds(50, 50, 350, 35);
-        adminPasskeyBtn.setFont(new Font("Arial", Font.BOLD, 12));
-        adminPasskeyBtn.setBackground(new Color(155, 89, 182));
-        adminPasskeyBtn.setForeground(Color.WHITE);
-        adminPasskeyBtn.setBorderPainted(false);
-        adminPasskeyBtn.setFocusPainted(false);
-        adminPasskeyBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        adminPasskeyBtn.addActionListener(e -> {
-            dispose();
-            new AdminLoginPage(rmiClient);
+        registerLink.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                new RegisterPage(rmiClient);
+            }
         });
-        linksPanel.add(adminPasskeyBtn);
 
-        // Back button
-        AnimatedButton backButton = new AnimatedButton("← Back", new Color(149, 165, 166), new Color(120, 144, 156));
-        backButton.setBounds(50, 90, 350, 35);
-        linksPanel.add(backButton);
-        backButton.addActionListener(e -> {
-            dispose();
-            new WelcomePage(rmiClient);
-        });
+        mainPanel.add(registerLink);
 
         setVisible(true);
     }
 
-    private JTextField createModernTextField() {
-        JTextField field = new JTextField();
-        field.setFont(new Font("Arial", Font.PLAIN, 14));
-        field.setBackground(new Color(236, 240, 241));
-        field.setForeground(Color.BLACK);
-        field.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(236, 240, 241), 2),
-                BorderFactory.createEmptyBorder(10, 15, 10, 15)));
-        field.setCaretColor(new Color(52, 152, 219));
-        return field;
-    }
-
+    /**
+     * Handle sign in action
+     * 
+     * Password Verification Flow:
+     * 1. GUI: User enters email and plain password
+     * 2. GUI: Plain password sent to server via RMI
+     * 3. Server: Fetches BCrypt hash from MongoDB
+     * 4. Server: PasswordUtil.verifyPassword() calls BCrypt.checkpw()
+     * 5. Server: Compares plain password against BCrypt hash
+     * 6. Server: Returns Session if password matches, error otherwise
+     */
     private void handleSignIn() {
         String email = emailField.getText().trim();
         String password = new String(passwordField.getPassword());
         String role = (String) roleComboBox.getSelectedItem();
 
-        if (email.isEmpty() || email.equals("Enter your email")) {
-            JOptionPane.showMessageDialog(this, "❌ Please enter your email", "Input Error", JOptionPane.WARNING_MESSAGE);
+        // Validation
+        if (email.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                    "❌ Please enter your email address",
+                    "Input Error",
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         if (password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "❌ Please enter your password", "Input Error", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "❌ Please enter your password",
+                    "Input Error",
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         try {
+            // Show loading message
+            JOptionPane.showMessageDialog(this,
+                    "⏳ Authenticating...",
+                    "Sign In",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+            // Call authentication service
             Session session = authService.login(email, password);
 
             if (session != null) {
-                if (!session.getRole().equalsIgnoreCase(role)) {
+                // Verify role matches (case-insensitive comparison)
+                String sessionRole = session.getRole();
+                if (sessionRole == null || sessionRole.trim().isEmpty()) {
                     JOptionPane.showMessageDialog(this,
-                            "❌ Role mismatch. Your account is: " + session.getRole(),
+                            "❌ Error: User role is missing. Please contact support.",
                             "Role Error",
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 }
+
+                // Normalize both roles for comparison
+                String normalizedSessionRole = sessionRole.toUpperCase().trim();
+                String normalizedSelectedRole = role.toUpperCase().trim();
+
+                // Map common role variations
+                if (normalizedSelectedRole.equals("RECRUITER") || normalizedSelectedRole.contains("RECRUIT")) {
+                    normalizedSelectedRole = "RECRUITER";
+                } else if (normalizedSelectedRole.equals("APPLICANT")) {
+                    normalizedSelectedRole = "APPLICANT";
+                } else if (normalizedSelectedRole.equals("ADMIN") || normalizedSelectedRole.equals("ADMINISTRATOR")) {
+                    normalizedSelectedRole = "ADMIN";
+                }
+
+                // Normalize session role to standard format
+                if (normalizedSessionRole.contains("RECRUITER") || normalizedSessionRole.contains("RECRUIT")) {
+                    normalizedSessionRole = "RECRUITER";
+                } else if (normalizedSessionRole.contains("APPLICANT")) {
+                    normalizedSessionRole = "APPLICANT";
+                } else if (normalizedSessionRole.contains("ADMIN")) {
+                    normalizedSessionRole = "ADMIN";
+                }
+
+                if (!normalizedSessionRole.equals(normalizedSelectedRole)) {
+                    JOptionPane.showMessageDialog(this,
+                            "❌ The selected role does not match your account role.\n" +
+                            "Selected: " + role + "\n" +
+                            "Your role: " + sessionRole + "\n\n" +
+                            "Please select the correct role and try again.",
+                            "Role Mismatch",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // Open appropriate menu based on role
                 dispose();
                 openRoleBasedMenu(session);
+
             } else {
-                JOptionPane.showMessageDialog(this, "❌ Invalid email or password", "Auth Failed", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        "❌ Invalid email or password",
+                        "Authentication Failed",
+                        JOptionPane.ERROR_MESSAGE);
                 passwordField.setText("");
             }
+
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "❌ Error: " + e.getMessage(), "Login Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "❌ Error: " + e.getMessage(),
+                    "Sign In Error",
+                    JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
     }
 
+    /**
+     * Open menu based on user role
+     */
     private void openRoleBasedMenu(Session session) {
-        String role = session.getRole().toLowerCase();
-        if (role.contains("applicant")) {
-            new ApplicantMenuGUI(rmiClient, session);
-        } else if (role.contains("recruiter")) {
+        if (session == null || session.getRole() == null) {
+            JOptionPane.showMessageDialog(null,
+                    "❌ Error: Invalid session or role",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            dispose();
+            new WelcomePage(rmiClient);
+            return;
+        }
+
+        String role = session.getRole().toUpperCase().trim();
+
+        // Normalize role to handle variations
+        if (role.contains("RECRUITER") || role.contains("RECRUIT")) {
+            // Open Recruiter Menu
             new RecruiterMenuGUI(rmiClient, session);
-        } else if (role.contains("admin")) {
+        } else if (role.contains("APPLICANT")) {
+            // Open Applicant Menu
+            new ApplicantMenuGUI(rmiClient, session);
+        } else if (role.contains("ADMIN")) {
+            // Open Admin Menu
             new AdminMenuGUI(rmiClient, session);
-        }
-    }
-
-    // Animated Button Class
-    private static class AnimatedButton extends JButton {
-        private Color baseColor;
-        private Color hoverColor;
-        private float scale = 1.0f;
-        private boolean isHovered = false;
-
-        public AnimatedButton(String text, Color baseColor, Color hoverColor) {
-            this.baseColor = baseColor;
-            this.hoverColor = hoverColor;
-            setText(text);
-            setFont(new Font("Arial", Font.BOLD, 16));
-            setForeground(Color.WHITE);
-            setBackground(baseColor);
-            setBorderPainted(false);
-            setContentAreaFilled(false);
-            setFocusPainted(false);
-            setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-            addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseEntered(MouseEvent e) {
-                    isHovered = true;
-                    scale = 1.03f;
-                    repaint();
-                }
-
-                @Override
-                public void mouseExited(MouseEvent e) {
-                    isHovered = false;
-                    scale = 1.0f;
-                    repaint();
-                }
-            });
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            Graphics2D g2d = (Graphics2D) g;
-            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-            int width = getWidth();
-            int height = getHeight();
-            int x = (int) ((width - width * scale) / 2);
-            int y = (int) ((height - height * scale) / 2);
-            int scaledWidth = (int) (width * scale);
-            int scaledHeight = (int) (height * scale);
-
-            g2d.setColor(isHovered ? hoverColor : baseColor);
-            g2d.fillRoundRect(x, y, scaledWidth, scaledHeight, 12, 12);
-
-            g2d.setColor(new Color(255, 255, 255, isHovered ? 150 : 100));
-            g2d.setStroke(new BasicStroke(2));
-            g2d.drawRoundRect(x, y, scaledWidth, scaledHeight, 12, 12);
-
-            if (isHovered) {
-                g2d.setColor(new Color(0, 0, 0, 30));
-                g2d.fillRoundRect(x + 2, y + 2, scaledWidth - 4, scaledHeight - 4, 12, 12);
-            }
-
-            FontMetrics fm = g2d.getFontMetrics();
-            int textX = (width - fm.stringWidth(getText())) / 2;
-            int textY = ((height - fm.getHeight()) / 2) + fm.getAscent();
-
-            g2d.setColor(Color.WHITE);
-            g2d.setFont(getFont());
-            g2d.drawString(getText(), textX, textY);
+        } else {
+            // Unknown role - show error and go back to welcome page
+            JOptionPane.showMessageDialog(null,
+                    "❌ Error: Unknown user role: " + session.getRole() + "\nPlease contact support.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            dispose();
+            new WelcomePage(rmiClient);
         }
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                RMIClient rmiClient = new RMIClient();
-                new SignInPage(rmiClient);
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "Failed to connect: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    RMIClient rmiClient = new RMIClient();
+                    new SignInPage(rmiClient);
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(null,
+                            "Failed to connect to server: " + e.getMessage(),
+                            "Connection Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
     }

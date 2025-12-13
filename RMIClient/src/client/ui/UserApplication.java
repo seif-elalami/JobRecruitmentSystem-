@@ -56,48 +56,59 @@ public class UserApplication {
         System.out.print("\nChoice: ");
     }
 
-    private void login() {
-        try {
-            System.out.println("\n=== LOGIN ===\n");
+private void login() {
+    try {
+        System.out.println("\n=== LOGIN ===\n");
 
-            System.out.print("Email: ");
-            String email = InputHelper.getString();
+        System.out.print("Email: ");
+        String email = InputHelper.getString();
 
-            System.out.print("Password: ");
-            String password = InputHelper.getString();
+        System.out.print("Password: ");
+        String password = InputHelper.getString();
 
-            System.out.println("\n📤 Logging in...");
+        System.out.println("\n📤 Logging in...");
 
-            Session session = authService.login(email, password);
+        Session session = authService.login(email, password);
 
-            if (session != null) {
-                System.out.println("✅ Login successful!");
-                System.out.println("   Welcome, " + session.getUserEmail() + "!");
-                System.out.println("   Role: " + session.getRole());
+        if (session != null) {
+            System.out.println("✅ Login successful!");
+            System.out.println("   Welcome, " + session.getUserEmail() + "!");
+            System.out.println("   Role: " + session.getRole());
 
-                InputHelper.pause();
+            InputHelper.pause();
 
-                currentSession = session;
+            currentSession = session;
 
-                // Redirect to appropriate menu based on role (case-insensitive)
-                String role = currentSession.getRole();
-                if (role != null && role.equalsIgnoreCase("APPLICANT")) {
-                    new ApplicantMenu(client, currentSession).run();
-                } else if (role != null && role.equalsIgnoreCase("RECRUITER")) {
-                    new RecruiterMenu(client, currentSession).run();
-                } else {
-                    System.out.println("⚠️  No console menu implemented for role: " + role);
-                }
-
-            } else {
-                System.out.println("❌ Login failed!");
-                System.out.println("   Invalid email or password.");
+            // Redirect to appropriate menu based on role (case-insensitive)
+            String role = currentSession.getRole();
+            if (role == null) {
+                System.err.println("❌ Error: User role is null!");
+                return;
             }
-
-        } catch (Exception e) {
-            System.err.println("❌ Login error: " + e.getMessage());
+            
+            String normalizedRole = role.toUpperCase().trim();
+            
+            if (normalizedRole.equals("APPLICANT") || normalizedRole.contains("APPLICANT")) {
+                System.out.println("\n🚀 Opening Applicant Menu...\n");
+                new ApplicantMenu(client, currentSession).run();
+                return; // <--- THIS ENSURES YOU STAY IN ROLE MENU!
+            } else if (normalizedRole.equals("RECRUITER") || normalizedRole.contains("RECRUITER") || normalizedRole.contains("RECRUIT")) {
+                System.out.println("\n🚀 Opening Recruiter Menu...\n");
+                new RecruiterMenu(client, currentSession).run();
+                return; // <--- THIS ENSURES YOU STAY IN ROLE MENU!
+            } else {
+                System.err.println("❌ Unknown role: " + role);
+                System.err.println("   Cannot redirect to appropriate menu.");
+            }
+        } else {
+            System.out.println("❌ Login failed!");
+            System.out.println("   Invalid email or password.");
         }
+    } catch (Exception e) {
+        System.err.println("❌ Login error: " + e.getMessage());
     }
+}
+
 
     private void register() {
         try {
@@ -287,11 +298,24 @@ public class UserApplication {
 
                 // Store session and redirect to appropriate menu
                 currentSession = session;
-
-                if (currentSession.getRole().equals("APPLICANT")) {
+                
+                String registeredUserRole = currentSession.getRole();
+                if (registeredUserRole == null) {
+                    System.err.println("❌ Error: User role is null!");
+                    return;
+                }
+                
+                String normalizedRegisteredRole = registeredUserRole.toUpperCase().trim();
+                
+                if (normalizedRegisteredRole.equals("APPLICANT") || normalizedRegisteredRole.contains("APPLICANT")) {
+                    System.out.println("\n🚀 Opening Applicant Menu...\n");
                     new ApplicantMenu(client, currentSession).run();
-                } else if (currentSession.getRole().equals("RECRUITER")) {
+                } else if (normalizedRegisteredRole.equals("RECRUITER") || normalizedRegisteredRole.contains("RECRUITER") || normalizedRegisteredRole.contains("RECRUIT")) {
+                    System.out.println("\n🚀 Opening Recruiter Menu...\n");
                     new RecruiterMenu(client, currentSession).run();
+                } else {
+                    System.err.println("❌ Unknown role: " + registeredUserRole);
+                    System.err.println("   Cannot redirect to appropriate menu.");
                 }
 
             } else {

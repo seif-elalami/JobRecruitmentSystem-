@@ -284,4 +284,5 @@ public class ApplicantMenu {
             System.err.println("❌ Error: " + e. getMessage());
         }
     }
+    
 }

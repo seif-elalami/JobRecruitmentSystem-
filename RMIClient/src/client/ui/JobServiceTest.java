@@ -4,6 +4,7 @@ import client.RMIClient;
 import client.utils.InputHelper;
 import shared.models.Job;
 import shared.interfaces.IJobService;
+import shared.interfaces.IReportService;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ public class JobServiceTest {
 
     private RMIClient client;
     private IJobService service;
+    private IReportService reportService;
 
     public JobServiceTest(RMIClient client) {
         this.client = client;
@@ -19,6 +21,7 @@ public class JobServiceTest {
     public void run() {
         try {
             service = client.getJobService();
+            reportService = client.getReportService();
 
             boolean back = false;
             while (!back) {
@@ -34,6 +37,9 @@ public class JobServiceTest {
                     case 5: searchByLocation(); break;
                     case 6: closeJob(); break;
                     case 7: deleteJob(); break;
+                    case 8: generateSimpleReport(); break;
+                    case 9: generateDetailedReport(); break;
+                    case 10: generateFilteredReport(); break;
                     case 0: back = true; break;
                     default: System.out.println("❌ Invalid choice!");
                 }
@@ -58,6 +64,10 @@ public class JobServiceTest {
         System.out.println("5. Search Jobs by Location");
         System.out.println("6. Close Job");
         System.out.println("7. Delete Job");
+        System.out.println("───── REPORTS ─────");
+        System.out.println("8. Generate Simple Report");
+        System.out.println("9. Generate Detailed Report");
+        System.out.println("10. Generate Filtered Report");
         System.out.println("0. Back");
         System.out.print("\nChoice: ");
     }
@@ -263,6 +273,57 @@ public class JobServiceTest {
             boolean deleted = service.deleteJob(id);
 
             System.out.println(deleted ? "✅ Deleted!" : "❌ Failed!");
+
+        } catch (Exception e) {
+            System.err.println("❌ Error: " + e.getMessage());
+        }
+    }
+
+    private void generateSimpleReport() {
+        try {
+            System.out.println("=== SIMPLE REPORT ===\n");
+            System.out.println("📤 Generating simple report for all jobs...");
+
+            List<Job> jobs = service.getAllJobs();
+            String report = reportService.generateSimpleReport(jobs, "Job Postings Summary");
+
+            System.out.println("\n" + report);
+
+        } catch (Exception e) {
+            System.err.println("❌ Error: " + e.getMessage());
+        }
+    }
+
+    private void generateDetailedReport() {
+        try {
+            System.out.println("=== DETAILED REPORT ===\n");
+            System.out.println("📤 Generating detailed report for all jobs...");
+
+            List<Job> jobs = service.getAllJobs();
+            String report = reportService.generateDetailedReport(jobs, "Complete Job Listings");
+
+            System.out.println("\n" + report);
+
+        } catch (Exception e) {
+            System.err.println("❌ Error: " + e.getMessage());
+        }
+    }
+
+    private void generateFilteredReport() {
+        try {
+            System.out.println("=== FILTERED REPORT ===\n");
+            System.out.print("Enter minimum salary: $");
+            double minSalary = InputHelper.getDouble();
+
+            System.out.print("Enter maximum salary: $");
+            double maxSalary = InputHelper.getDouble();
+
+            System.out.println("\n📤 Generating filtered report (salary range: $" + minSalary + " - $" + maxSalary + ")...");
+
+            List<Job> jobs = service.getAllJobs();
+            String report = reportService.generateFilteredReportBySalary(jobs, "Jobs in Salary Range: $" + minSalary + " - $" + maxSalary, minSalary, maxSalary);
+
+            System.out.println("\n" + report);
 
         } catch (Exception e) {
             System.err.println("❌ Error: " + e.getMessage());

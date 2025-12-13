@@ -4,7 +4,7 @@ import shared.models.User;
 import shared.models.Session;
 
 import java.rmi.Remote;
-import java.rmi.RemoteException;
+import java. rmi.RemoteException;
 
 /**
  * Authentication Service Interface

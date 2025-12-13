@@ -6,11 +6,13 @@ import Server.services.JobServiceImpl;
 import Server.services.ApplicationServiceImpl;
 import Server.services.AuthServiceImpl;
 import Server.services.RecruiterServiceImpl;
+import Server.services.ReportServiceImpl;
 import shared.interfaces.IApplicantService;
 import shared.interfaces.IJobService;
 import shared.interfaces.IApplicationService;
 import shared.interfaces.IAuthService;
 import shared.interfaces.IRecruiterService;
+import shared.interfaces.IReportService;
 
 import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
@@ -52,6 +54,7 @@ public class RMIServer {
             IJobService jobService = new JobServiceImpl();
             IApplicationService applicationService = new ApplicationServiceImpl();
             IAuthService authService = new AuthServiceImpl();
+            IReportService reportService = new ReportServiceImpl();
 
             System.out.println("   ✅ All services created");
             System.out.println();
@@ -76,6 +79,9 @@ public class RMIServer {
             Naming.rebind(serverURL + "AuthService", authService);
             System.out.println("   ✅ AuthService bound");
 
+            Naming.rebind(serverURL + "ReportService", reportService);
+            System.out.println("   ✅ ReportService bound");
+
             System.out.println();
             System.out.println("╔════════════════════════════════════════╗");
             System.out.println("║     ✅ SERVER RUNNING!                    ║");
@@ -92,6 +98,7 @@ public class RMIServer {
             System.out.println("  • " + serverURL + "JobService");
             System.out.println("  • " + serverURL + "ApplicationService");
             System.out.println("  • " + serverURL + "AuthService");
+            System.out.println("  • " + serverURL + "ReportService");
             System.out.println();
             System.out.println("Press Ctrl+C to stop the server...");
             System.out.println("═══════════════════════════════════════════");

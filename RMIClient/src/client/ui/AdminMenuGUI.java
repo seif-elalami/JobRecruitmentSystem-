@@ -226,7 +226,12 @@ public class AdminMenuGUI extends JFrame {
                 new ManageUsersPage(this, rmiClient.getAuthService(), session).setVisible(true);
                 break;
             case 1:
-                new SystemReportsPage(this, session).setVisible(true);
+                try {
+                    new ReportPage(rmiClient);
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, "Failed to open Report Page: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    ex.printStackTrace();
+                }
                 break;
             case 2:
                 new ManageJobsPage(this, rmiClient.getJobService(), session).setVisible(true);

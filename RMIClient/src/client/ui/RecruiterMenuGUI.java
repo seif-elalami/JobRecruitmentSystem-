@@ -6,61 +6,65 @@ import shared.models.Session;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * Recruiter Menu GUI - Swing based interface
- * This will eventually replace the console-based RecruiterMenu
- */
 public class RecruiterMenuGUI extends JFrame {
 
     public RecruiterMenuGUI(RMIClient rmiClient, Session session) {
-
-        // Frame setup
-        setTitle("Recruiter Dashboard - Job Recruitment System");
+        setTitle("Recruiter Home - Job Recruitment System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1000, 700);
+        setSize(600, 500);
         setLocationRelativeTo(null);
-        setResizable(true);
+        setResizable(false);
 
-        // Main panel
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.setBackground(new Color(236, 240, 241));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         add(mainPanel);
 
         // Header
         JPanel headerPanel = new JPanel();
         headerPanel.setBackground(new Color(41, 128, 185));
         headerPanel.setPreferredSize(new Dimension(0, 60));
-
         JLabel welcomeLabel = new JLabel("Welcome, " + session.getUserEmail() + " (Recruiter)");
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 20));
         welcomeLabel.setForeground(Color.WHITE);
-
         headerPanel.add(welcomeLabel);
         mainPanel.add(headerPanel, BorderLayout.NORTH);
 
-        // Center panel - Menu
+        // Center panel - Main menu buttons
         JPanel centerPanel = new JPanel();
         centerPanel.setBackground(Color.WHITE);
-        centerPanel.setBorder(BorderFactory.createTitledBorder("Recruiter Features"));
-        centerPanel.setLayout(new GridLayout(3, 2, 20, 20));
-        centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        centerPanel.setLayout(new GridLayout(4, 1, 30, 30));
+        centerPanel.setBorder(BorderFactory.createEmptyBorder(40, 60, 40, 60));
 
-        // Feature buttons
-        addFeatureButton(centerPanel, "📋 Post Job", "Create and publish new job listings");
-        addFeatureButton(centerPanel, "👥 View Applications", "Review applications from candidates");
-        addFeatureButton(centerPanel, "🔍 Search Candidates", "Find candidates by skills and experience");
-        addFeatureButton(centerPanel, "📅 Schedule Interview", "Schedule interviews with applicants");
-        addFeatureButton(centerPanel, "📊 Job Postings", "Manage your active job postings");
-        addFeatureButton(centerPanel, "🔐 Settings", "Account settings and preferences");
+        JButton profileBtn = new JButton("Recruiter Profile");
+        JButton jobMgmtBtn = new JButton("Job Management");
+        JButton appMgmtBtn = new JButton("Application Management");
+        JButton candidateBtn = new JButton("Candidate Matching & Search");
 
-        mainPanel.add(new JScrollPane(centerPanel), BorderLayout.CENTER);
+        profileBtn.setFont(new Font("Arial", Font.BOLD, 18));
+        jobMgmtBtn.setFont(new Font("Arial", Font.BOLD, 18));
+        appMgmtBtn.setFont(new Font("Arial", Font.BOLD, 18));
+        candidateBtn.setFont(new Font("Arial", Font.BOLD, 18));
+
+        profileBtn.addActionListener(e -> {
+            dispose();
+            new RecruiterProfileScreen(rmiClient, session);
+        });
+        jobMgmtBtn.addActionListener(e -> JOptionPane.showMessageDialog(this, "Job Management screen not implemented yet."));
+        appMgmtBtn.addActionListener(e -> JOptionPane.showMessageDialog(this, "Application Management screen not implemented yet."));
+        candidateBtn.addActionListener(e -> JOptionPane.showMessageDialog(this, "Candidate Matching & Search screen not implemented yet."));
+
+        centerPanel.add(profileBtn);
+        centerPanel.add(jobMgmtBtn);
+        centerPanel.add(appMgmtBtn);
+        centerPanel.add(candidateBtn);
+
+        mainPanel.add(centerPanel, BorderLayout.CENTER);
 
         // Footer
         JPanel footerPanel = new JPanel();
         footerPanel.setBackground(new Color(52, 73, 94));
         footerPanel.setPreferredSize(new Dimension(0, 50));
-
         JButton logoutButton = new JButton("Logout");
         logoutButton.setFont(new Font("Arial", Font.BOLD, 14));
         logoutButton.setBackground(new Color(231, 76, 60));
@@ -68,58 +72,13 @@ public class RecruiterMenuGUI extends JFrame {
         logoutButton.setFocusPainted(false);
         logoutButton.setBorderPainted(false);
         logoutButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
         logoutButton.addActionListener(e -> {
             dispose();
             new WelcomePage(rmiClient);
         });
-
         footerPanel.add(logoutButton);
         mainPanel.add(footerPanel, BorderLayout.SOUTH);
 
         setVisible(true);
-    }
-
-    /**
-     * Add feature button to panel
-     */
-    private void addFeatureButton(JPanel parent, String title, String description) {
-        JPanel buttonPanel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-                g2d.setColor(new Color(236, 240, 241));
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
-
-                g2d.setColor(new Color(52, 152, 219));
-                g2d.setStroke(new BasicStroke(2));
-                g2d.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 15, 15);
-            }
-        };
-
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
-        buttonPanel.setOpaque(false);
-        buttonPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        titleLabel.setForeground(new Color(41, 128, 185));
-        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JLabel descLabel = new JLabel("<html><center>" + description + "</center></html>");
-        descLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        descLabel.setForeground(new Color(127, 140, 141));
-        descLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        buttonPanel.add(Box.createVerticalGlue());
-        buttonPanel.add(titleLabel);
-        buttonPanel.add(Box.createVerticalStrut(5));
-        buttonPanel.add(descLabel);
-        buttonPanel.add(Box.createVerticalGlue());
-
-        parent.add(buttonPanel);
     }
 }

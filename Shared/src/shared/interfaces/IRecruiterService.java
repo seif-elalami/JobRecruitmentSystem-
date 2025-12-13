@@ -96,4 +96,5 @@ public interface IRecruiterService extends Remote {
      * @return List of matching candidates (read-only)
      */
     List<ICandidateView> searchCandidatesByMinExperience(int minYears) throws RemoteException;
+    List<Applicant> matchCandidatesToJob(String jobId) throws RemoteException;
 }

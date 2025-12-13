@@ -51,7 +51,6 @@ public class ManageUsersPage extends JDialog {
         tablePanel.setBackground(Color.WHITE);
         tablePanel.setBorder(BorderFactory.createLineBorder(new Color(220, 226, 235)));
 
-        // Create table
         String[] columns = {"User ID", "Name", "Email", "Role", "Phone", "Status", "Joined"};
         DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
@@ -78,7 +77,6 @@ public class ManageUsersPage extends JDialog {
         footer.add(Box.createHorizontalGlue());
         footer.add(countLabel);
 
-        // Add User button
         JButton addUserBtn = new JButton("➕ Add User");
         addUserBtn.setBackground(new Color(76, 175, 80));
         addUserBtn.setForeground(Color.WHITE);
@@ -86,7 +84,6 @@ public class ManageUsersPage extends JDialog {
         addUserBtn.addActionListener(e -> showAddUserDialog(countLabel));
         footer.add(addUserBtn);
 
-        // Delete User button
         JButton deleteUserBtn = new JButton("🗑️ Delete User");
         deleteUserBtn.setBackground(new Color(211, 47, 47));
         deleteUserBtn.setForeground(Color.WHITE);
@@ -94,7 +91,6 @@ public class ManageUsersPage extends JDialog {
         deleteUserBtn.addActionListener(e -> deleteSelectedUser(countLabel));
         footer.add(deleteUserBtn);
 
-        // Deactivate User button
         JButton deactivateBtn = new JButton("🚫 Deactivate");
         deactivateBtn.setBackground(new Color(255, 152, 0));
         deactivateBtn.setForeground(Color.WHITE);
@@ -102,7 +98,6 @@ public class ManageUsersPage extends JDialog {
         deactivateBtn.addActionListener(e -> toggleActiveSelectedUser(false, countLabel));
         footer.add(deactivateBtn);
 
-        // Activate User button
         JButton activateBtn = new JButton("✅ Activate");
         activateBtn.setBackground(new Color(76, 175, 80));
         activateBtn.setForeground(Color.WHITE);
@@ -187,7 +182,6 @@ public class ManageUsersPage extends JDialog {
                 user.setRole((String) roleBox.getSelectedItem());
                 user.setPhone(phoneField.getText().trim());
 
-                // Use register for now; server will validate and create
                 Session created = authService.register(user);
                 if (created != null) {
                     JOptionPane.showMessageDialog(this, "✅ User created successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
@@ -217,7 +211,7 @@ public class ManageUsersPage extends JDialog {
         if (confirm != JOptionPane.YES_OPTION) return;
 
         try {
-            // Fetch full user to get actual ID
+
             User user = authService.getUserByEmail(email);
             if (user == null || user.getUserId() == null) {
                 JOptionPane.showMessageDialog(this, "❌ Could not resolve user ID", "Error", JOptionPane.ERROR_MESSAGE);

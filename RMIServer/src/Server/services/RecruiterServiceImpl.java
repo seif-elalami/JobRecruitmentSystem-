@@ -20,7 +20,6 @@ import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
-
 import java. rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
@@ -45,7 +44,6 @@ public class RecruiterServiceImpl extends UnicastRemoteObject implements IRecrui
         System.out.println("   Database: " + database.getName());
         System.out.println("   Collection: users");
 
-        // Initialize other services
         this.jobService = new JobServiceImpl();
         this.applicationService = new ApplicationServiceImpl();
         this.applicantService = new ApplicantServiceImpl();
@@ -55,20 +53,15 @@ public class RecruiterServiceImpl extends UnicastRemoteObject implements IRecrui
         System.out.println("✅ RecruiterService initialized");
     }
 
-    // ========================================
-    // Recruiter Profile Management (for Auth)
-    // ========================================
-
     @Override
     public String createRecruiter(Recruiter recruiter) throws RemoteException {
         try {
-            // Validation - Email Format
+
             if (!ValidationUtil.isValidEmail(recruiter.getEmail())) {
                 System.err.println("❌ Create recruiter failed: " + ValidationUtil.getEmailErrorMessage());
                 throw new RemoteException(ValidationUtil.getEmailErrorMessage());
             }
 
-            // Validation - Phone Number (if provided)
             if (recruiter.getPhone() != null && !recruiter.getPhone().isEmpty()) {
                 if (!ValidationUtil.isValidPhone(recruiter.getPhone())) {
                     System.err.println("❌ Create recruiter failed: " + ValidationUtil.getPhoneErrorMessage());
@@ -76,13 +69,11 @@ public class RecruiterServiceImpl extends UnicastRemoteObject implements IRecrui
                 }
             }
 
-            // Check if email already exists
             Document existingDoc = userCollection.find(new Document("email", recruiter.getEmail())).first();
             if (existingDoc != null) {
                 throw new RemoteException("❌ Email already exists");
             }
 
-            // Create document
             Document doc = new Document();
             doc.append("username", recruiter.getUsername());
             doc.append("password", recruiter.getPassword());
@@ -121,7 +112,6 @@ public class RecruiterServiceImpl extends UnicastRemoteObject implements IRecrui
             System.out.println("   Database: " + database.getName());
             System.out.println("   Collection: users");
 
-            // ✅ First, find by ID only
             Document query = new Document("_id", new ObjectId(id));
             Document doc = userCollection.find(query).first();
 
@@ -130,7 +120,6 @@ public class RecruiterServiceImpl extends UnicastRemoteObject implements IRecrui
                 return null;
             }
 
-            // ✅ Check if role is recruiter (case-insensitive)
             String role = doc.getString("role");
             if (role == null) {
                 System.err.println("❌ User has no role assigned!");
@@ -162,11 +151,9 @@ public Recruiter getRecruiterByEmail(String email) throws RemoteException {
     try {
         System.out.println("📋 Getting recruiter by email: " + email);
 
-        // ✅ Search in users collection (try exact match first)
         Document query = new Document("email", email);
         Document doc = userCollection.find(query).first();
 
-        // If not found, try case-insensitive
         if (doc == null) {
             query = new Document("email", new Document("$regex", "^" + email + "$").append("$options", "i"));
             doc = userCollection.find(query).first();
@@ -177,7 +164,6 @@ public Recruiter getRecruiterByEmail(String email) throws RemoteException {
             return null;
         }
 
-        // ✅ Check if role is recruiter (case-insensitive)
         String role = doc.getString("role");
         if (role == null) {
             System.err.println("❌ User has no role assigned!");
@@ -206,13 +192,11 @@ public Recruiter getRecruiterByEmail(String email) throws RemoteException {
         try {
             System.out.println("📝 Updating recruiter: " + recruiter.getId());
 
-            // Validation - Email Format
             if (!ValidationUtil.isValidEmail(recruiter.getEmail())) {
                 System.err.println("❌ Invalid email format");
                 throw new RemoteException(ValidationUtil.getEmailErrorMessage());
             }
 
-            // Validation - Phone Number (if provided)
             if (recruiter.getPhone() != null && !recruiter.getPhone().isEmpty()) {
                 if (!ValidationUtil.isValidPhone(recruiter.getPhone())) {
                     System.err.println("❌ Invalid phone format");
@@ -220,11 +204,9 @@ public Recruiter getRecruiterByEmail(String email) throws RemoteException {
                 }
             }
 
-            // ✅ Query:  Find by ID and ensure role is RECRUITER
             Document query = new Document("_id", new ObjectId(recruiter.getId()))
                     .append("role", "RECRUITER");
 
-            // ✅ Build update document
             Document update = new Document();
             update.append("username", recruiter.getUsername());
             update.append("email", recruiter.getEmail());
@@ -235,7 +217,6 @@ public Recruiter getRecruiterByEmail(String email) throws RemoteException {
             update.append("description", recruiter.getDescription());
             update.append("role", "RECRUITER"); // ✅ Keep role as RECRUITER
 
-            // Only update password if provided
             if (recruiter.getPassword() != null && !recruiter.getPassword().isEmpty()) {
                 String hashedPassword = PasswordUtil.hashPassword(recruiter.getPassword());
                 update.append("password", hashedPassword);
@@ -243,7 +224,6 @@ public Recruiter getRecruiterByEmail(String email) throws RemoteException {
 
             Document updateDoc = new Document("$set", update);
 
-            // ✅ Update in users collection
             long modifiedCount = userCollection.updateOne(query, updateDoc).getModifiedCount();
 
             if (modifiedCount > 0) {
@@ -263,10 +243,6 @@ public Recruiter getRecruiterByEmail(String email) throws RemoteException {
         }
     }
 
-    // ========================================
-    // 1. Job Posting Management
-    // ========================================
-
     @Override
     public String postJob(Job job) throws RemoteException {
         return jobService.createJob(job);
@@ -280,7 +256,7 @@ public Recruiter getRecruiterByEmail(String email) throws RemoteException {
     @Override
     public boolean closeJobPosting(String jobId, String recruiterId) throws RemoteException {
         try {
-            // Verify the job belongs to this recruiter
+
             Job job = jobService.getJobById(jobId);
 
             if (job == null) {
@@ -301,10 +277,6 @@ public Recruiter getRecruiterByEmail(String email) throws RemoteException {
         }
     }
 
-    // ========================================
-    // 2. Application Management
-    // ========================================
-
     @Override
     public List<Application> getApplicationsForJob(String jobId) throws RemoteException {
         return applicationService.getApplicationsByJobId(jobId);
@@ -315,10 +287,6 @@ public Recruiter getRecruiterByEmail(String email) throws RemoteException {
         return applicationService.updateApplicationStatus(applicationId, status);
     }
 
-    // ========================================
-    // 3. Applicant Search
-    // ========================================
-
     @Override
     public List<Applicant> searchApplicantsBySkills(String skills) throws RemoteException {
         return applicantService.searchApplicantsBySkills(skills);
@@ -328,10 +296,6 @@ public Recruiter getRecruiterByEmail(String email) throws RemoteException {
     public List<Applicant> searchApplicantsByExperience(String experience) throws RemoteException {
         return applicantService.searchApplicantsByExperience(experience);
     }
-
-    // ========================================
-    // 4. Interview Management
-    // ========================================
 
     @Override
     public String createInterview(Interview interview) throws RemoteException {
@@ -358,9 +322,6 @@ public Recruiter getRecruiterByEmail(String email) throws RemoteException {
         return interviewService.getInterviewById(interviewId);
     }
 
-    // ========================================
-    // ✅ MATCH CV FEATURE IMPLEMENTATION
-    // ========================================
     @Override
     public List<ICandidateView> getCandidatesForJob(String jobId) throws RemoteException {
         try {
@@ -372,7 +333,6 @@ public Recruiter getRecruiterByEmail(String email) throws RemoteException {
 
             List<ICandidateView> candidates = new ArrayList<>();
 
-            // Get applications
             System.out.println("\n--- Fetching Applications ---");
             List<Application> applications = applicationService.getApplicationsByJobId(jobId);
             System.out.println("Applications found: " + applications.size());
@@ -382,7 +342,6 @@ public Recruiter getRecruiterByEmail(String email) throws RemoteException {
                 return candidates;
             }
 
-            // Process each application
             System.out.println("\n--- Processing Applications ---");
             for (int i = 0; i < applications.size(); i++) {
                 Application app = applications.get(i);
@@ -436,7 +395,7 @@ public Recruiter getRecruiterByEmail(String email) throws RemoteException {
 
     @Override
 public List<Applicant> matchCandidatesToJob(String jobId) throws RemoteException {
-    // Example: return all applicants (you can add matching logic later)
+
     return applicantService.getAllApplicants();
 }
 
@@ -445,29 +404,24 @@ public List<Applicant> matchCandidatesToJob(String jobId) throws RemoteException
         try {
             System.out.println("📋 Getting candidate:  " + candidateId);
 
-            // ✅ Try getting from users collection first (unified system)
             if (authService != null) {
                 User user = authService.getUserById(candidateId);
 
                 if (user != null && "APPLICANT".equals(user.getRole())) {
                     System.out.println("✅ Found candidate in users collection:  " + user.getUsername());
 
-                    // Convert User to Applicant
                     Applicant applicant = new Applicant();
 
-                    // Map User fields to Applicant fields
                     applicant.setId(user.getUserId()); // ✅ User has getUserId()
                     applicant.setName(user.getUsername()); // ✅ User has getUsername()
                     applicant.setEmail(user.getEmail());
                     applicant.setPhone(user.getPhone() != null ? user.getPhone() : "");
 
-                    // Education - User doesn't have this, set default
                     applicant.setEducation("Not specified");
 
-                    // Experience - User has it as String, convert to int
                     if (user.getExperience() != null && !user.getExperience().isEmpty()) {
                         try {
-                            // Try to extract number from "5 years" or just "5"
+
                             String expStr = user.getExperience().replaceAll("[^0-9]", "");
                             int expYears = expStr.isEmpty() ? 0 : Integer.parseInt(expStr);
                             applicant.setExperience(expYears);
@@ -478,7 +432,6 @@ public List<Applicant> matchCandidatesToJob(String jobId) throws RemoteException
                         applicant.setExperience(0);
                     }
 
-                    // Skills - User has it as String, convert to List
                     if (user.getSkills() != null && !user.getSkills().isEmpty()) {
                         List<String> skillsList = Arrays.asList(user.getSkills().split(",\\s*"));
                         applicant.setSkills(skillsList);
@@ -486,14 +439,12 @@ public List<Applicant> matchCandidatesToJob(String jobId) throws RemoteException
                         applicant.setSkills(new ArrayList<>());
                     }
 
-                    // Resume - User doesn't have this field, set empty
                     applicant.setResume("");
 
                     return applicant; // Automatically casts to ICandidateView
                 }
             }
 
-            // ✅ Fallback to applicants collection (if exists)
             Applicant applicant = applicantService.getApplicantById(candidateId);
 
             if (applicant != null) {
@@ -518,15 +469,14 @@ public List<Applicant> matchCandidatesToJob(String jobId) throws RemoteException
 
             List<ICandidateView> candidates = new ArrayList<>();
 
-            // Get all users with APPLICANT role from users collection
             if (authService != null) {
                 List<User> allUsers = authService.getAllUsers();
 
                 for (User user : allUsers) {
                     if ("APPLICANT".equals(user.getRole())) {
-                        // Check if user has matching skills
+
                         if (user.getSkills() != null && user.getSkills().toLowerCase().contains(skills.toLowerCase())) {
-                            // Convert to Applicant
+
                             Applicant applicant = convertUserToApplicant(user);
                             candidates.add(applicant);
                         }
@@ -551,13 +501,12 @@ public List<Applicant> matchCandidatesToJob(String jobId) throws RemoteException
 
             List<ICandidateView> candidates = new ArrayList<>();
 
-            // Get all users with APPLICANT role
             if (authService != null) {
                 List<User> allUsers = authService.getAllUsers();
 
                 for (User user : allUsers) {
                     if ("APPLICANT".equals(user.getRole())) {
-                        // Parse experience
+
                         if (user.getExperience() != null && !user.getExperience().isEmpty()) {
                             try {
                                 String expStr = user.getExperience().replaceAll("[^0-9]", "");
@@ -571,7 +520,7 @@ public List<Applicant> matchCandidatesToJob(String jobId) throws RemoteException
                                                     + " years)");
                                 }
                             } catch (NumberFormatException e) {
-                                // Skip if can't parse
+
                             }
                         }
                     }
@@ -625,7 +574,6 @@ public boolean matchFinalCandidateToJob(String jobId, String applicantId) throws
         applicant.setPhone(user.getPhone() != null ? user.getPhone() : "");
         applicant.setEducation("Not specified");
 
-        // Experience - convert String to int
         if (user.getExperience() != null && !user.getExperience().isEmpty()) {
             try {
                 String expStr = user.getExperience().replaceAll("[^0-9]", "");
@@ -638,7 +586,6 @@ public boolean matchFinalCandidateToJob(String jobId, String applicantId) throws
             applicant.setExperience(0);
         }
 
-        // Skills - convert String to List
         if (user.getSkills() != null && !user.getSkills().isEmpty()) {
             List<String> skillsList = Arrays.asList(user.getSkills().split(",\\s*"));
             applicant.setSkills(skillsList);
@@ -650,32 +597,25 @@ public boolean matchFinalCandidateToJob(String jobId, String applicantId) throws
 
         return applicant;
     }
-    // ========================================
-    // Helper Methods
-    // ========================================
 
     private Recruiter documentToRecruiter(Document doc) {
         Recruiter recruiter = new Recruiter();
 
-        // Map from User fields
         recruiter.setUserId(doc.getObjectId("_id").toString());
         recruiter.setUsername(doc.getString("username"));
         recruiter.setEmail(doc.getString("email"));
         recruiter.setPassword(doc.getString("password"));
         recruiter.setRole(doc.getString("role"));
 
-        // Map Recruiter-specific fields
         recruiter.setPhone(doc.getString("phone"));
         recruiter.setCompany(doc.getString("company"));
         recruiter.setDepartment(doc.getString("department"));
         recruiter.setPosition(doc.getString("position"));
         recruiter.setDescription(doc.getString("description"));
 
-        // Map dates if they exist
         recruiter.setCreatedAt(doc.getDate("createdAt"));
         recruiter.setLastLogin(doc.getDate("lastLogin"));
 
-        // Map active status
         Boolean isActive = doc.getBoolean("isActive");
         if (isActive != null) {
             recruiter.setActive(isActive);
@@ -685,7 +625,4 @@ public boolean matchFinalCandidateToJob(String jobId, String applicantId) throws
 
     }
 
-
 }
-
-

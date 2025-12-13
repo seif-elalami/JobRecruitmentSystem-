@@ -29,9 +29,6 @@ public class ApplicationServiceImpl extends UnicastRemoteObject implements IAppl
         System.out.println("   Current count: " + applicationCollection.countDocuments());
     }
 
-    // ========================================
-    // FUNCTION 1:  SUBMIT APPLICATION
-    // ========================================
      @Override
     public String SubmitApplication(Application application) throws RemoteException {
         try {
@@ -60,18 +57,11 @@ public class ApplicationServiceImpl extends UnicastRemoteObject implements IAppl
         }
     }
 
-
-    // ========================================
-    // FUNCTION 2: CREATE APPLICATION (Alias for submitApplication)
-    // ========================================
     @Override
     public String CreateApplication(Application application) throws RemoteException {
         return SubmitApplication(application);
     }
 
-    // ========================================
-    // FUNCTION 3: GET APPLICATION BY ID
-    // ========================================
     @Override
     public Application getApplicationById(String id) throws RemoteException {
         try {
@@ -98,9 +88,6 @@ public class ApplicationServiceImpl extends UnicastRemoteObject implements IAppl
         }
     }
 
-    // ========================================
-    // FUNCTION 4: GET APPLICATIONS BY APPLICANT ID
-    // ========================================
     @Override
     public List<Application> getApplicationsByApplicantId(String applicantId) throws RemoteException {
         try {
@@ -124,9 +111,6 @@ public class ApplicationServiceImpl extends UnicastRemoteObject implements IAppl
         }
     }
 
-    // ========================================
-    // FUNCTION 5: GET ALL APPLICATIONS (RECRUITERS/ADMINS)
-    // ========================================
     @Override
     public List<Application> getAllApplications() throws RemoteException {
         try {
@@ -149,9 +133,6 @@ public class ApplicationServiceImpl extends UnicastRemoteObject implements IAppl
         }
     }
 
-    // ========================================
-    // FUNCTION 6: GET APPLICATIONS BY JOB ID
-    // ========================================
     @Override
 public List<Application> getApplicationsByJobId(String jobId) throws RemoteException {
     try {
@@ -159,16 +140,15 @@ public List<Application> getApplicationsByJobId(String jobId) throws RemoteExcep
 
         List<Application> applications = new ArrayList<>();
 
-        // ✅ FIX: Try both String and ObjectId formats
         Document query;
 
         try {
-            // Try as ObjectId first
+
             ObjectId jobObjectId = new ObjectId(jobId);
             query = new Document("jobId", jobObjectId);
             System.out.println("   Searching with ObjectId: " + jobObjectId);
         } catch (IllegalArgumentException e) {
-            // If not valid ObjectId, search as String
+
             query = new Document("jobId", jobId);
             System.out.println("   Searching with String: " + jobId);
         }
@@ -184,17 +164,16 @@ public List<Application> getApplicationsByJobId(String jobId) throws RemoteExcep
             System.out.println("   ✅ Found application: " + app.getApplicationId());
         }
 
-        // ✅ If no results, try the OTHER format
         if (applications.isEmpty()) {
             System.out.println("\n   ⚠️ No results with first query, trying alternate format...");
 
             Document alternateQuery;
             if (query.get("jobId") instanceof ObjectId) {
-                // We tried ObjectId, now try String
+
                 alternateQuery = new Document("jobId", jobId);
                 System.out.println("   Trying as String: " + alternateQuery.toJson());
             } else {
-                // We tried String, now try ObjectId
+
                 try {
                     alternateQuery = new Document("jobId", new ObjectId(jobId));
                     System.out.println("   Trying as ObjectId: " + alternateQuery.toJson());
@@ -221,9 +200,6 @@ public List<Application> getApplicationsByJobId(String jobId) throws RemoteExcep
     }
 }
 
-    // ========================================
-    // FUNCTION 7: UPDATE APPLICATION STATUS
-    // ========================================
     @Override
     public boolean updateApplicationStatus(String applicationId, String status) throws RemoteException {
         try {
@@ -231,7 +207,6 @@ public List<Application> getApplicationsByJobId(String jobId) throws RemoteExcep
             System.out.println("   Application ID: " + applicationId);
             System.out.println("   New Status: " + status);
 
-            // Validate status
             if (! status.equals("PENDING") && !status.equals("ACCEPTED") &&
                 !status.equals("REJECTED") && !status.equals("UNDER_REVIEW")) {
                 System.err.println("❌ Invalid status:  " + status);
@@ -257,9 +232,6 @@ public List<Application> getApplicationsByJobId(String jobId) throws RemoteExcep
         }
     }
 
-    // ========================================
-    // FUNCTION 8: DELETE APPLICATION
-    // ========================================
     @Override
     public boolean deleteApplication(String id) throws RemoteException {
         try {
@@ -282,15 +254,11 @@ public List<Application> getApplicationsByJobId(String jobId) throws RemoteExcep
         }
     }
 
-    // ========================================
-    // HELPER METHOD
-    // ========================================
   private Application documentToApplication(Document doc) {
     Application app = new Application();
 
     app.setApplicationId(doc.getObjectId("_id").toString());
 
-    // ✅ Handle jobId as either String or ObjectId
     Object jobIdObj = doc.get("jobId");
     if (jobIdObj instanceof ObjectId) {
         app.setJobId(((ObjectId) jobIdObj).toString());
@@ -298,7 +266,6 @@ public List<Application> getApplicationsByJobId(String jobId) throws RemoteExcep
         app.setJobId(doc.getString("jobId"));
     }
 
-    // ✅ Handle applicantId as either String or ObjectId
     Object applicantIdObj = doc. get("applicantId");
     if (applicantIdObj instanceof ObjectId) {
         app.setApplicantId(((ObjectId) applicantIdObj).toString());

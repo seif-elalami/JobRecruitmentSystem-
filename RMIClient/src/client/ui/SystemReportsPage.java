@@ -40,7 +40,6 @@ public class SystemReportsPage extends JDialog {
                 BorderFactory.createLineBorder(new Color(220, 226, 235)),
                 BorderFactory.createEmptyBorder(16, 16, 16, 16)));
 
-        // Date
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String currentDate = sdf.format(new Date());
 

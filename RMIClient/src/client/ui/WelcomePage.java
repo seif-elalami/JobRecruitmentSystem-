@@ -15,7 +15,6 @@ public class WelcomePage extends JFrame {
     public WelcomePage(RMIClient rmiClient) {
         this.rmiClient = rmiClient;
 
-        // Frame setup
         setTitle("Job Recruitment System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1200, 800);
@@ -24,7 +23,6 @@ public class WelcomePage extends JFrame {
         setUndecorated(true);
         setShape(new RoundRectangle2D.Double(0, 0, 1200, 800, 0, 0));
 
-        // Create main panel with animated gradient background
         mainPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -33,13 +31,11 @@ public class WelcomePage extends JFrame {
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
-                // Modern gradient background (Deep blue to purple to teal)
                 GradientPaint gradient = new GradientPaint(0, 0, new Color(20, 33, 61), 
                         getWidth(), getHeight(), new Color(52, 152, 219));
                 g2d.setPaint(gradient);
                 g2d.fillRect(0, 0, getWidth(), getHeight());
-                
-                // Add subtle overlay pattern
+
                 g2d.setColor(new Color(255, 255, 255, 5));
                 for (int i = 0; i < getWidth(); i += 50) {
                     g2d.drawLine(i, 0, i, getHeight());
@@ -50,14 +46,12 @@ public class WelcomePage extends JFrame {
         mainPanel.setLayout(null);
         add(mainPanel);
 
-        // Logo/Icon area
         JLabel logoLabel = new JLabel("💼");
         logoLabel.setFont(new Font("Arial", Font.PLAIN, 80));
         logoLabel.setBounds(550, 80, 100, 100);
         logoLabel.setHorizontalAlignment(SwingConstants.CENTER);
         mainPanel.add(logoLabel);
 
-        // Title Label
         JLabel titleLabel = new JLabel("Job Recruitment System");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 52));
         titleLabel.setForeground(Color.WHITE);
@@ -65,7 +59,6 @@ public class WelcomePage extends JFrame {
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         mainPanel.add(titleLabel);
 
-        // Subtitle Label
         JLabel subtitleLabel = new JLabel("Find Your Perfect Job or Hire Exceptional Talent");
         subtitleLabel.setFont(new Font("Arial", Font.PLAIN, 18));
         subtitleLabel.setForeground(new Color(236, 240, 241));
@@ -73,7 +66,6 @@ public class WelcomePage extends JFrame {
         subtitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         mainPanel.add(subtitleLabel);
 
-        // Divider line
         JPanel dividerPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -87,30 +79,25 @@ public class WelcomePage extends JFrame {
         dividerPanel.setOpaque(false);
         mainPanel.add(dividerPanel);
 
-        // Sign In Button with animation
         AnimatedButton signInButton = new AnimatedButton("🔐 Sign In", new Color(52, 152, 219), new Color(41, 128, 185));
         signInButton.setBounds(200, 360, 250, 70);
         signInButton.addActionListener(e -> openSignInPage());
         mainPanel.add(signInButton);
 
-        // Register Button with animation
         AnimatedButton registerButton = new AnimatedButton("✏️ Register", new Color(46, 204, 113), new Color(39, 174, 96));
         registerButton.setBounds(475, 360, 250, 70);
         registerButton.addActionListener(e -> openRegisterPage());
         mainPanel.add(registerButton);
 
-        // Admin Login Button with animation
         AnimatedButton adminButton = new AnimatedButton("🛡️ Admin Login", new Color(231, 76, 60), new Color(192, 57, 43));
         adminButton.setBounds(750, 360, 250, 70);
         adminButton.addActionListener(e -> openAdminLoginPage());
         mainPanel.add(adminButton);
 
-        // Feature Cards
         createFeatureCard(mainPanel, "👤", "For Applicants", "Discover exciting opportunities\nand manage your applications", 100, 520);
         createFeatureCard(mainPanel, "👔", "For Recruiters", "Post jobs and connect with\nqualified candidates", 450, 520);
         createFeatureCard(mainPanel, "🛡️", "Secure & Reliable", "Your data is protected with\nmodern security measures", 800, 520);
 
-        // Footer
         JLabel footerLabel = new JLabel("© 2025 Job Recruitment System | Secure • Reliable • Innovative");
         footerLabel.setFont(new Font("Arial", Font.PLAIN, 11));
         footerLabel.setForeground(new Color(149, 165, 166));
@@ -176,7 +163,6 @@ public class WelcomePage extends JFrame {
             setFocusPainted(false);
             setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-            // Mouse listener for hover animation
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseEntered(MouseEvent e) {
@@ -215,22 +201,18 @@ public class WelcomePage extends JFrame {
             int scaledWidth = (int) (width * scale);
             int scaledHeight = (int) (height * scale);
 
-            // Draw button background with rounded corners
             g2d.setColor(isHovered ? hoverColor : baseColor);
             g2d.fillRoundRect(x, y, scaledWidth, scaledHeight, 15, 15);
 
-            // Draw border
             g2d.setColor(new Color(255, 255, 255, 100));
             g2d.setStroke(new BasicStroke(2));
             g2d.drawRoundRect(x, y, scaledWidth, scaledHeight, 15, 15);
 
-            // Draw shadow effect when hovered
             if (isHovered) {
                 g2d.setColor(new Color(0, 0, 0, 50));
                 g2d.fillRoundRect(x + 2, y + 2, scaledWidth - 4, scaledHeight - 4, 15, 15);
             }
 
-            // Draw text
             FontMetrics fm = g2d.getFontMetrics();
             int textX = (width - fm.stringWidth(getText())) / 2;
             int textY = ((height - fm.getHeight()) / 2) + fm.getAscent();

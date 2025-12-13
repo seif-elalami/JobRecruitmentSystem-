@@ -12,7 +12,6 @@ import java.util.List;
 public class Applicant extends User implements ICandidateView {
     private static final long serialVersionUID = 1L;
 
-    // Applicant-specific fields (not present in User)
     private String applicantId;
     private String resumeID;
     private String resume;
@@ -21,11 +20,10 @@ public class Applicant extends User implements ICandidateView {
     private int yearsExperience; // numeric projection of User's experience
     private List<Application> applications;
 
-    // Constructors
     public Applicant() {
         super();
         this.applications = new ArrayList<>();
-        // Ensure role defaults to APPLICANT
+
         setRole("APPLICANT");
     }
 
@@ -46,18 +44,15 @@ public class Applicant extends User implements ICandidateView {
             setLastLogin(user.getLastLogin());
             setActive(user.isActive());
 
-            // Optional descriptive fields present in User
             setDepartment(user.getDepartment());
             setCompany(user.getCompany());
             setPosition(user.getPosition());
             setDescription(user.getDescription());
 
-            // Map experience string to numeric years if possible
             this.yearsExperience = parseYearsFromExperience(user.getExperience());
         }
     }
 
-    // Backward-compatible parameter constructor used by client tests
     public Applicant(String name, String email, String phone,
                      String resume, String education, int experience) {
         this();
@@ -69,7 +64,6 @@ public class Applicant extends User implements ICandidateView {
         setExperience(experience); // updates yearsExperience and User.experience
     }
 
-    // Getters
     @Override
     public String getId() { return applicantId; }
     public String getApplicantId() { return applicantId; }
@@ -92,7 +86,6 @@ public class Applicant extends User implements ICandidateView {
     public int getYearsExperience() { return yearsExperience; }
     public List<Application> getApplications() { return applications; }
 
-    // Setters
     public void setId(String id) { this.applicantId = id; }
     public void setApplicantId(String applicantId) { this.applicantId = applicantId; }
     public void setResumeID(String resumeID) { this.resumeID = resumeID; }
@@ -102,7 +95,6 @@ public class Applicant extends User implements ICandidateView {
     public void setYearsExperience(int yearsExperience) { this.yearsExperience = yearsExperience; }
     public void setApplications(List<Application> applications) { this.applications = applications; }
 
-    // Backward-compatibility setters used by server services
     public void setName(String name) { super.setUsername(name); }
     public void setExperience(int years) {
         this.yearsExperience = years;
@@ -116,9 +108,8 @@ public class Applicant extends User implements ICandidateView {
         }
     }
 
-    // Helper and Action Methods
     public void addSkill(String skill) {
-        // Append to User.skills string safely
+
         String current = super.getSkills();
         if (current == null || current.isEmpty()) {
             super.setSkills(skill);
@@ -135,17 +126,15 @@ public class Applicant extends User implements ICandidateView {
     }
 
     public void uploadResume() {
-        // Implementation for resume upload
-        // This will interact with file storage service
+
         System.out.println("📤 Uploading resume...");
-        // File upload logic handled by service layer
+
     }
 
     public void applyToJob(String jobId) {
-        // Implementation for job application
-        // This will be handled by ApplicationService
+
         System.out.println("📋 Applying to job: " + jobId);
-        // Application creation logic handled by service layer
+
     }
 
     @Override
@@ -161,7 +150,6 @@ public class Applicant extends User implements ICandidateView {
                 '}';
     }
 
-    // Helpers
     private List<String> mapSkillsStringToList(String skillsStr) {
         if (skillsStr == null || skillsStr.trim().isEmpty()) return new ArrayList<>();
         return new ArrayList<>(Arrays.asList(skillsStr.split("\s*,\s*")));
@@ -170,10 +158,10 @@ public class Applicant extends User implements ICandidateView {
     public int parseYearsFromExperience(String expStr) {
         if (expStr == null) return 0;
         try {
-            // Try pure integer first
+
             return Integer.parseInt(expStr.trim());
         } catch (NumberFormatException ignored) {
-            // Try patterns like "5 years", "3+ years"
+
             String digits = expStr.replaceAll("[^0-9]", "");
             if (digits.isEmpty()) return 0;
             try { return Integer.parseInt(digits); } catch (NumberFormatException e) { return 0; }

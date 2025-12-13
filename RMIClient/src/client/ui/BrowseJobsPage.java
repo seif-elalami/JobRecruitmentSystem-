@@ -21,7 +21,7 @@ public class BrowseJobsPage extends JFrame {
         this.rmiClient = rmiClient;
         this.session = session;
         this.jobService = rmiClient.getJobService();
-        
+
         setTitle("Browse Jobs - Job Recruitment System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         initUI();
@@ -71,10 +71,10 @@ public class BrowseJobsPage extends JFrame {
 
         JButton refresh = primaryButton("Refresh");
         refresh.addActionListener(e -> loadJobs());
-        
+
         JButton applyBtn = primaryButton("Apply for Job");
         applyBtn.addActionListener(e -> applyForJob());
-        
+
         JButton backBtn = secondaryButton("Back to Dashboard");
         backBtn.addActionListener(e -> {
             dispose();
@@ -147,12 +147,12 @@ public class BrowseJobsPage extends JFrame {
             JOptionPane.showMessageDialog(this, "Please select a job first!", "No Selection", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
+
         String coverLetter = JOptionPane.showInputDialog(this, 
             "Enter your cover letter for:\n" + selectedJob.getTitle(), 
             "Apply for Job", 
             JOptionPane.QUESTION_MESSAGE);
-            
+
         if (coverLetter != null && !coverLetter.trim().isEmpty()) {
             try {
                 rmiClient.getApplicationService().CreateApplication(
@@ -179,7 +179,7 @@ public class BrowseJobsPage extends JFrame {
         btn.setBorder(BorderFactory.createEmptyBorder(10, 16, 10, 16));
         return btn;
     }
-    
+
     private JButton secondaryButton(String text) {
         JButton btn = new JButton(text);
         btn.setBackground(new Color(149, 165, 166));

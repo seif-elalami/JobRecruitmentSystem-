@@ -7,7 +7,6 @@ import shared.interfaces.ICandidateView;
 
 public class candidateDTO implements ICandidateView, Serializable  {
 
-     
     private static final long serialVersionUID = 1L;
     private String id;
     private String name;
@@ -29,40 +28,30 @@ public class candidateDTO implements ICandidateView, Serializable  {
         this.skills = skills;
     }
 
-    
-    
-
-
     public String getId() {
         return id;
     }
 
-    
     public String getName() {
         return name;
     }
 
-    
     public String getEmail() {
         return email;
     }
 
-    
     public String getPhone() {
         return phone;
     }
 
-    
     public String getResume() {
         return resume;
     }
 
-    
     public String getEducation() {
         return education;
     }
 
-    
     @Override
     public String getExperience() {
         return String.valueOf(experience);
@@ -75,7 +64,5 @@ public class candidateDTO implements ICandidateView, Serializable  {
         }
         return String.join(",", skills);
     }
-
-
 
 }

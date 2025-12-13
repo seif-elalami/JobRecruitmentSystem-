@@ -17,7 +17,6 @@ public class Interview extends NotificationSubject implements Serializable {
     private String status;    // "SCHEDULED", "COMPLETED", "CANCELLED"
     private String notes;
 
-    // Constructors
     public Interview() {
     }
 
@@ -30,7 +29,6 @@ public class Interview extends NotificationSubject implements Serializable {
         this.status = "SCHEDULED";
     }
 
-    // Getters and Setters
     public String getInterviewId() {
         return interviewId;
     }

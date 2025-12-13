@@ -28,7 +28,7 @@ public class InterviewManagementPanel extends JPanel {
         JButton viewDetailsBtn = new JButton("View Interview Details");
         JButton updateBtn = new JButton("Update Interview");
         JButton cancelBtn = new JButton("Cancel Interview");
-        
+
         buttonPanel.add(scheduleBtn);
         buttonPanel.add(viewMyInterviewsBtn);
         buttonPanel.add(viewDetailsBtn);
@@ -46,12 +46,11 @@ public class InterviewManagementPanel extends JPanel {
 
     private void scheduleInterview() {
         try {
-            // Get Job ID
+
             String jobId = JOptionPane.showInputDialog(this, "Enter Job ID:");
             if (jobId == null || jobId.trim().isEmpty()) return;
             jobId = jobId.trim();
 
-            // Validate job exists
             try {
                 if (client.getJobService().getJobById(jobId) == null) {
                     JOptionPane.showMessageDialog(this, "Job not found with ID: " + jobId);
@@ -62,12 +61,10 @@ public class InterviewManagementPanel extends JPanel {
                 return;
             }
 
-            // Get Applicant ID
             String applicantId = JOptionPane.showInputDialog(this, "Enter Applicant (Candidate) ID:");
             if (applicantId == null || applicantId.trim().isEmpty()) return;
             applicantId = applicantId.trim();
 
-            // Validate candidate exists
             try {
                 if (client.getRecruiterService().getCandidateById(applicantId) == null) {
                     JOptionPane.showMessageDialog(this, "Candidate not found with ID: " + applicantId);
@@ -78,23 +75,19 @@ public class InterviewManagementPanel extends JPanel {
                 return;
             }
 
-            // Get date
             String dateStr = JOptionPane.showInputDialog(this, "Enter Interview Date (DD/MM/YYYY):");
             if (dateStr == null || dateStr.trim().isEmpty()) return;
             dateStr = dateStr.trim();
 
-            // Get time
             String timeStr = JOptionPane.showInputDialog(this, "Enter Interview Time (HH:MM, 24-hour format):");
             if (timeStr == null || timeStr.trim().isEmpty()) return;
             timeStr = timeStr.trim();
 
-            // Parse date and time
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
             java.util.Date scheduledDate;
             try {
                 scheduledDate = sdf.parse(dateStr + " " + timeStr);
-                
-                // Check if date is in the past
+
                 if (scheduledDate.before(new java.util.Date())) {
                     JOptionPane.showMessageDialog(this, "Error: Interview date and time must be in the future.");
                     return;
@@ -104,7 +97,6 @@ public class InterviewManagementPanel extends JPanel {
                 return;
             }
 
-            // Get location
             String location = JOptionPane.showInputDialog(this, "Enter Location (e.g., 'Online - Zoom' or 'Office - Room 301'):");
             if (location == null || location.trim().isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Location is required.");
@@ -112,19 +104,16 @@ public class InterviewManagementPanel extends JPanel {
             }
             location = location.trim();
 
-            // Get notes (optional)
             String notes = JOptionPane.showInputDialog(this, "Enter Notes (Optional, press Cancel to skip):");
             if (notes == null) notes = "";
 
-            // Create interview
             Interview interview = new Interview(jobId, applicantId, session.getUserId(), scheduledDate, location);
             if (!notes.isEmpty()) {
                 interview.setNotes(notes);
             }
 
-            // Schedule interview
             String interviewId = client.getRecruiterService().createInterview(interview);
-            
+
             JOptionPane.showMessageDialog(this, 
                 "✅ Interview scheduled successfully!\n" +
                 "Interview ID: " + interviewId + "\n" +
@@ -141,7 +130,7 @@ public class InterviewManagementPanel extends JPanel {
     private void viewMyInterviews() {
         try {
             List<Interview> interviews = client.getRecruiterService().getMyInterviews(session.getUserId());
-            
+
             if (interviews == null || interviews.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "No interviews found.", "My Interviews", JOptionPane.INFORMATION_MESSAGE);
                 return;
@@ -150,7 +139,7 @@ public class InterviewManagementPanel extends JPanel {
             StringBuilder sb = new StringBuilder();
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
             sb.append("Found ").append(interviews.size()).append(" interview(s):\n\n");
-            
+
             for (int i = 0; i < interviews.size(); i++) {
                 Interview interview = interviews.get(i);
                 sb.append("Interview ").append(i + 1).append(":\n");
@@ -183,7 +172,7 @@ public class InterviewManagementPanel extends JPanel {
             interviewId = interviewId.trim();
 
             Interview interview = client.getRecruiterService().getInterviewById(interviewId);
-            
+
             if (interview == null) {
                 JOptionPane.showMessageDialog(this, "Interview not found.");
                 return;
@@ -225,7 +214,6 @@ public class InterviewManagementPanel extends JPanel {
                 return;
             }
 
-            // Show current details
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
             String currentInfo = "Current Interview Details:\n" +
                     "Date & Time: " + sdf.format(interview.getScheduledDate()) + "\n" +
@@ -235,11 +223,10 @@ public class InterviewManagementPanel extends JPanel {
 
             JOptionPane.showMessageDialog(this, currentInfo, "Current Interview", JOptionPane.INFORMATION_MESSAGE);
 
-            // Get new date
             String dateStr = JOptionPane.showInputDialog(this, "Enter New Date (DD/MM/YYYY) or press Cancel to keep current:");
             String timeStr = null;
             java.util.Date newDate = interview.getScheduledDate();
-            
+
             if (dateStr != null && !dateStr.trim().isEmpty()) {
                 timeStr = JOptionPane.showInputDialog(this, "Enter New Time (HH:MM) or press Cancel to keep current:");
                 if (timeStr != null && !timeStr.trim().isEmpty()) {
@@ -252,25 +239,22 @@ public class InterviewManagementPanel extends JPanel {
                 }
             }
 
-            // Get new location
             String location = JOptionPane.showInputDialog(this, "Enter New Location or press Cancel to keep current:");
             if (location == null) location = interview.getLocation();
             else if (location.trim().isEmpty()) location = interview.getLocation();
             else location = location.trim();
 
-            // Get new notes
             String notes = JOptionPane.showInputDialog(this, "Enter New Notes or press Cancel to keep current:");
             if (notes == null) notes = interview.getNotes();
             else if (notes.trim().isEmpty()) notes = interview.getNotes();
             else notes = notes.trim();
 
-            // Update interview
             interview.setScheduledDate(newDate);
             interview.setLocation(location);
             if (notes != null) interview.setNotes(notes);
 
             boolean success = client.getRecruiterService().updateInterview(interview);
-            
+
             if (success) {
                 JOptionPane.showMessageDialog(this, "✅ Interview updated successfully!");
             } else {
@@ -289,16 +273,15 @@ public class InterviewManagementPanel extends JPanel {
             if (interviewId == null || interviewId.trim().isEmpty()) return;
             interviewId = interviewId.trim();
 
-            // Confirm cancellation
             int confirm = JOptionPane.showConfirmDialog(this,
                     "Are you sure you want to cancel this interview?",
                     "Confirm Cancellation",
                     JOptionPane.YES_NO_OPTION);
-            
+
             if (confirm != JOptionPane.YES_OPTION) return;
 
             boolean success = client.getRecruiterService().cancelInterview(interviewId);
-            
+
             if (success) {
                 JOptionPane.showMessageDialog(this, "✅ Interview cancelled successfully!");
             } else {
@@ -311,4 +294,3 @@ public class InterviewManagementPanel extends JPanel {
         }
     }
 }
-

@@ -51,7 +51,6 @@ public class ManageJobsPage extends JDialog {
         tablePanel.setBackground(Color.WHITE);
         tablePanel.setBorder(BorderFactory.createLineBorder(new Color(220, 226, 235)));
 
-        // Create table
         String[] columns = {"Job ID", "Title", "Company", "Location", "Salary Range", "Posted Date"};
         DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override

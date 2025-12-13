@@ -19,20 +19,17 @@ public class RecruiterServiceTest {
     private IRecruiterService service;
     private Session session;
 
-    // ✅ Constructor with session (for production use)
     public RecruiterServiceTest(RMIClient client, Session session) {
         this.service = client.getRecruiterService();
         this.session = session;
     }
 
-    // ✅ Constructor without session (for testing)
     public RecruiterServiceTest(RMIClient client) {
         this.service = client.getRecruiterService();
-        // Create a default test session
+
         this.session = createTestSession();
     }
 
-    // Helper method to create test session
     private Session createTestSession() {
         System.out.println("\n⚠️  Test Mode: Creating test recruiter session");
         System.out.print("Enter test recruiter ID (or press Enter for default): ");
@@ -91,7 +88,6 @@ public class RecruiterServiceTest {
                     System.out.println("❌ Invalid choice!");
             }
 
-
             if (running) {
                 InputHelper.pause();
             }
@@ -114,10 +110,6 @@ public class RecruiterServiceTest {
         System.out.println("0. Back");
         System.out.print("\nChoice: ");
     }
-
-    // ========================================
-    // 1. Job Posting Management
-    // ========================================
 
     private void postJob() {
         try {
@@ -142,7 +134,6 @@ public class RecruiterServiceTest {
                 }
             }
 
-            // Create job with recruiter ID from session
             Job job = new Job(title, description, requirements, session.getUserId());
 
             System.out.println("\n📤 Posting job...");
@@ -208,10 +199,6 @@ public class RecruiterServiceTest {
         }
     }
 
-    // ========================================
-    // 2. Application Management
-    // ========================================
-
     private void viewApplicationsForJob() {
         try {
             System.out.println("=== VIEW APPLICATIONS FOR JOB ===\n");
@@ -238,10 +225,6 @@ public class RecruiterServiceTest {
         }
     }
 
-    // ========================================
-    // 3. Applicant Search
-    // ========================================
-
     private void searchApplicantsBySkills() {
         try {
             System.out.println("=== SEARCH APPLICANTS BY SKILLS ===\n");
@@ -267,10 +250,6 @@ public class RecruiterServiceTest {
             System.err.println("❌ Error: " + e.getMessage());
         }
     }
-
-    // ========================================
-    // 4. Interview Management
-    // ========================================
 
     private void createInterview() {
         try {
@@ -408,10 +387,6 @@ public class RecruiterServiceTest {
             System.err.println("❌ Error: " + e.getMessage());
         }
     }
-
-    // ========================================
-    // Display Helpers
-    // ========================================
 
     private void displayJob(Job job) {
         System.out.println("Job ID:       " + job.getJobId());

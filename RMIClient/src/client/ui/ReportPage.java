@@ -34,14 +34,12 @@ public class ReportPage extends JFrame {
         main.setBackground(new Color(41, 128, 185));
         setContentPane(main);
 
-        // Header
         JLabel header = new JLabel("Generate Reports", SwingConstants.CENTER);
         header.setForeground(Color.WHITE);
         header.setFont(new Font("Segoe UI", Font.BOLD, 32));
         header.setBorder(BorderFactory.createEmptyBorder(24, 12, 12, 12));
         main.add(header, BorderLayout.NORTH);
 
-        // Center grid with three cards/buttons
         JPanel center = new JPanel(new GridBagLayout());
         center.setOpaque(false);
         GridBagConstraints gbc = new GridBagConstraints();
@@ -50,7 +48,6 @@ public class ReportPage extends JFrame {
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
 
-        // Simple Report button
         JButton simpleBtn = createCardButton("Simple Report", "Quick summary of jobs and counts", new Color(52, 152, 219));
         simpleBtn.setToolTipText("Generate a short summary report for all jobs (Alt+S)");
         simpleBtn.setMnemonic('S');
@@ -59,7 +56,6 @@ public class ReportPage extends JFrame {
         gbc.gridx = 0; gbc.gridy = 0;
         center.add(simpleBtn, gbc);
 
-        // Detailed Report button
         JButton detailedBtn = createCardButton("Detailed Report", "Full listing of matching jobs and details", new Color(46, 204, 113));
         detailedBtn.setToolTipText("Generate a detailed report listing all job fields (Alt+D)");
         detailedBtn.setMnemonic('D');
@@ -68,7 +64,6 @@ public class ReportPage extends JFrame {
         gbc.gridx = 1; gbc.gridy = 0;
         center.add(detailedBtn, gbc);
 
-        // Filtered Report button
         JButton filteredBtn = createCardButton("Filtered Report", "Generate report by salary or location", new Color(155, 89, 182));
         filteredBtn.setToolTipText("Open a dialog to generate a report filtered by salary range or location (Alt+F)");
         filteredBtn.setMnemonic('F');
@@ -79,7 +74,6 @@ public class ReportPage extends JFrame {
 
         main.add(center, BorderLayout.CENTER);
 
-        // Back button
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.CENTER));
         footer.setOpaque(false);
         JButton back = new JButton("Back");
@@ -134,7 +128,7 @@ public class ReportPage extends JFrame {
     }
 
     private void onFilteredReport() {
-        // dialog with min/max salary and location
+
         JDialog dlg = new JDialog(this, "Filtered Report", true);
         dlg.setLayout(new BorderLayout());
         JPanel form = new JPanel(new GridBagLayout());
@@ -237,7 +231,6 @@ public class ReportPage extends JFrame {
         e.printStackTrace();
     }
 
-    // quick test runner when running this file standalone
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             try {

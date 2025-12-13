@@ -26,7 +26,6 @@ public class AdminLoginPage extends JFrame {
         setResizable(false);
         setUndecorated(true);
 
-        // Main panel with gradient
         JPanel mainPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -42,7 +41,6 @@ public class AdminLoginPage extends JFrame {
         mainPanel.setLayout(null);
         add(mainPanel);
 
-        // Close button
         JButton closeBtn = new JButton("✕");
         closeBtn.setBounds(760, 10, 30, 30);
         closeBtn.setFont(new Font("Arial", Font.BOLD, 20));
@@ -57,7 +55,6 @@ public class AdminLoginPage extends JFrame {
         });
         mainPanel.add(closeBtn);
 
-        // Card panel
         JPanel cardPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -73,34 +70,29 @@ public class AdminLoginPage extends JFrame {
         cardPanel.setOpaque(false);
         mainPanel.add(cardPanel);
 
-        // Crown icon
         JLabel crownIcon = new JLabel("👑");
         crownIcon.setFont(new Font("Arial", Font.PLAIN, 60));
         crownIcon.setBounds(300, 20, 100, 70);
         cardPanel.add(crownIcon);
 
-        // Title
         JLabel titleLabel = new JLabel("Admin Access");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 32));
         titleLabel.setForeground(new Color(155, 89, 182));
         titleLabel.setBounds(50, 85, 600, 40);
         cardPanel.add(titleLabel);
 
-        // Subtitle
         JLabel subtitleLabel = new JLabel("Enter your passkey for quick access");
         subtitleLabel.setFont(new Font("Arial", Font.PLAIN, 13));
         subtitleLabel.setForeground(new Color(127, 140, 141));
         subtitleLabel.setBounds(50, 125, 600, 20);
         cardPanel.add(subtitleLabel);
 
-        // Passkey label
         JLabel passkeyLabel = new JLabel("🔑 Admin Passkey");
         passkeyLabel.setFont(new Font("Arial", Font.BOLD, 12));
         passkeyLabel.setForeground(new Color(44, 62, 80));
         passkeyLabel.setBounds(50, 160, 600, 20);
         cardPanel.add(passkeyLabel);
 
-        // Passkey field
         passkeyField = new JPasswordField();
         passkeyField.setBounds(50, 185, 600, 45);
         passkeyField.setFont(new Font("Arial", Font.PLAIN, 16));
@@ -112,7 +104,6 @@ public class AdminLoginPage extends JFrame {
         passkeyField.addActionListener(e -> loginWithPasskey());
         cardPanel.add(passkeyField);
 
-        // Login button
         JButton loginBtn = new JButton("🚀 Access Admin Panel");
         loginBtn.setBounds(50, 250, 600, 45);
         loginBtn.setFont(new Font("Arial", Font.BOLD, 14));
@@ -124,7 +115,6 @@ public class AdminLoginPage extends JFrame {
         loginBtn.addActionListener(e -> loginWithPasskey());
         cardPanel.add(loginBtn);
 
-        // Info text
         JLabel infoLabel = new JLabel("<html><center>⚠️ Passkey is stored securely in the database<br>" +
                 "Only administrators have access to this page</center></html>");
         infoLabel.setFont(new Font("Arial", Font.ITALIC, 11));
@@ -132,7 +122,6 @@ public class AdminLoginPage extends JFrame {
         infoLabel.setBounds(50, 310, 600, 50);
         cardPanel.add(infoLabel);
 
-        // Back button
         JButton backBtn = new JButton("⬅ Back to Sign In");
         backBtn.setBounds(50, 375, 600, 40);
         backBtn.setFont(new Font("Arial", Font.BOLD, 12));
@@ -160,7 +149,7 @@ public class AdminLoginPage extends JFrame {
         }
 
         try {
-            // Use the new loginWithPasskey method for admin authentication
+
             Session session = authService.loginWithPasskey("admin@jobsystem.com", passkey);
             if (session != null && "Admin".equalsIgnoreCase(session.getRole())) {
                 JOptionPane.showMessageDialog(this, "✅ Welcome Admin!", "Success", JOptionPane.INFORMATION_MESSAGE);

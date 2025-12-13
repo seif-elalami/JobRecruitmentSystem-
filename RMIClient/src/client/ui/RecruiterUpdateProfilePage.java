@@ -31,7 +31,6 @@ public class RecruiterUpdateProfilePage extends JDialog {
         shell.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
         shell.setBackground(new Color(244, 247, 252));
 
-        // Header
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(new Color(76, 175, 80));
         JLabel title = new JLabel("✏️ Update Profile", SwingConstants.LEFT);
@@ -47,7 +46,6 @@ public class RecruiterUpdateProfilePage extends JDialog {
         header.setBorder(BorderFactory.createEmptyBorder(14, 16, 14, 16));
         header.add(titlePanel, BorderLayout.WEST);
 
-        // Form panel
         JPanel formPanel = new JPanel();
         formPanel.setBackground(Color.WHITE);
         formPanel.setLayout(new GridBagLayout());
@@ -57,7 +55,6 @@ public class RecruiterUpdateProfilePage extends JDialog {
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Phone field
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 0;
@@ -71,7 +68,6 @@ public class RecruiterUpdateProfilePage extends JDialog {
         phoneField.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         formPanel.add(phoneField, gbc);
 
-        // Company field
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.weightx = 0;
@@ -85,7 +81,6 @@ public class RecruiterUpdateProfilePage extends JDialog {
         companyField.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         formPanel.add(companyField, gbc);
 
-        // Department field
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.weightx = 0;
@@ -99,7 +94,6 @@ public class RecruiterUpdateProfilePage extends JDialog {
         departmentField.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         formPanel.add(departmentField, gbc);
 
-        // Footer
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         footer.setBackground(shell.getBackground());
 
@@ -149,7 +143,7 @@ public class RecruiterUpdateProfilePage extends JDialog {
                 recruiter.setDepartment(departmentField.getText());
 
                 boolean success = recruiterService.updateRecruiter(recruiter);
-                
+
                 if (success) {
                     JOptionPane.showMessageDialog(this, "✅ Profile updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                     System.out.println("✅ Profile updated");

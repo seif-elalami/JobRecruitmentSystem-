@@ -35,13 +35,11 @@ public class JobManagementPanel extends JPanel {
 
         add(buttonPanel, BorderLayout.CENTER);
 
-        // Button actions
         createJobBtn.addActionListener(e -> createJob());
         viewJobsBtn.addActionListener(e -> viewJobs());
         closeJobBtn.addActionListener(e -> closeJob());
     }
 
-    // 1. Create Job Posting GUI
     private void createJob() {
         JTextField jobTitleField = new JTextField();
         JTextField jobDescField = new JTextField();
@@ -50,7 +48,7 @@ public class JobManagementPanel extends JPanel {
         JTextField salaryField = new JTextField();
         JTextArea requirementsArea = new JTextArea(5, 20);
         JScrollPane requirementsScroll = new JScrollPane(requirementsArea);
-    
+
         JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
         panel.add(new JLabel("Job Title:"));        panel.add(jobTitleField);
         panel.add(new JLabel("Job Description:"));  panel.add(jobDescField);
@@ -58,7 +56,7 @@ public class JobManagementPanel extends JPanel {
         panel.add(new JLabel("Location:"));         panel.add(locationField);
         panel.add(new JLabel("Salary:"));           panel.add(salaryField);
         panel.add(new JLabel("Requirements (one per line):")); panel.add(requirementsScroll);
-    
+
         int result = JOptionPane.showConfirmDialog(this, panel, "Create Job Posting", JOptionPane.OK_CANCEL_OPTION);
         if(result == JOptionPane.OK_OPTION) {
             try {
@@ -68,8 +66,7 @@ public class JobManagementPanel extends JPanel {
                 String location = locationField.getText().trim();
                 double salary = Double.parseDouble(salaryField.getText().trim());
                 String requirementsText = requirementsArea.getText().trim();
-    
-                // Validate required fields
+
                 if (title.isEmpty() || desc.isEmpty() || company.isEmpty() || location.isEmpty()) {
                     JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
@@ -78,8 +75,7 @@ public class JobManagementPanel extends JPanel {
                     JOptionPane.showMessageDialog(this, "Please enter at least one requirement.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-    
-                // Split requirements into a list by lines, remove any empty lines
+
                 String[] reqArray = requirementsText.split("\\R");
                 java.util.List<String> requirements = new java.util.ArrayList<>();
                 for (String req : reqArray) {
@@ -90,13 +86,13 @@ public class JobManagementPanel extends JPanel {
                     JOptionPane.showMessageDialog(this, "Please enter at least one requirement.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-    
+
                 Job job = new Job(title, desc, requirements, session.getUserId());
                 job.setCompany(company);
                 job.setLocation(location);
                 job.setSalary(salary);
                 String jobId = client.getJobService().createJob(job);
-    
+
                 JOptionPane.showMessageDialog(this, "Job posted successfully with ID: " + jobId, "Success", JOptionPane.INFORMATION_MESSAGE);
             } catch (NumberFormatException nfe) {
                 JOptionPane.showMessageDialog(this, "Salary must be a number.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -107,7 +103,6 @@ public class JobManagementPanel extends JPanel {
         }
     }
 
-    // 2. View My Job Postings
     private void viewJobs() {
         try {
             List<Job> jobs = client.getJobService().getJobsByRecruiterId(session.getUserId());
@@ -133,7 +128,6 @@ public class JobManagementPanel extends JPanel {
         }
     }
 
-    // 3. Close Job Posting GUI
     private void closeJob() {
         try {
             List<Job> jobs = client.getJobService().getJobsByRecruiterId(session.getUserId());

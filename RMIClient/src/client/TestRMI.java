@@ -17,18 +17,13 @@ public class TestRMI {
         System.out.println("╚════════════════════════════════════════╝\n");
 
         try {
-            // ========================================
-            // Connect to Server
-            // ========================================
+
             RMIClient client = new RMIClient();
 
             IApplicantService applicantService = client.getApplicantService();
             IJobService jobService = client.getJobService();
             IApplicationService applicationService = client.getApplicationService();
 
-            // ========================================
-            // TEST 1: Create Applicant (Remote Call)
-            // ========================================
             System.out.println("========================================");
             System.out.println("TEST 1: Remote Call - Create Applicant");
             System.out.println("========================================\n");
@@ -52,9 +47,6 @@ public class TestRMI {
             System.out.println("   Returned ID: " + applicantId);
             System.out.println();
 
-            // ========================================
-            // TEST 2: Create Job (Remote Call)
-            // ========================================
             System.out.println("========================================");
             System.out.println("TEST 2: Remote Call - Create Job");
             System.out.println("========================================\n");
@@ -75,9 +67,6 @@ public class TestRMI {
             System.out.println("   Returned Job ID: " + jobId);
             System.out.println();
 
-            // ========================================
-            // TEST 3: Get All Jobs (Remote Call)
-            // ========================================
             System.out.println("========================================");
             System.out.println("TEST 3: Remote Call - Get All Jobs");
             System.out.println("========================================\n");
@@ -96,9 +85,6 @@ public class TestRMI {
             }
             System.out.println();
 
-            // ========================================
-            // TEST 4: Submit Application (Remote Call)
-            // ========================================
             System.out.println("========================================");
             System.out.println("TEST 4: Remote Call - Submit Application");
             System.out.println("========================================\n");
@@ -116,9 +102,6 @@ public class TestRMI {
             System.out.println("   Returned Application ID: " + applicationId);
             System.out.println();
 
-            // ========================================
-            // TEST 5: Get Applicant by ID (Remote Call)
-            // ========================================
             System.out.println("========================================");
             System.out.println("TEST 5: Remote Call - Get Applicant by ID");
             System.out.println("========================================\n");
@@ -133,9 +116,6 @@ public class TestRMI {
             System.out.println("      Skills: " + retrieved.getSkills());
             System.out.println();
 
-            // ========================================
-            // TEST 6: Search by Skill (Remote Call)
-            // ========================================
             System.out.println("========================================");
             System.out.println("TEST 6: Remote Call - Search by Skill");
             System.out.println("========================================\n");
@@ -150,9 +130,6 @@ public class TestRMI {
             }
             System.out.println();
 
-            // ========================================
-            // SUMMARY
-            // ========================================
             System.out.println("╔════════════════════════════════════════╗");
             System.out.println("║   ✅ ALL RMI TESTS PASSED!             ║");
             System.out.println("╚════════════════════════════════════════╝\n");

@@ -53,7 +53,6 @@ public class ManageApplicationsPage extends JDialog {
         tablePanel.setBackground(Color.WHITE);
         tablePanel.setBorder(BorderFactory.createLineBorder(new Color(220, 226, 235)));
 
-        // Create table
         String[] columns = {"App ID", "Applicant ID", "Job ID", "Status", "Application Date"};
         DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
@@ -143,7 +142,6 @@ public class ManageApplicationsPage extends JDialog {
         });
         footer.add(rejectBtn);
 
-        // Pending state
         JButton pendingBtn = new JButton("⏳ Set Pending");
         pendingBtn.setBackground(new Color(100, 100, 100));
         pendingBtn.setForeground(Color.WHITE);
@@ -151,7 +149,6 @@ public class ManageApplicationsPage extends JDialog {
         pendingBtn.addActionListener(e -> updateSelectedStatus("APPLIED"));
         footer.add(pendingBtn);
 
-        // Under Review state
         JButton reviewBtn = new JButton("🔍 Under Review");
         reviewBtn.setBackground(new Color(52, 152, 219));
         reviewBtn.setForeground(Color.WHITE);
@@ -159,7 +156,6 @@ public class ManageApplicationsPage extends JDialog {
         reviewBtn.addActionListener(e -> updateSelectedStatus("UNDER_REVIEW"));
         footer.add(reviewBtn);
 
-        // View Details button with State Pattern
         JButton detailsBtn = new JButton("📄 View Details");
         detailsBtn.setBackground(new Color(108, 92, 231));
         detailsBtn.setForeground(Color.WHITE);
@@ -251,7 +247,6 @@ public class ManageApplicationsPage extends JDialog {
         }
         sb.append("\nCover Letter:\n").append(app.getCoverLetter() != null ? app.getCoverLetter() : "N/A").append("\n\n");
 
-        // State Pattern Information
         ApplicationState state = app.getCurrentState();
         if (state != null) {
             sb.append("═══ APPLICATION STATE (State Pattern) ═══\n");

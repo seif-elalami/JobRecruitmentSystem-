@@ -9,7 +9,6 @@ public class Job implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String jobId;
-    // Alias so UI/tests can call getId()
 
     private String title;
     private String description;
@@ -21,7 +20,6 @@ public class Job implements Serializable {
     private double salary;
     private String recruiterId;  // ← ADD THIS:  ID of recruiter who posted the job
 
-    // Constructors
     public Job() {
         this.postedDate = new Date();
         this.status = "OPEN";
@@ -36,7 +34,6 @@ public class Job implements Serializable {
         this.status = "OPEN";
     }
 
-    // Overload used by client test menus (no recruiterId, string requirements)
     public Job(String title, String description, String company, String location, double salary, String requirements) {
         this(title, description, List.of(requirements), null);
         this.company = company;
@@ -44,7 +41,6 @@ public class Job implements Serializable {
         this.salary = salary;
     }
 
-    // Overload used by tests (list requirements, no recruiterId)
     public Job(String title, String description, String company, String location, double salary, List<String> requirements) {
         this(title, description, requirements, null);
         this.company = company;
@@ -52,7 +48,6 @@ public class Job implements Serializable {
         this.salary = salary;
     }
 
-    // Getters and Setters
     public String getJobId() {
         return jobId;
     }
@@ -61,7 +56,6 @@ public class Job implements Serializable {
         this.jobId = jobId;
     }
 
-    // Alias for UI/tests
     public String getId() {
         return jobId;
     }
@@ -135,7 +129,6 @@ public class Job implements Serializable {
         this.salary = salary;
     }
 
-    // ← ADD THIS GETTER/SETTER
     public String getRecruiterId() {
         return recruiterId;
     }

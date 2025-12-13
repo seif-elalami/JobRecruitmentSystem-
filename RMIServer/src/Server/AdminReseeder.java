@@ -22,22 +22,18 @@ public class AdminReseeder {
             System.out.println("🔑 Admin Resetseeder");
             System.out.println("================================================");
 
-            // Connect to MongoDB
             MongoDatabase database = MongoDBConnection.getInstance().getDatabase();
             MongoCollection<Document> userCollection = database.getCollection("users");
 
-            // Step 1: Delete existing admin
             System.out.println("\n📍 Step 1: Checking and deleting existing admin...");
             long deleted = userCollection.deleteMany(new Document("email", adminEmail)).getDeletedCount();
             System.out.println("   Deleted " + deleted + " existing admin(s)");
 
-            // Step 2: Hash password and immediately test it
             System.out.println("\n📍 Step 2: Creating password hash...");
             String hashedPassword = PasswordUtil.hashPassword(adminPassword);
             System.out.println("   Hash: " + hashedPassword);
             System.out.println("   Length: " + hashedPassword.length());
 
-            // Step 3: Test the hash immediately
             System.out.println("\n📍 Step 3: Testing password verification...");
             boolean testMatch = PasswordUtil.verifyPassword(adminPassword, hashedPassword);
             System.out.println("   Verification result: " + (testMatch ? "✅ PASS" : "❌ FAIL"));
@@ -48,7 +44,6 @@ public class AdminReseeder {
                 System.exit(1);
             }
 
-            // Step 4: Insert into database
             System.out.println("\n📍 Step 4: Inserting admin into database...");
             Document adminDoc = new Document()
                     .append("username", adminUsername)
@@ -63,7 +58,6 @@ public class AdminReseeder {
             userCollection.insertOne(adminDoc);
             System.out.println("   ✅ Admin inserted into database");
 
-            // Step 5: Read it back and test
             System.out.println("\n📍 Step 5: Reading admin from database and testing...");
             Document readAdmin = userCollection.find(new Document("email", adminEmail)).first();
             if (readAdmin == null) {
@@ -76,7 +70,6 @@ public class AdminReseeder {
             System.out.println("   Length: " + storedHash.length());
             System.out.println("   Matches original hash? " + storedHash.equals(hashedPassword));
 
-            // Step 6: Test verification with stored hash
             System.out.println("\n📍 Step 6: Testing password verification with stored hash...");
             boolean finalMatch = PasswordUtil.verifyPassword(adminPassword, storedHash);
             System.out.println("   Verification result: " + (finalMatch ? "✅ PASS" : "❌ FAIL"));

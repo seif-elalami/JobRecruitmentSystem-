@@ -18,7 +18,7 @@ public class SystemNotificationObserver implements NotificationObserver {
     @Override
     public void update(String notificationData) {
         System.out.println("🔔 System Notification: " + notificationData);
-        
+
         if (recipientId != null) {
             NotificationDAO.getInstance().save(recipientId, notificationData);
         } else {

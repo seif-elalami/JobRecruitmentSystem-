@@ -40,7 +40,7 @@ public class ApplicationManagementPanel extends JPanel {
     private void viewAllApplications() {
         try {
             List<Application> applications = client.getApplicationService().getAllApplications();
-            // If you want ONLY this recruiter's jobs:
+
             List<Job> jobs = client.getJobService().getJobsByRecruiterId(session.getUserId());
             List<String> myJobIds = jobs.stream().map(Job::getJobId).collect(Collectors.toList());
             applications = applications.stream()
@@ -73,19 +73,18 @@ public class ApplicationManagementPanel extends JPanel {
         try {
             String jobId = JOptionPane.showInputDialog(this, "Enter Job ID to view its applications:");
             if (jobId == null || jobId.trim().isEmpty()) {
-                // User cancelled or empty input
+
                 return;
             }
             jobId = jobId.trim();
-    
-            // Fetch applications for the provided job ID
+
             java.util.List<Application> applications = client.getRecruiterService().getApplicationsForJob(jobId);
-    
+
             if (applications == null || applications.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "No applications found for Job ID " + jobId + ".");
                 return;
             }
-    
+
             StringBuilder sb = new StringBuilder();
             int i = 1;
             for (Application app : applications) {
@@ -96,14 +95,13 @@ public class ApplicationManagementPanel extends JPanel {
             JTextArea area = new JTextArea(sb.toString(), 15, 40);
             area.setEditable(false);
             JOptionPane.showMessageDialog(this, new JScrollPane(area), "Applications for Job ID: " + jobId, JOptionPane.INFORMATION_MESSAGE);
-    
+
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
         }
     }
 
-    // --- 3. Review Application ---
     private void reviewApplication() {
         try {
             String appId = JOptionPane.showInputDialog(this, "Enter Application ID to review:");
@@ -114,7 +112,7 @@ public class ApplicationManagementPanel extends JPanel {
                 JOptionPane.showMessageDialog(this, "Application not found!");
                 return;
             }
-            // Optional: Show details
+
             String msg = "Applicant ID: " + app.getApplicantId() +
                     "\nJob ID: " + app.getJobId() +
                     "\nStatus: " + app.getStatus() +

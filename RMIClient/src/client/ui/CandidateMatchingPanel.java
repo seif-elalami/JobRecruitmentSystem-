@@ -40,22 +40,19 @@ public class CandidateMatchingPanel extends JPanel {
         searchByExperienceBtn.addActionListener(e -> searchByExperienceLevel());
     }
 
-  
     private void matchFinalCandidateToJob() {
         try {
-            // 1. Ask for Job ID
+
             String jobId = JOptionPane.showInputDialog(this, "Enter Job ID:");
             if (jobId == null || jobId.trim().isEmpty()) return;
             jobId = jobId.trim();
-    
-            // 2. Fetch ALL applications for this job
+
             List<shared.models.Application> allApplications = client.getRecruiterService().getApplicationsForJob(jobId);
             if (allApplications == null || allApplications.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "No applications found for this job.");
                 return;
             }
-    
-            // 3. Filter to show ONLY ACCEPTED applications (final matching step)
+
             List<shared.models.Application> acceptedApplications = allApplications.stream()
                 .filter(a -> {
                     String status = a.getStatus();
@@ -63,7 +60,7 @@ public class CandidateMatchingPanel extends JPanel {
                                              status.equalsIgnoreCase("ACCEPT"));
                 })
                 .collect(java.util.stream.Collectors.toList());
-    
+
             if (acceptedApplications.isEmpty()) {
                 JOptionPane.showMessageDialog(this, 
                     "No ACCEPTED applications found for this job.\n\n" +
@@ -73,21 +70,20 @@ public class CandidateMatchingPanel extends JPanel {
                     JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
-    
-            // 4. Build candidate list with full details
+
             String[] candidateChoices = new String[acceptedApplications.size()];
             for (int i = 0; i < acceptedApplications.size(); i++) {
                 shared.models.Application a = acceptedApplications.get(i);
                 String name = "Unknown";
                 String email = "Unknown";
                 try {
-                    // Use recruiter service to get candidate info (works with users collection)
+
                     shared.interfaces.ICandidateView candidate = client.getRecruiterService().getCandidateById(a.getApplicantId());
                     if (candidate != null) {
                         name = candidate.getName();
                         email = candidate.getEmail();
                     } else {
-                        // Fallback: try to get user info from auth service
+
                         try {
                             shared.models.User user = client.getAuthService().getUserById(a.getApplicantId());
                             if (user != null) {
@@ -104,8 +100,7 @@ public class CandidateMatchingPanel extends JPanel {
                 }
                 candidateChoices[i] = name + " - " + email + " (ID: " + a.getApplicantId() + ")";
             }
-    
-            // 5. Show selection dialog for final matching
+
             String selected = (String) JOptionPane.showInputDialog(
                     this,
                     "Select the FINAL candidate to match for this job:\n" +
@@ -117,34 +112,30 @@ public class CandidateMatchingPanel extends JPanel {
                     candidateChoices.length > 0 ? candidateChoices[0] : null
             );
             if (selected == null || selected.trim().isEmpty()) return;
-    
-            // 6. Extract the applicant ID from the selected string
+
             String selectedApplicantId = selected.substring(selected.lastIndexOf("(ID: ") + 5, selected.lastIndexOf(")"));
-    
-            // 7. Find matching application
+
             shared.models.Application selectedApp = acceptedApplications.stream()
                 .filter(a -> a.getApplicantId().equals(selectedApplicantId.trim()))
                 .findFirst().orElse(null);
-    
+
             if (selectedApp == null) {
                 JOptionPane.showMessageDialog(this, "Application not found for this candidate.");
                 return;
             }
-    
-            // 8. Get full candidate details (CV)
+
             shared.interfaces.ICandidateView candidate = null;
             try {
                 candidate = client.getRecruiterService().getCandidateById(selectedApplicantId.trim());
             } catch (Exception e) {
                 System.err.println("Error getting candidate details: " + e.getMessage());
             }
-    
-            // 9. Show candidate CV and details
+
             StringBuilder cvDetails = new StringBuilder();
             cvDetails.append("═══════════════════════════════════════\n");
             cvDetails.append("   FINAL CANDIDATE SELECTION\n");
             cvDetails.append("═══════════════════════════════════════\n\n");
-            
+
             if (candidate != null) {
                 cvDetails.append("🆔 ID:           ").append(candidate.getId()).append("\n");
                 cvDetails.append("👤 Name:         ").append(candidate.getName()).append("\n");
@@ -164,7 +155,7 @@ public class CandidateMatchingPanel extends JPanel {
                 cvDetails.append("⚠️  Could not load full candidate details\n");
                 cvDetails.append("   Applicant ID: ").append(selectedApplicantId).append("\n");
             }
-            
+
             cvDetails.append("\n═══════════════════════════════════════\n");
             cvDetails.append("Application Details:\n");
             cvDetails.append("   Application ID: ").append(selectedApp.getApplicationId()).append("\n");
@@ -172,15 +163,13 @@ public class CandidateMatchingPanel extends JPanel {
             if (selectedApp.getCoverLetter() != null && !selectedApp.getCoverLetter().isEmpty()) {
                 cvDetails.append("\n   Cover Letter:\n   ").append(selectedApp.getCoverLetter().replace("\n", "\n   ")).append("\n");
             }
-            
-            // Show CV in scrollable text area
+
             JTextArea cvArea = new JTextArea(cvDetails.toString(), 20, 50);
             cvArea.setEditable(false);
             cvArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
             JOptionPane.showMessageDialog(this, new JScrollPane(cvArea), 
                 "Candidate CV - Final Matching", JOptionPane.INFORMATION_MESSAGE);
-    
-            // 10. Confirm final matching/selection
+
             JOptionPane.showMessageDialog(this,
                 "✅ Candidate HIRED Successfully!\n\n" +
                 "Candidate: " + (candidate != null ? candidate.getName() : selectedApplicantId) + "\n" +
@@ -191,10 +180,10 @@ public class CandidateMatchingPanel extends JPanel {
                 "Hiring Complete",
                 JOptionPane.INFORMATION_MESSAGE
             );
-    
+
             boolean success = client.getRecruiterService()
             .matchFinalCandidateToJob(jobId, selectedApplicantId);
-    
+
     if (!success) {
         JOptionPane.showMessageDialog(this,
                 "❌ Failed to save final hire in database.",
@@ -202,14 +191,13 @@ public class CandidateMatchingPanel extends JPanel {
                 JOptionPane.ERROR_MESSAGE);
         return;
     }
-    
+
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-   
     private void viewCandidateDetails() {
         try {
             String candidateId = JOptionPane.showInputDialog(this, "Enter Candidate ID:");
@@ -238,7 +226,6 @@ public class CandidateMatchingPanel extends JPanel {
         }
     }
 
-  
     private void searchCandidatesBySkills() {
         try {
             String skills = JOptionPane.showInputDialog(this, "Enter skills (comma-separated):");
@@ -250,7 +237,6 @@ public class CandidateMatchingPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
         }
     }
-
 
     private void searchByExperienceLevel() {
         try {
@@ -271,7 +257,6 @@ public class CandidateMatchingPanel extends JPanel {
         }
     }
 
-    // Helper for showing lists
     private void showCandidateList(List<ICandidateView> candidates, String title) {
         if (candidates == null || candidates.isEmpty()) {
             JOptionPane.showMessageDialog(this, "No candidates found.", title, JOptionPane.INFORMATION_MESSAGE);

@@ -8,7 +8,6 @@ import java.util.List;
 public class Admin implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    // Admin-specific attributes
     private String adminId;
     private String name;
     private String email;
@@ -22,7 +21,6 @@ public class Admin implements Serializable {
     private String department;
     private int actionsPerformed;
 
-    // Constructors
     public Admin() {
         this.permissions = new ArrayList<>();
         this.assignedDate = new Date();
@@ -37,7 +35,6 @@ public class Admin implements Serializable {
         initializeDefaultPermissions(accessLevel);
     }
 
-    // Initialize default permissions based on access level
     private void initializeDefaultPermissions(String accessLevel) {
         if ("SUPER_ADMIN".equals(accessLevel)) {
             this.canModifyUsers = true;
@@ -57,7 +54,6 @@ public class Admin implements Serializable {
         }
     }
 
-    // Core Admin Methods
     public String generateReport(String reportType, Date startDate, Date endDate) {
         if (!canGenerateReports) {
             return "❌ Access denied: Insufficient permissions to generate reports";
@@ -66,11 +62,10 @@ public class Admin implements Serializable {
         actionsPerformed++;
         System.out.println("📊 Generating " + reportType + " report...");
         System.out.println("   Period: " + startDate + " to " + endDate);
-        
-        // Report generation logic handled by service layer
+
         String reportId = "RPT-" + System.currentTimeMillis();
         System.out.println("✅ Report generated: " + reportId);
-        
+
         return reportId;
     }
 
@@ -83,8 +78,7 @@ public class Admin implements Serializable {
         actionsPerformed++;
         System.out.println("👤 Managing user: " + userId);
         System.out.println("   Action: " + action);
-        
-        // User management logic handled by service layer
+
         switch (action.toUpperCase()) {
             case "ACTIVATE":
             case "DEACTIVATE":
@@ -108,8 +102,7 @@ public class Admin implements Serializable {
         actionsPerformed++;
         System.out.println("💼 Managing job: " + jobId);
         System.out.println("   Action: " + action);
-        
-        // Job management logic handled by service layer
+
         return true;
     }
 
@@ -122,8 +115,7 @@ public class Admin implements Serializable {
         actionsPerformed++;
         System.out.println("📄 Managing application: " + applicationId);
         System.out.println("   Action: " + action);
-        
-        // Application management logic handled by service layer
+
         return true;
     }
 
@@ -152,8 +144,7 @@ public class Admin implements Serializable {
 
         System.out.println("📋 Fetching system logs from " + startDate + " to " + endDate);
         actionsPerformed++;
-        
-        // Log retrieval logic handled by service layer
+
         return new ArrayList<>();
     }
 
@@ -165,11 +156,9 @@ public class Admin implements Serializable {
 
         System.out.println("🔍 Auditing user activity: " + userId);
         actionsPerformed++;
-        
-        // Audit logic handled by service layer
+
     }
 
-    // Getters and Setters
     public String getAdminId() {
         return adminId;
     }

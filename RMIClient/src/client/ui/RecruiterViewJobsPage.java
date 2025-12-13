@@ -33,7 +33,6 @@ public class RecruiterViewJobsPage extends JDialog {
         shell.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
         shell.setBackground(new Color(244, 247, 252));
 
-        // Header
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(new Color(52, 152, 219));
         JLabel title = new JLabel("📋 My Job Postings", SwingConstants.LEFT);
@@ -49,7 +48,6 @@ public class RecruiterViewJobsPage extends JDialog {
         header.setBorder(BorderFactory.createEmptyBorder(14, 16, 14, 16));
         header.add(titlePanel, BorderLayout.WEST);
 
-        // Table panel
         JPanel tablePanel = new JPanel(new BorderLayout());
         tablePanel.setBackground(Color.WHITE);
         tablePanel.setBorder(BorderFactory.createLineBorder(new Color(220, 226, 235)));
@@ -71,7 +69,6 @@ public class RecruiterViewJobsPage extends JDialog {
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         tablePanel.add(scrollPane, BorderLayout.CENTER);
 
-        // Footer
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         footer.setBackground(shell.getBackground());
 

@@ -6,14 +6,12 @@ import org.bson.Document;
 
 public class Main {
 
-
     public static void main(String[] args) {
         System.out.println("╔════════════════════════════════════════╗");
         System.out.println("║    Job Recruitment System - Server    ║");
         System.out.println("╚════════════════════════════════════════╝");
         System.out.println();
 
-        // Check MongoDB connection first
         if (! checkMongoDB()) {
             System.err.println("\n❌ Cannot start server:  MongoDB is not running!");
             System.err.println("\n💡 Start MongoDB first:");
@@ -25,12 +23,11 @@ public class Main {
             try {
                 System.in.read();
             } catch (Exception e) {
-                // Ignore
+
             }
             System.exit(1);
         }
 
-        // Start RMI Server
         try {
             System.out.println("✅ MongoDB is connected");
             System.out.println("🚀 Starting RMI Server...\n");
@@ -50,11 +47,10 @@ public class Main {
         MongoClient testClient = null;
         try {
             System.out.print("🔍 Checking MongoDB connection...   ");
-            // Use port 27017 to match MongoDBConnection configuration
+
             testClient = new MongoClient("localhost", 27017);
             MongoDatabase database = testClient.getDatabase("JobRecruitmentDB");
 
-            // Ping the database to verify connection
             database.runCommand(new Document("ping", 1));
 
             System.out.println("✅");
@@ -71,7 +67,7 @@ public class Main {
                 try {
                     testClient.close();
                 } catch (Exception e) {
-                    // Ignore closing errors
+
                 }
             }
         }

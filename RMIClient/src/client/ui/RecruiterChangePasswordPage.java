@@ -29,7 +29,6 @@ public class RecruiterChangePasswordPage extends JDialog {
         shell.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
         shell.setBackground(new Color(244, 247, 252));
 
-        // Header
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(new Color(211, 47, 47));
         JLabel title = new JLabel("🔐 Change Password", SwingConstants.LEFT);
@@ -45,7 +44,6 @@ public class RecruiterChangePasswordPage extends JDialog {
         header.setBorder(BorderFactory.createEmptyBorder(14, 16, 14, 16));
         header.add(titlePanel, BorderLayout.WEST);
 
-        // Form panel
         JPanel formPanel = new JPanel();
         formPanel.setBackground(Color.WHITE);
         formPanel.setLayout(new GridBagLayout());
@@ -55,7 +53,6 @@ public class RecruiterChangePasswordPage extends JDialog {
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Old password field
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 0;
@@ -69,7 +66,6 @@ public class RecruiterChangePasswordPage extends JDialog {
         oldPasswordField.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         formPanel.add(oldPasswordField, gbc);
 
-        // New password field
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.weightx = 0;
@@ -83,7 +79,6 @@ public class RecruiterChangePasswordPage extends JDialog {
         newPasswordField.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         formPanel.add(newPasswordField, gbc);
 
-        // Confirm password field
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.weightx = 0;
@@ -97,7 +92,6 @@ public class RecruiterChangePasswordPage extends JDialog {
         confirmPasswordField.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         formPanel.add(confirmPasswordField, gbc);
 
-        // Info panel
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 2;
@@ -107,7 +101,6 @@ public class RecruiterChangePasswordPage extends JDialog {
         infoLabel.setForeground(new Color(150, 150, 150));
         formPanel.add(infoLabel, gbc);
 
-        // Footer
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         footer.setBackground(shell.getBackground());
 
@@ -137,7 +130,6 @@ public class RecruiterChangePasswordPage extends JDialog {
         String newPassword = new String(newPasswordField.getPassword());
         String confirmPassword = new String(confirmPasswordField.getPassword());
 
-        // Validation
         if (oldPassword.isEmpty()) {
             JOptionPane.showMessageDialog(this, "❌ Please enter your current password", "Validation Error", JOptionPane.WARNING_MESSAGE);
             return;

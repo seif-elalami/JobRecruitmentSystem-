@@ -77,7 +77,7 @@ public class ApplicantServiceImpl extends UnicastRemoteObject implements IApplic
                 objectId = new ObjectId(id);
                 doc = applicantCollection.find(new Document("_id", objectId)).first();
             } catch (IllegalArgumentException ignored) {
-                // id is not a valid ObjectId; fall through to email lookup
+
             }
 
             if (doc == null && id != null) {
@@ -201,7 +201,7 @@ public class ApplicantServiceImpl extends UnicastRemoteObject implements IApplic
                 try {
                     objectId = new ObjectId(applicant.getId());
                 } catch (IllegalArgumentException ignored) {
-                    // fall through to new id
+
                 }
             }
 
@@ -210,12 +210,10 @@ public class ApplicantServiceImpl extends UnicastRemoteObject implements IApplic
                 applicant.setId(objectId.toString());
             }
 
-            // Update applicants collection
             upsertApplicantDocument(objectId, applicant);
-            
-            // Also update users collection with the same data
+
             updateUserDocument(objectId, applicant);
-            
+
             System.out.println("✅ Applicant updated: " + applicant.getEmail());
             return true;
         } catch (RemoteException e) {
@@ -350,15 +348,15 @@ public class ApplicantServiceImpl extends UnicastRemoteObject implements IApplic
             update.append("phone", applicant.getPhone());
             update.append("skills", normalizeSkillsToString(applicant.getSkills()));
             update.append("experience", parseExperience(applicant.getExperience()));
-            
+
             if (applicant.getEducation() != null && !applicant.getEducation().isEmpty()) {
                 update.append("education", applicant.getEducation());
             }
-            
+
             if (applicant.getResume() != null && !applicant.getResume().isEmpty()) {
                 update.append("resume", applicant.getResume());
             }
-            
+
             Document updateDoc = new Document("$set", update);
             userCollection.updateOne(new Document("_id", objectId), updateDoc);
             System.out.println("✅ User document updated in users collection");
@@ -410,4 +408,3 @@ public class ApplicantServiceImpl extends UnicastRemoteObject implements IApplic
     }
 
 }
-

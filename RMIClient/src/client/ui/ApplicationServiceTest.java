@@ -75,7 +75,6 @@ public class ApplicationServiceTest {
             System.out.print("Job ID: ");
             String jobId = InputHelper.getString();
 
-            // Verify job exists
             System.out.println("\n📤 Verifying job.. .");
             Job job = jobService.getJobById(jobId);
             if (job == null) {
@@ -87,7 +86,6 @@ public class ApplicationServiceTest {
             System.out.print("\nApplicant ID: ");
             String applicantId = InputHelper.getString();
 
-            // Verify applicant exists
             System.out.println("\n📤 Verifying applicant...");
             Applicant applicant = applicantService.getApplicantById(applicantId);
             if (applicant == null) {
@@ -142,7 +140,6 @@ public class ApplicationServiceTest {
             System. out.print("Enter Job ID:  ");
             String jobId = InputHelper.getString();
 
-            // Get job details
             System.out.println("\n📤 Fetching job.. .");
             Job job = jobService.getJobById(jobId);
             if (job == null) {
@@ -179,7 +176,6 @@ public class ApplicationServiceTest {
             System.out.print("Enter Applicant ID: ");
             String applicantId = InputHelper.getString();
 
-            // Get applicant details
             System.out.println("\n📤 Fetching applicant...");
             Applicant applicant = applicantService. getApplicantById(applicantId);
             if (applicant == null) {
@@ -297,7 +293,6 @@ public class ApplicationServiceTest {
         System.out.println("  Status: " + app.getStatus());
         System.out.println("  Date: " + app.getApplicationDate());
 
-        // Get and display job details
         try {
             Job job = jobService.getJobById(app.getJobId());
             if (job != null) {
@@ -309,7 +304,6 @@ public class ApplicationServiceTest {
             System.out.println("  Job ID: " + app.getJobId());
         }
 
-        // Get and display applicant details
         try {
             Applicant applicant = applicantService.getApplicantById(app.getApplicantId());
             if (applicant != null) {
@@ -321,7 +315,6 @@ public class ApplicationServiceTest {
             System.out.println("  Applicant ID: " + app. getApplicantId());
         }
 
-        // Display cover letter (truncated if too long)
         if (app.getCoverLetter() != null && ! app.getCoverLetter().isEmpty()) {
             String cover = app.getCoverLetter();
             System.out.println("  Cover Letter: " +

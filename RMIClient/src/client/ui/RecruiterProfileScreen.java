@@ -66,7 +66,7 @@ public class RecruiterProfileScreen extends JFrame {
 
     private void updateRecruiter(RMIClient rmiClient, Session session) {
         try {
-            // Fetch current recruiter info
+
             Recruiter recruiter = rmiClient.getRecruiterService().getRecruiterById(session.getUserId());
             if (recruiter == null) {
                 JOptionPane.showMessageDialog(this, "Profile not found.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -118,16 +118,16 @@ public class RecruiterProfileScreen extends JFrame {
     private void changePassword(RMIClient rmiClient, Session session) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-    
+
         JLabel oldPassLabel = new JLabel("Current password:");
         JPasswordField oldPassField = new JPasswordField(15);
-    
+
         JLabel newPassLabel = new JLabel("New password:");
         JPasswordField newPassField = new JPasswordField(15);
-    
+
         JLabel confirmPassLabel = new JLabel("Confirm new password:");
         JPasswordField confirmPassField = new JPasswordField(15);
-    
+
         panel.add(oldPassLabel);
         panel.add(oldPassField);
         panel.add(new JLabel(" "));
@@ -136,7 +136,7 @@ public class RecruiterProfileScreen extends JFrame {
         panel.add(new JLabel(" "));
         panel.add(confirmPassLabel);
         panel.add(confirmPassField);
-    
+
         int result = JOptionPane.showConfirmDialog(
             this,
             panel,
@@ -144,12 +144,12 @@ public class RecruiterProfileScreen extends JFrame {
             JOptionPane.OK_CANCEL_OPTION,
             JOptionPane.PLAIN_MESSAGE
         );
-    
+
         if(result == JOptionPane.OK_OPTION) {
             String oldPassword = new String(oldPassField.getPassword());
             String newPassword = new String(newPassField.getPassword());
             String confirmPassword = new String(confirmPassField.getPassword());
-    
+
             if(!newPassword.equals(confirmPassword)) {
                 JOptionPane.showMessageDialog(this, "New passwords do not match!", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -158,21 +158,20 @@ public class RecruiterProfileScreen extends JFrame {
                 JOptionPane.showMessageDialog(this, "Password must be at least 6 characters.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-    
+
             try {
-                // (1) Verify old password is correct
+
                 IAuthService authService = rmiClient.getAuthService();
                 Session loginSession = authService.login(session.getUserEmail(), oldPassword);
                 if (loginSession == null) {
                     JOptionPane.showMessageDialog(this, "Current password is incorrect.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-    
-                // (2) Update password using recruiter profile update
+
                 Recruiter recruiter = rmiClient.getRecruiterService().getRecruiterById(session.getUserId());
                 recruiter.setPassword(newPassword);
                 boolean updated = rmiClient.getRecruiterService().updateRecruiter(recruiter);
-    
+
                 if(updated) {
                     JOptionPane.showMessageDialog(this, "Password changed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 } else {

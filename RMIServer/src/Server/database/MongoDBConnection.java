@@ -18,13 +18,12 @@ public class MongoDBConnection {
             System.out.println("   Host: " + HOST);
             System.out.println("   Port: " + PORT);
             System.out.println("   Database: " + DATABASE_NAME);
-            
+
             mongoClient = new MongoClient(HOST, PORT);
             database = mongoClient.getDatabase(DATABASE_NAME);
-            
-            // Test the connection by pinging the database
+
             database.runCommand(new org.bson.Document("ping", 1));
-            
+
             System.out.println("✅ Connected to MongoDB successfully!");
             System.out.println("   Host: " + HOST);
             System.out.println("   Port: " + PORT);

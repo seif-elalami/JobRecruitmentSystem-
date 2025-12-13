@@ -27,7 +27,7 @@ public class FilteredReport<T> extends GenerateReport<T> {
 
     public String generateBySalary(double minSalary, double maxSalary) {
         List<T> matched = new ArrayList<>();
-        
+
         if (items != null) {
             for (T item : items) {
                 if (item instanceof Job) {
@@ -53,7 +53,7 @@ public class FilteredReport<T> extends GenerateReport<T> {
 
     public String generateByLocation(String location) {
         List<T> matched = new ArrayList<>();
-        
+
         if (items != null) {
             for (T item : items) {
                 if (item instanceof Job) {

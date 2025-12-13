@@ -9,8 +9,7 @@ public class ResetAdmin {
         try {
             MongoDatabase database = MongoDBConnection.getInstance().getDatabase();
             MongoCollection<Document> userCollection = database.getCollection("users");
-            
-            // Delete admin account
+
             userCollection.deleteOne(new Document("email", "admin@jobsystem.com"));
             System.out.println("✅ Admin account deleted. Now run AdminSeeder again.");
         } catch (Exception e) {

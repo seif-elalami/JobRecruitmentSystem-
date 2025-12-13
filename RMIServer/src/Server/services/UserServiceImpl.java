@@ -33,29 +33,25 @@ public class UserServiceImpl {
      */
     public String createUser(User user) throws RemoteException {
         try {
-            // Validate email
+
             if (! ValidationUtil.isValidEmail(user.getEmail())) {
                 throw new RemoteException(ValidationUtil.getEmailErrorMessage());
             }
 
-            // Check if email already exists
             if (getUserByEmail(user.getEmail()) != null) {
                 throw new RemoteException("Email already exists");
             }
 
-            // Validate password
             if (user.getPassword() == null || user.getPassword().length() < 6) {
                 throw new RemoteException("Password must be at least 6 characters");
             }
 
-            // Validate phone if provided
             if (user.getPhone() != null && !user.getPhone().isEmpty()) {
                 if (!ValidationUtil.isValidPhone(user.getPhone())) {
                     throw new RemoteException(ValidationUtil.getPhoneErrorMessage());
                 }
             }
 
-            // Create document
             Document doc = new Document();
             doc.append("username", user.getUsername());
             doc.append("email", user.getEmail());
@@ -66,7 +62,6 @@ public class UserServiceImpl {
             doc.append("lastLogin", null);
             doc.append("isActive", true);
 
-            // Add role-specific fields
             if ("APPLICANT".equals(user. getRole())) {
                 doc.append("skills", user.getSkills());
                 doc.append("experience", user.getExperience());
@@ -158,12 +153,11 @@ public class UserServiceImpl {
      */
     public boolean updateUser(User user) throws RemoteException {
         try {
-            // Validate email
+
             if (!ValidationUtil.isValidEmail(user.getEmail())) {
                 throw new RemoteException(ValidationUtil.getEmailErrorMessage());
             }
 
-            // Validate phone if provided
             if (user.getPhone() != null && !user.getPhone().isEmpty()) {
                 if (!ValidationUtil.isValidPhone(user.getPhone())) {
                     throw new RemoteException(ValidationUtil.getPhoneErrorMessage());
@@ -177,12 +171,10 @@ public class UserServiceImpl {
             update.append("email", user.getEmail());
             update.append("phone", user.getPhone());
 
-            // Only update password if provided
             if (user.getPassword() != null && !user.getPassword().isEmpty()) {
                 update.append("password", user.getPassword());
             }
 
-            // Update role-specific fields
             if ("APPLICANT".equals(user.getRole())) {
                 update.append("skills", user.getSkills());
                 update.append("experience", user.getExperience());
@@ -274,7 +266,6 @@ public class UserServiceImpl {
     private User documentToUser(Document doc) {
         User user = new User();
 
-        // Common fields
         user.setUserId(doc.getObjectId("_id").toString());
         user.setUsername(doc.getString("username"));
         user.setEmail(doc.getString("email"));
@@ -285,7 +276,6 @@ public class UserServiceImpl {
         user.setLastLogin(doc.getDate("lastLogin"));
         user.setActive(doc. getBoolean("isActive", true));
 
-        // Role-specific fields
         if ("APPLICANT".equals(user.getRole())) {
             user. setSkills(doc.getString("skills"));
             user.setExperience(doc.getString("experience"));

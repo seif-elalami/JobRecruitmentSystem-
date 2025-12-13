@@ -10,7 +10,6 @@ public class ApplicationState implements Serializable {
 
     private String currentStateName;
 
-    // State enum for internal state management
     public enum State {
         APPLIED,
         UNDER_REVIEW,
@@ -21,7 +20,6 @@ public class ApplicationState implements Serializable {
 
     private State currentState;
 
-    // Constructor
     public ApplicationState() {
         this.currentState = State.APPLIED;
         this.currentStateName = "APPLIED";

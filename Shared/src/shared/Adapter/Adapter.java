@@ -12,18 +12,14 @@ public class Adapter implements ICandidateView {
       this.linkedIn = linkedIn; 
   }
 
-  
-  
   public String getId() {
       return linkedIn.getid();
   }
 
-  
   public String getName() {
       return linkedIn.getFullName();
   }
 
-  
 @Override
   public String getSkills() {
       List<String> skillList = linkedIn.getSkill();
@@ -33,17 +29,9 @@ public class Adapter implements ICandidateView {
       return String.join(",", skillList);
   }
 
-  
-    
-  
-
-  
-  
-
   public String getAddress() {
       return linkedIn.getaddress();
   }
-
 
   public String getEmail() {
       return linkedIn.getEmail();
@@ -53,28 +41,17 @@ public class Adapter implements ICandidateView {
         return linkedIn.getphone();
     }
 
-
-
-    
     @Override
     public String getExperience() {
         return String.valueOf(linkedIn.getexperience());
     }
 
-
-
-    
     public String getEducation() {
         return linkedIn.geteducation();
     }
 
-
-
-    
     public String getResume() {
         return linkedIn.getresume();
     }
-
-   
 
 }

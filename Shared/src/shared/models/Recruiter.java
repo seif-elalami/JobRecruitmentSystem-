@@ -8,10 +8,8 @@ public class Recruiter extends User {
 
     private static final long serialVersionUID = 1L;
 
-    // Additional attribute specific to Recruiter : department)
     private String department;
 
-    // Constructors
     public Recruiter() {
         super();
         this.setRole("RECRUITER");  // Set role automatically
@@ -22,7 +20,6 @@ public class Recruiter extends User {
         this.department = department;
     }
 
-    // Getter and Setter for department
     public String getDepartment() {
         return department;
     }
@@ -31,8 +28,6 @@ public class Recruiter extends User {
         this.department = department;
     }
 
-    // Convenience methods for backward compatibility
-    // Map User. userId to id
     public String getId() {
         return getUserId();
     }
@@ -41,7 +36,6 @@ public class Recruiter extends User {
         setUserId(id);
     }
 
-    // Map User. username to name
     public String getName() {
         return getUsername();
     }
@@ -50,9 +44,6 @@ public class Recruiter extends User {
         setUsername(name);
     }
 
-    // Phone is not in User, so we keep it in Recruiter
-    // But we can store it in a custom field or use department
-    // For now, let's add it as a separate field
     private String phone;
     private String company;
     private String position;

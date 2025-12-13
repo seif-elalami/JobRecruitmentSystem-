@@ -26,10 +26,9 @@ public class LinkedInApiData{
             this.education = education;
    } 
 
-
   public void setFullName(String fullName)
   {
-       
+
          FullName = fullName;
 
   }
@@ -38,7 +37,6 @@ public class LinkedInApiData{
 {
 
       return FullName;
-    
 
 }
 
@@ -46,7 +44,6 @@ public void setaddress(String Address)
 {
 
   address = Address;
-
 
 }
 
@@ -76,7 +73,6 @@ public String getresume()
    return Resume;
 
 }
-
 
 public List<String>getSkill()
 {

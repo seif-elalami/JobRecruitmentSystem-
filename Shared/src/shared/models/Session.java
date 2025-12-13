@@ -7,7 +7,6 @@ public class Session implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    // Session timeout in milliseconds (e.g., 30 minutes)
     private static final long SESSION_TIMEOUT = 30 * 60 * 1000;  // 30 minutes
 
     private String sessionId;
@@ -17,7 +16,6 @@ public class Session implements Serializable {
     private Date loginTime;
     private Date lastActivity;
 
-    // Constructors
     public Session() {
     }
 
@@ -29,7 +27,6 @@ public class Session implements Serializable {
         this.lastActivity = new Date();
     }
 
-    // Getters and Setters
     public String getSessionId() {
         return sessionId;
     }

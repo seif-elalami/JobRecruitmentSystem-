@@ -21,7 +21,6 @@ public class ApplicantNotificationsGUI extends JFrame {
         this.rmiClient = rmiClient;
         this.session = session;
 
-        // Frame setup
         setTitle("Notifications - Job Recruitment System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1200, 800);
@@ -29,14 +28,13 @@ public class ApplicantNotificationsGUI extends JFrame {
         setResizable(false);
         setUndecorated(true);
 
-        // Main panel
         JPanel mainPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                // Gradient similar to Applicant Menu (Dark Blue to Blue)
+
                 GradientPaint gradient = new GradientPaint(0, 0, new Color(20, 33, 61), 
                         getWidth(), getHeight(), new Color(52, 152, 219));
                 g2d.setPaint(gradient);
@@ -46,14 +44,12 @@ public class ApplicantNotificationsGUI extends JFrame {
         mainPanel.setLayout(null);
         add(mainPanel);
 
-        // Header Title
         JLabel titleLabel = new JLabel("🔔 My Notifications");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 32));
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setBounds(50, 40, 400, 50);
         mainPanel.add(titleLabel);
 
-        // Back Button
         JButton backBtn = new JButton("← Back to Dashboard");
         backBtn.setBounds(950, 50, 200, 30);
         backBtn.setFont(new Font("Arial", Font.BOLD, 14));
@@ -68,7 +64,6 @@ public class ApplicantNotificationsGUI extends JFrame {
         });
         mainPanel.add(backBtn);
 
-        // Scroll pane for notifications
         listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
         listPanel.setBackground(new Color(236, 240, 241));
@@ -80,7 +75,6 @@ public class ApplicantNotificationsGUI extends JFrame {
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         mainPanel.add(scrollPane);
 
-        // Load notifications
         loadNotifications();
 
         setVisible(true);
@@ -90,19 +84,19 @@ public class ApplicantNotificationsGUI extends JFrame {
         listPanel.removeAll();
 
         try {
-            // Use getApplicantService() to fetch notifications
+
             List<Notification> notifications = rmiClient.getApplicantService().getNotifications(session.getUserId());
 
             if (notifications.isEmpty()) {
                 JPanel emptyPanel = new JPanel();
                 emptyPanel.setBackground(new Color(236, 240, 241));
                 emptyPanel.setPreferredSize(new Dimension(1000, 100));
-                
+
                 JLabel emptyLabel = new JLabel("No notifications yet! 📭");
                 emptyLabel.setFont(new Font("Arial", Font.ITALIC, 18));
                 emptyLabel.setForeground(Color.GRAY);
                 emptyPanel.add(emptyLabel);
-                
+
                 listPanel.add(emptyPanel);
             } else {
                 for (Notification notification : notifications) {
@@ -131,13 +125,11 @@ public class ApplicantNotificationsGUI extends JFrame {
                 BorderFactory.createEmptyBorder(10, 15, 10, 15)
         ));
 
-        // Icon
         JLabel iconLabel = new JLabel("📢"); // Generic notification icon
         iconLabel.setFont(new Font("Arial", Font.PLAIN, 24));
         iconLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 15));
         card.add(iconLabel, BorderLayout.WEST);
 
-        // Content Panel
         JPanel contentPanel = new JPanel(new GridLayout(2, 1));
         contentPanel.setBackground(Color.WHITE);
 

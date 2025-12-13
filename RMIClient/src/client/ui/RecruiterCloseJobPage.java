@@ -33,7 +33,6 @@ public class RecruiterCloseJobPage extends JDialog {
         shell.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
         shell.setBackground(new Color(244, 247, 252));
 
-        // Header
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(new Color(211, 47, 47));
         JLabel title = new JLabel("🔒 Close Job Posting", SwingConstants.LEFT);
@@ -49,7 +48,6 @@ public class RecruiterCloseJobPage extends JDialog {
         header.setBorder(BorderFactory.createEmptyBorder(14, 16, 14, 16));
         header.add(titlePanel, BorderLayout.WEST);
 
-        // Table panel
         JPanel tablePanel = new JPanel(new BorderLayout());
         tablePanel.setBackground(Color.WHITE);
         tablePanel.setBorder(BorderFactory.createLineBorder(new Color(220, 226, 235)));
@@ -72,7 +70,6 @@ public class RecruiterCloseJobPage extends JDialog {
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         tablePanel.add(scrollPane, BorderLayout.CENTER);
 
-        // Footer
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         footer.setBackground(shell.getBackground());
 
@@ -122,7 +119,7 @@ public class RecruiterCloseJobPage extends JDialog {
 
             int openCount = 0;
             for (Job job : currentJobs) {
-                // Only show open jobs
+
                 if (job.getStatus() != null && job.getStatus().equalsIgnoreCase("OPEN")) {
                     String postedDate = job.getPostedDate() != null ? sdf.format(job.getPostedDate()) : "N/A";
                     model.addRow(new Object[]{
@@ -155,8 +152,7 @@ public class RecruiterCloseJobPage extends JDialog {
         try {
             Job selectedJob = null;
             String selectedJobId = (String) jobsTable.getValueAt(row, 0);
-            
-            // Find the full job object
+
             for (Job job : currentJobs) {
                 if (job.getJobId().startsWith(selectedJobId.replace("...", ""))) {
                     selectedJob = job;

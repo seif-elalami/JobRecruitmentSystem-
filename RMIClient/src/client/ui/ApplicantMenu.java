@@ -87,7 +87,6 @@ public class ApplicantMenu {
 
         System.out.println("📤 Fetching available jobs...");
 
-        // Get all open jobs
         List<Job> jobs = jobService.getAllJobs();
 
         if (jobs.isEmpty()) {
@@ -98,7 +97,6 @@ public class ApplicantMenu {
             for (int i = 0; i < jobs.size(); i++) {
                 Job job = jobs.get(i);
 
-                // Only show OPEN jobs
                 if ("OPEN".equals(job.getStatus())) {
                     System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
                     System.out.println("📋 Job " + (i + 1) + ":");
@@ -132,7 +130,6 @@ public class ApplicantMenu {
             System.out.print("Enter Job ID: ");
             String jobId = InputHelper.getString();
 
-            // Verify job exists and is open
             System.out.println("\n📤 Checking job.. .");
             Job job = jobService.getJobById(jobId);
 
@@ -214,13 +211,12 @@ public class ApplicantMenu {
         System.out.println("✅ Current profile loaded");
         System.out.println("\nUpdate fields (press Enter to skip):");
 
-        // Phone number with validation
         System.out.print("Phone [" + profile.getPhone() + "]: ");
         System.out.println("   (Must start with 0 and be 11 digits, e.g., 01234567890)");
         String phone = InputHelper.getString();
 
         if (! phone.isEmpty()) {
-            // Validate phone format before setting
+
             if (phone.matches("^0\\d{10}$")) {
                 profile. setPhone(phone);
             } else {
@@ -284,5 +280,5 @@ public class ApplicantMenu {
             System.err.println("❌ Error: " + e. getMessage());
         }
     }
-    
+
 }

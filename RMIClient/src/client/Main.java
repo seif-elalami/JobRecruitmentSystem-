@@ -11,7 +11,6 @@ public class Main {
             System.out.println("╚════════════════════════════════════════╝");
             System.out.println();
 
-            // Start the console UI4
             ConsoleUI ui = new ConsoleUI();
             ui.start();
 

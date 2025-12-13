@@ -17,7 +17,6 @@ public class ApplicantMenuGUI extends JFrame {
         this.rmiClient = rmiClient;
         this.session = session;
 
-        // Frame setup
         setTitle("Applicant Dashboard - Job Recruitment System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1200, 800);
@@ -25,7 +24,6 @@ public class ApplicantMenuGUI extends JFrame {
         setResizable(false);
         setUndecorated(true);
 
-        // Main panel with gradient
         JPanel mainPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -37,8 +35,7 @@ public class ApplicantMenuGUI extends JFrame {
                         getWidth(), getHeight(), new Color(52, 152, 219));
                 g2d.setPaint(gradient);
                 g2d.fillRect(0, 0, getWidth(), getHeight());
-                
-                // Subtle overlay pattern
+
                 g2d.setColor(new Color(255, 255, 255, 5));
                 for (int i = 0; i < getWidth(); i += 50) {
                     g2d.drawLine(i, 0, i, getHeight());
@@ -48,7 +45,6 @@ public class ApplicantMenuGUI extends JFrame {
         mainPanel.setLayout(null);
         add(mainPanel);
 
-        // Close button
         JButton closeBtn = new JButton("✕");
         closeBtn.setBounds(1160, 10, 30, 30);
         closeBtn.setFont(new Font("Arial", Font.BOLD, 20));
@@ -60,14 +56,13 @@ public class ApplicantMenuGUI extends JFrame {
         closeBtn.addActionListener(e -> System.exit(0));
         mainPanel.add(closeBtn);
 
-        // Header panel
         JPanel headerPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                // Soft gradient app bar
+
                 GradientPaint gp = new GradientPaint(0, 0, new Color(29, 45, 68), getWidth(), 0, new Color(58, 123, 213));
                 g2d.setPaint(gp);
                 g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
@@ -78,14 +73,12 @@ public class ApplicantMenuGUI extends JFrame {
         headerPanel.setOpaque(false);
         mainPanel.add(headerPanel);
 
-        // Welcome text
         JLabel welcomeLabel = new JLabel("👋 Welcome, " + session.getUserEmail() + "!");
         welcomeLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
         welcomeLabel.setForeground(Color.WHITE);
         welcomeLabel.setBounds(40, 22, 600, 46);
         headerPanel.add(welcomeLabel);
 
-        // Logout button on header
         JButton logoutBtn = new JButton("Logout");
         logoutBtn.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         logoutBtn.setForeground(Color.WHITE);
@@ -97,7 +90,6 @@ public class ApplicantMenuGUI extends JFrame {
         logoutBtn.addActionListener(e -> logout());
         headerPanel.add(logoutBtn);
 
-        // Content panel
         JPanel contentPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -113,14 +105,12 @@ public class ApplicantMenuGUI extends JFrame {
         contentPanel.setOpaque(false);
         mainPanel.add(contentPanel);
 
-        // Title
         JLabel titleLabel = new JLabel("📋 My Dashboard");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
         titleLabel.setForeground(new Color(44, 62, 80));
         titleLabel.setBounds(50, 25, 400, 40);
         contentPanel.add(titleLabel);
 
-        // Features grid (2x3 layout)
         String[][] features = {
             {"🔍", "Browse Jobs", "Explore job\nopportunities"},
             {"📄", "Upload Resume", "Manage your\nresume"},
@@ -156,10 +146,10 @@ public class ApplicantMenuGUI extends JFrame {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                // Card background
+
                 g2d.setColor(Color.WHITE);
                 g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 18, 18);
-                // Subtle shadow
+
                 g2d.setColor(new Color(0, 0, 0, 25));
                 g2d.drawRoundRect(1, 1, getWidth() - 2, getHeight() - 2, 18, 18);
             }
@@ -168,8 +158,7 @@ public class ApplicantMenuGUI extends JFrame {
         cardPanel.setBounds(x, y, width, height);
         cardPanel.setOpaque(false);
         cardPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        
-        // Add hover effect
+
         cardPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent evt) {
@@ -185,20 +174,17 @@ public class ApplicantMenuGUI extends JFrame {
             }
         });
 
-        // Icon
         JLabel iconLabel = new JLabel(icon);
         iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 48));
         iconLabel.setBounds(24, 18, 60, 60);
         cardPanel.add(iconLabel);
 
-        // Title
         JLabel titleLabel = new JLabel(title);
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
         titleLabel.setForeground(new Color(44, 62, 80));
         titleLabel.setBounds(20, 82, 280, 22);
         cardPanel.add(titleLabel);
 
-        // Description
         JLabel descLabel = new JLabel("<html>" + description + "</html>");
         descLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         descLabel.setForeground(new Color(91, 105, 120));
@@ -211,7 +197,7 @@ public class ApplicantMenuGUI extends JFrame {
     private void handleFeatureClick(int index) {
         switch(index) {
             case 0:
-                // Browse Jobs
+
                 dispose();
                 try {
                     new BrowseJobsPage(rmiClient, session);
@@ -221,7 +207,7 @@ public class ApplicantMenuGUI extends JFrame {
                 }
                 break;
             case 1:
-                // Upload Resume page
+
                 dispose();
                 try {
                     new UploadResumePage(rmiClient, session);
@@ -231,7 +217,7 @@ public class ApplicantMenuGUI extends JFrame {
                 }
                 break;
             case 2:
-                // My Applications (with state pattern)
+
                 dispose();
                 try {
                     new MyApplicationsPage(rmiClient, session);
@@ -241,12 +227,12 @@ public class ApplicantMenuGUI extends JFrame {
                 }
                 break;
             case 3:
-                // Notifications
+
                 dispose();
                 new ApplicantNotificationsGUI(rmiClient, session);
                 break;
             case 4:
-                // Update Profile
+
                 dispose();
                 try {
                     new UpdateProfilePage(rmiClient, session);
@@ -256,7 +242,7 @@ public class ApplicantMenuGUI extends JFrame {
                 }
                 break;
             case 5:
-                // View Resume
+
                 dispose();
                 try {
                     new ViewResumePage(rmiClient, session);
@@ -266,7 +252,7 @@ public class ApplicantMenuGUI extends JFrame {
                 }
                 break;
             case 6:
-                // View Profile
+
                 dispose();
                 try {
                     new ViewProfilePage(rmiClient, session);

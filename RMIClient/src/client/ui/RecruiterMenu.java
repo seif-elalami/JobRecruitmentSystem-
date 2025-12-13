@@ -13,7 +13,6 @@ import shared.models.Session;
 import shared.models.Interview;
 import shared.models.Applicant;
 
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,7 +48,7 @@ public class RecruiterMenu {
         System.out.println();
 
         switch (choice) {
-            // Recruiter Profile
+
             case 1:
                 viewMyProfile();
                 break;
@@ -60,7 +59,6 @@ public class RecruiterMenu {
                 changePasswordSecurely();  // ✅ Secure password change with verification
                 break;
 
-            // Job Management
             case 4:
                 createJobPosting();
                 break;
@@ -71,7 +69,6 @@ public class RecruiterMenu {
                 closeJobPosting();
                 break;
 
-            // Application Management
             case 7:
                 viewAllApplications();
                 break;
@@ -82,7 +79,6 @@ public class RecruiterMenu {
                 reviewApplication();
                 break;
 
-            // Candidate Matching (Read-Only)
             case 10:
                 matchCandidatesToJob();
                 break;
@@ -96,8 +92,6 @@ public class RecruiterMenu {
                 searchByExperienceLevel();
                 break;
 
-
-            // Interview Management
             case 14:
                 scheduleInterview();
                 break;
@@ -161,8 +155,6 @@ public class RecruiterMenu {
     System.out.println("  13. Search by Experience Level");
     System.out.println();
 
-
-
     System.out.println("📅 Interview Management:");
     System.out.println("  14. Schedule Interview");
     System.out.println("  15. View My Interviews");
@@ -175,12 +167,10 @@ public class RecruiterMenu {
     System.out.print("\nChoice: ");
 }
 
-
     private void createJobPosting() {
         try {
             System.out.println("=== CREATE JOB POSTING ===\n");
 
-            // Title
             System.out.print("Job Title: ");
             String title = InputHelper.getString();
             if (title.trim().isEmpty()) {
@@ -188,7 +178,6 @@ public class RecruiterMenu {
                 return;
             }
 
-            // Description
             System.out.print("Job Description: ");
             String description = InputHelper.getString();
             if (description.trim().isEmpty()) {
@@ -196,7 +185,6 @@ public class RecruiterMenu {
                 return;
             }
 
-            // Company
             System.out.print("Company Name: ");
             String company = InputHelper.getString();
             if (company.trim().isEmpty()) {
@@ -204,7 +192,6 @@ public class RecruiterMenu {
                 return;
             }
 
-            // Location
             System.out.print("Job Location: ");
             String location = InputHelper.getString();
             if (location.trim().isEmpty()) {
@@ -212,7 +199,6 @@ public class RecruiterMenu {
                 return;
             }
 
-            // Salary
             System.out.print("Salary (annual): ");
             double salary = InputHelper.getDouble();
             if (salary <= 0) {
@@ -220,7 +206,6 @@ public class RecruiterMenu {
                 return;
             }
 
-            // Requirements
             System.out.println("Requirements (enter one per line, type 'done' when finished):");
             List<String> requirements = new ArrayList<>();
             while (true) {
@@ -239,7 +224,6 @@ public class RecruiterMenu {
                 return;
             }
 
-            // Create job with all fields
             Job job = new Job(title, description, requirements, session.getUserId());
             job.setCompany(company);
             job.setLocation(location);
@@ -268,7 +252,6 @@ public class RecruiterMenu {
 
             System.out.println("📤 Fetching your job postings...");
 
-            // Only get jobs posted by this recruiter
             List<Job> jobs = jobService.getJobsByRecruiterId(session.getUserId());
 
             if (jobs.isEmpty()) {
@@ -380,7 +363,6 @@ public class RecruiterMenu {
         try {
             System.out.println("=== CLOSE JOB POSTING ===\n");
 
-            // First, show recruiter's jobs
             System.out.println("📤 Fetching your job postings...");
             List<Job> jobs = jobService.getJobsByRecruiterId(session.getUserId());
 
@@ -407,7 +389,6 @@ public class RecruiterMenu {
             System.out.print("\nJob ID to close: ");
             String jobId = InputHelper.getString();
 
-            // Verify the job belongs to this recruiter
             Job jobToClose = jobService.getJobById(jobId);
             if (jobToClose == null) {
                 System.out.println("❌ Job not found!");
@@ -438,10 +419,6 @@ public class RecruiterMenu {
         }
     }
 
-    // ========================================
-    // ✅ MATCH CV FEATURE (READ-ONLY VIEWS)
-    // ========================================
-
     /**
      * Match candidates to a specific job - View all CVs of applicants
      */
@@ -456,7 +433,6 @@ public class RecruiterMenu {
 
             System.out.println("\n📤 Fetching candidates who applied to this job...");
 
-            // Get read-only candidate views
             List<ICandidateView> candidates = recruiterService.getCandidatesForJob(jobId);
 
             if (candidates.isEmpty()) {
@@ -474,7 +450,6 @@ public class RecruiterMenu {
                     System. out.println();
                 }
 
-                // Offer to schedule interview
                 if (InputHelper.confirm("\n💡 Would you like to schedule an interview with a candidate?")) {
                     System.out.print("Enter Candidate ID: ");
                     String candidateId = InputHelper.getString();
@@ -502,7 +477,6 @@ public class RecruiterMenu {
 
             System.out.println("\n📤 Fetching candidate details.. .");
 
-            // Get read-only candidate view
             ICandidateView candidate = recruiterService.getCandidateById(candidateId);
 
             if (candidate == null) {
@@ -513,8 +487,6 @@ public class RecruiterMenu {
                 displayCandidateCV(candidate);
                 System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
-                // Cannot modify - read-only!
-                // candidate.setName("Hacker"); // ← This would be a COMPILE ERROR!
             }
 
         } catch (Exception e) {
@@ -537,7 +509,6 @@ public class RecruiterMenu {
 
             System.out.println("\n🔍 Searching for candidates with skills: " + skills + "...");
 
-            // Get read-only candidate views
             List<ICandidateView> candidates = recruiterService.searchCandidatesBySkillsReadOnly(skills);
 
             if (candidates.isEmpty()) {
@@ -576,7 +547,6 @@ public class RecruiterMenu {
 
             System.out.println("\n🔍 Searching for candidates with at least " + minYears + " years of experience...");
 
-            // Get read-only candidate views
             List<ICandidateView> candidates = recruiterService.searchCandidatesByMinExperience(minYears);
 
             if (candidates.isEmpty()) {
@@ -600,9 +570,6 @@ public class RecruiterMenu {
         }
     }
 
-    // ========================================
-    // INTERVIEW MANAGEMENT
-    // ========================================
 private void scheduleInterview() {
     try {
         System.out.println("=== SCHEDULE INTERVIEW ===\n");
@@ -610,7 +577,6 @@ private void scheduleInterview() {
         System.out.print("Job ID: ");
         String jobId = InputHelper.getString();
 
-        // Job ID validation
         Job job = jobService.getJobById(jobId);
         if (job == null) {
             System.out.println("❌ Error: This job does not exist. Please enter a valid Job ID.");
@@ -620,7 +586,6 @@ private void scheduleInterview() {
         System.out.print("Applicant (Candidate) ID: ");
         String applicantId = InputHelper.getString();
 
-        // Candidate ID validation
         ICandidateView candidate = recruiterService.getCandidateById(applicantId);
         if (candidate == null) {
             System.out.println("❌ Error: This candidate does not exist. Please enter a valid Candidate ID.");
@@ -633,11 +598,9 @@ private void scheduleInterview() {
         System.out.print("Interview Time (HH:MM, 24-hour format): ");
         String timeStr = InputHelper.getString();
 
-        // Parse date and time
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         Date scheduledDate = sdf.parse(dateStr + " " + timeStr);
 
-        // Optional: check that the interview is not set in the past
         if (scheduledDate.before(new Date())) {
             System.out.println("❌ Error: Interview date and time must be in the future.");
             return;
@@ -649,7 +612,6 @@ private void scheduleInterview() {
         System.out.print("Notes [Optional, press Enter to skip]: ");
         String notes = InputHelper.getString();
 
-        // Create interview
         Interview interview = new Interview(jobId, applicantId, session.getUserId(), scheduledDate, location);
         if (!notes.isEmpty()) {
             interview.setNotes(notes);
@@ -669,7 +631,6 @@ private void scheduleInterview() {
         e.printStackTrace();
     }
 }
-
 
     /**
      * Helper method to schedule interview directly from candidate matching
@@ -758,7 +719,6 @@ private void scheduleInterview() {
             System.out.println("✅ Current interview details loaded.");
             System.out.println("Update fields (press Enter to skip):\n");
 
-            // Update date
             System.out.print("New Date (DD/MM/YYYY) [Current: " + sdf.format(interview.getScheduledDate()) + "]: ");
             String newDateStr = InputHelper.getString();
 
@@ -770,14 +730,12 @@ private void scheduleInterview() {
                 interview.setScheduledDate(newDate);
             }
 
-            // Update location
             System.out.print("Location [Current: " + interview.getLocation() + "]: ");
             String newLocation = InputHelper.getString();
             if (!newLocation.isEmpty()) {
                 interview.setLocation(newLocation);
             }
 
-            // Update notes
             System.out.print("Notes [Current: " + (interview.getNotes() != null ? interview.getNotes() : "None") + "]: ");
             String newNotes = InputHelper.getString();
             if (!newNotes.isEmpty()) {
@@ -858,8 +816,6 @@ private void scheduleInterview() {
         }
     }
 
-
-
     private void viewApplicationsForSpecificJob() {
         try {
             System.out.println("\n╔════════════════════════════════════════╗");
@@ -927,8 +883,6 @@ private void scheduleInterview() {
         }
     }
 
-
-
     private void searchApplicantsByExperience() {
     try {
         System.out.println("\n╔════════════════════════════════════════╗");
@@ -962,7 +916,6 @@ private void scheduleInterview() {
         e.printStackTrace();
     }
 }
-
 
 private void viewInterviewDetails() {
     try {
@@ -1039,7 +992,6 @@ private void updateMyProfile() {
             recruiter.setPosition(position);
         }
 
-        // ✅ NEW: Add password update option
         System.out.println("\n--- Password Update (Optional) ---");
         System.out.print("Do you want to change your password? (y/n): ");
         String changePassword = InputHelper.getString().toLowerCase();
@@ -1067,7 +1019,7 @@ private void updateMyProfile() {
                 }
             }
         } else {
-            // Don't update password
+
             recruiter. setPassword(null);
         }
 
@@ -1078,7 +1030,6 @@ private void updateMyProfile() {
         if (success) {
             System.out.println("✅ Profile updated successfully!");
 
-            // If password was changed, recommend re-login
             if (recruiter.getPassword() != null && ! recruiter.getPassword().isEmpty()) {
                 System.out.println("\n💡 Password changed! Please logout and login again for security.");
             }
@@ -1100,14 +1051,13 @@ private void changePasswordSecurely() {
         System.out.println("\n🔒 This method verifies your current password");
         System.out.println("   for added security.\n");
 
-        // ✅ STEP 1:  Verify current password
         System.out.print("Enter your CURRENT password: ");
         String currentPassword = InputHelper.getString();
 
         System.out.println("\n🔍 Verifying current password...");
 
         try {
-            // Verify by attempting login
+
             authService.login(session. getUserEmail(), currentPassword);
             System. out.println("✅ Current password verified!\n");
         } catch (Exception e) {
@@ -1116,17 +1066,14 @@ private void changePasswordSecurely() {
             return;
         }
 
-        // ✅ STEP 2: Get new password
         System.out. print("Enter NEW password (min 6 characters): ");
         String newPassword = InputHelper.getString();
 
-        // Validate length
         if (newPassword.length() < 6) {
             System.out.println("❌ Password must be at least 6 characters!");
             return;
         }
 
-        // Check if same as current
         if (newPassword. equals(currentPassword)) {
             System.out.println("⚠️  New password is the same as current password!");
             System.out.print("Continue anyway? (y/n): ");
@@ -1137,7 +1084,6 @@ private void changePasswordSecurely() {
             }
         }
 
-        // ✅ STEP 3: Confirm new password
         System.out. print("CONFIRM new password: ");
         String confirmPassword = InputHelper.getString();
 
@@ -1146,7 +1092,6 @@ private void changePasswordSecurely() {
             return;
         }
 
-        // ✅ STEP 4: Update password
         shared.models. Recruiter recruiter = recruiterService.getRecruiterById(session.getUserId());
 
         if (recruiter == null) {
@@ -1182,13 +1127,6 @@ private void changePasswordSecurely() {
         e.printStackTrace();
     }
 }
-
-
-
-
-
-    // DISPLAY HELPER METHODS
-
 
     private void displayJob(Job job) {
         System.out.println("Job ID:       " + job.getJobId());

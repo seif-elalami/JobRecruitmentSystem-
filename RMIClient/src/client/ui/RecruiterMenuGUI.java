@@ -17,16 +17,13 @@ public class RecruiterMenuGUI extends JFrame {
         setLocationRelativeTo(null);
         setResizable(false);
 
-        // CardLayout setup for "home" and feature panels
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
 
-        // --- Home Menu Panel (main menu) ---
         JPanel homePanel = new JPanel(new BorderLayout(10, 10));
         homePanel.setBackground(new Color(236, 240, 241));
         homePanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Header
         JPanel headerPanel = new JPanel();
         headerPanel.setBackground(new Color(41, 128, 185));
         headerPanel.setPreferredSize(new Dimension(0, 60));
@@ -36,7 +33,6 @@ public class RecruiterMenuGUI extends JFrame {
         headerPanel.add(welcomeLabel);
         homePanel.add(headerPanel, BorderLayout.NORTH);
 
-        // Buttons
         JPanel centerPanel = new JPanel();
         centerPanel.setBackground(Color.WHITE);
         centerPanel.setLayout(new GridLayout(5, 1, 30, 30));
@@ -58,13 +54,13 @@ public class RecruiterMenuGUI extends JFrame {
             dispose();
             new RecruiterProfileScreen(rmiClient, session);
         });
-        // Show Job Management panel
+
         jobMgmtBtn.addActionListener(e -> cardLayout.show(cardPanel, "JobManagement"));
-        // Show Application Management panel
+
         appMgmtBtn.addActionListener(e -> cardLayout.show(cardPanel, "AppManagement"));
-        // Show Candidate Matching & Search panel
+
         candidateBtn.addActionListener(e -> cardLayout.show(cardPanel, "CandidateMatching"));
-        // Show Interview Management panel
+
         interviewBtn.addActionListener(e -> cardLayout.show(cardPanel, "InterviewManagement"));
 
         centerPanel.add(profileBtn);
@@ -75,7 +71,6 @@ public class RecruiterMenuGUI extends JFrame {
 
         homePanel.add(centerPanel, BorderLayout.CENTER);
 
-        // Footer
         JPanel footerPanel = new JPanel();
         footerPanel.setBackground(new Color(52, 73, 94));
         footerPanel.setPreferredSize(new Dimension(0, 50));
@@ -93,7 +88,6 @@ public class RecruiterMenuGUI extends JFrame {
         footerPanel.add(logoutButton);
         homePanel.add(footerPanel, BorderLayout.SOUTH);
 
-        // --- Job Management Panel ---
         JobManagementPanel jobPanel = new JobManagementPanel(rmiClient, session);
         JButton backBtnJob = new JButton("← Back to Menu");
         backBtnJob.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -102,7 +96,6 @@ public class RecruiterMenuGUI extends JFrame {
         jobPanelWithBack.add(backBtnJob, BorderLayout.NORTH);
         jobPanelWithBack.add(jobPanel, BorderLayout.CENTER);
 
-        // --- Application Management Panel ---
         ApplicationManagementPanel appManagementPanel = new ApplicationManagementPanel(rmiClient, session);
         JButton backBtnAppMgmt = new JButton("← Back to Menu");
         backBtnAppMgmt.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -111,7 +104,6 @@ public class RecruiterMenuGUI extends JFrame {
         appMgmtPanelWithBack.add(backBtnAppMgmt, BorderLayout.NORTH);
         appMgmtPanelWithBack.add(appManagementPanel, BorderLayout.CENTER);
 
-        // --- Candidate Matching & Search Panel ---
         CandidateMatchingPanel candidatePanel = new CandidateMatchingPanel(rmiClient, session);
         JButton backBtnCandidate = new JButton("← Back to Menu");
         backBtnCandidate.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -120,7 +112,6 @@ public class RecruiterMenuGUI extends JFrame {
         candidatePanelWithBack.add(backBtnCandidate, BorderLayout.NORTH);
         candidatePanelWithBack.add(candidatePanel, BorderLayout.CENTER);
 
-        // --- Interview Management Panel ---
         InterviewManagementPanel interviewPanel = new InterviewManagementPanel(rmiClient, session);
         JButton backBtnInterview = new JButton("← Back to Menu");
         backBtnInterview.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -129,7 +120,6 @@ public class RecruiterMenuGUI extends JFrame {
         interviewPanelWithBack.add(backBtnInterview, BorderLayout.NORTH);
         interviewPanelWithBack.add(interviewPanel, BorderLayout.CENTER);
 
-        // Add all panels to CardLayout
         cardPanel.add(homePanel, "HomeMenu");
         cardPanel.add(jobPanelWithBack, "JobManagement");
         cardPanel.add(appMgmtPanelWithBack, "AppManagement");

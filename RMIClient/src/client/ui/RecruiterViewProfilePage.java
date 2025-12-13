@@ -36,7 +36,6 @@ public class RecruiterViewProfilePage extends JDialog {
         shell.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
         shell.setBackground(new Color(244, 247, 252));
 
-        // Header
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(new Color(41, 128, 185));
         JLabel title = new JLabel("👤 My Profile", SwingConstants.LEFT);
@@ -52,7 +51,6 @@ public class RecruiterViewProfilePage extends JDialog {
         header.setBorder(BorderFactory.createEmptyBorder(14, 16, 14, 16));
         header.add(titlePanel, BorderLayout.WEST);
 
-        // Content panel
         JPanel contentPanel = new JPanel();
         contentPanel.setBackground(Color.WHITE);
         contentPanel.setLayout(new GridBagLayout());
@@ -62,7 +60,6 @@ public class RecruiterViewProfilePage extends JDialog {
         gbc.insets = new Insets(8, 8, 8, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Email
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 0.3;
@@ -78,7 +75,6 @@ public class RecruiterViewProfilePage extends JDialog {
         emailLabel.setForeground(new Color(50, 50, 50));
         contentPanel.add(emailLabel, gbc);
 
-        // Username
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.weightx = 0.3;
@@ -94,7 +90,6 @@ public class RecruiterViewProfilePage extends JDialog {
         usernameLabel.setForeground(new Color(50, 50, 50));
         contentPanel.add(usernameLabel, gbc);
 
-        // Phone
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.weightx = 0.3;
@@ -110,7 +105,6 @@ public class RecruiterViewProfilePage extends JDialog {
         phoneLabel.setForeground(new Color(50, 50, 50));
         contentPanel.add(phoneLabel, gbc);
 
-        // Company
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.weightx = 0.3;
@@ -126,7 +120,6 @@ public class RecruiterViewProfilePage extends JDialog {
         companyLabel.setForeground(new Color(50, 50, 50));
         contentPanel.add(companyLabel, gbc);
 
-        // Department
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.weightx = 0.3;
@@ -142,7 +135,6 @@ public class RecruiterViewProfilePage extends JDialog {
         departmentLabel.setForeground(new Color(50, 50, 50));
         contentPanel.add(departmentLabel, gbc);
 
-        // Position
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.weightx = 0.3;
@@ -158,7 +150,6 @@ public class RecruiterViewProfilePage extends JDialog {
         positionLabel.setForeground(new Color(50, 50, 50));
         contentPanel.add(positionLabel, gbc);
 
-        // Member Since
         gbc.gridx = 0;
         gbc.gridy = 6;
         gbc.weightx = 0.3;
@@ -174,7 +165,6 @@ public class RecruiterViewProfilePage extends JDialog {
         createdAtLabel.setForeground(new Color(50, 50, 50));
         contentPanel.add(createdAtLabel, gbc);
 
-        // Status
         gbc.gridx = 0;
         gbc.gridy = 7;
         gbc.weightx = 0.3;
@@ -193,7 +183,6 @@ public class RecruiterViewProfilePage extends JDialog {
         JScrollPane scrollPane = new JScrollPane(contentPanel);
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(220, 226, 235)));
 
-        // Footer
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         footer.setBackground(shell.getBackground());
         JButton closeBtn = new JButton("Close");

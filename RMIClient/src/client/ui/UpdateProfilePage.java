@@ -25,7 +25,7 @@ public class UpdateProfilePage extends JFrame {
         this.rmiClient = rmiClient;
         this.session = session;
         this.applicantService = rmiClient.getApplicantService();
-        
+
         setTitle("Update Profile - Job Recruitment System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         initUI();
@@ -158,7 +158,7 @@ public class UpdateProfilePage extends JFrame {
             boolean ok = applicantService.updateApplicant(profile);
             if (ok) {
                 JOptionPane.showMessageDialog(this, "Profile updated", "Update Profile", JOptionPane.INFORMATION_MESSAGE);
-                // Navigate back to Applicant dashboard instead of closing app
+
                 dispose();
                 try {
                     new ApplicantMenuGUI(rmiClient, session);

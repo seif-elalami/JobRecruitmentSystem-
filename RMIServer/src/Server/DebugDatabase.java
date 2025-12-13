@@ -15,7 +15,6 @@ public class DebugDatabase {
             System.out.println("🔍 Database Debug - Checking users collection...");
             System.out.println("================================================");
 
-            // Connect to MongoDB
             MongoDatabase database = MongoDBConnection.getInstance().getDatabase();
             MongoCollection<Document> userCollection = database.getCollection("users");
 
@@ -23,7 +22,6 @@ public class DebugDatabase {
             System.out.println("📊 Total users in database: " + userCount);
             System.out.println("================================================\n");
 
-            // Print all users
             for (Document doc : userCollection.find()) {
                 System.out.println("👤 User Document:");
                 System.out.println("   ID:       " + doc.getObjectId("_id"));

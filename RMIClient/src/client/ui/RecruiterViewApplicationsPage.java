@@ -41,7 +41,6 @@ public class RecruiterViewApplicationsPage extends JDialog {
         shell.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
         shell.setBackground(new Color(244, 247, 252));
 
-        // Header
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(new Color(25, 103, 210));
         JLabel title = new JLabel("📊 All Applications", SwingConstants.LEFT);
@@ -57,7 +56,6 @@ public class RecruiterViewApplicationsPage extends JDialog {
         header.setBorder(BorderFactory.createEmptyBorder(14, 16, 14, 16));
         header.add(titlePanel, BorderLayout.WEST);
 
-        // Table panel
         JPanel tablePanel = new JPanel(new BorderLayout());
         tablePanel.setBackground(Color.WHITE);
         tablePanel.setBorder(BorderFactory.createLineBorder(new Color(220, 226, 235)));
@@ -79,7 +77,6 @@ public class RecruiterViewApplicationsPage extends JDialog {
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         tablePanel.add(scrollPane, BorderLayout.CENTER);
 
-        // Footer
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         footer.setBackground(shell.getBackground());
 
@@ -122,11 +119,10 @@ public class RecruiterViewApplicationsPage extends JDialog {
 
             for (Application app : currentApplications) {
                 try {
-                    // Get applicant email
+
                     User applicant = authService.getUserById(app.getApplicantId());
                     String applicantEmail = applicant != null && applicant.getEmail() != null ? applicant.getEmail() : "Unknown";
 
-                    // Get job title
                     Job job = jobService.getJobById(app.getJobId());
                     String jobTitle = job != null && job.getTitle() != null ? job.getTitle() : "Unknown";
 

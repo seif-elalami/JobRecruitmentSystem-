@@ -28,7 +28,7 @@ public class MyApplicationsPage extends JFrame {
         this.session = session;
         this.applicationService = rmiClient.getApplicationService();
         this.jobService = rmiClient.getJobService();
-        
+
         setTitle("My Applications - Job Recruitment System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         initUI();
@@ -78,7 +78,7 @@ public class MyApplicationsPage extends JFrame {
 
         JButton refresh = primaryButton("Refresh");
         refresh.addActionListener(e -> load());
-        
+
         JButton backBtn = secondaryButton("Back to Dashboard");
         backBtn.addActionListener(e -> {
             dispose();
@@ -131,23 +131,22 @@ public class MyApplicationsPage extends JFrame {
         try {
             Job job = jobService.getJobById(app.getJobId());
             ApplicationState state = app.getCurrentState();
-            
+
             StringBuilder sb = new StringBuilder();
             sb.append("Job: ").append(job != null ? job.getTitle() : "Unknown").append(" (ID: ").append(app.getJobId()).append(")\n\n");
-            
-            // Show State Pattern information
+
             sb.append("═══ APPLICATION STATE (State Pattern) ═══\n");
             sb.append("Current State: ").append(state.getStateName()).append("\n");
             sb.append("Is Final State: ").append(state.isFinalState() ? "Yes" : "No").append("\n");
             sb.append("Is Accepted: ").append(state.isAccepted() ? "Yes" : "No").append("\n");
             sb.append("Is Rejected: ").append(state.isRejected() ? "Yes" : "No").append("\n\n");
-            
+
             sb.append("═══ APPLICATION DETAILS ═══\n");
             sb.append("Applied On: ").append(app.getApplicationDate() != null ? df.format(app.getApplicationDate()) : "N/A").append("\n");
             sb.append("Application ID: ").append(app.getApplicationId()).append("\n\n");
-            
+
             sb.append("Cover Letter:\n").append(app.getCoverLetter() != null ? app.getCoverLetter() : "No cover letter provided");
-            
+
             details.setText(sb.toString());
             details.setCaretPosition(0);
         } catch (Exception ex) {
@@ -163,7 +162,7 @@ public class MyApplicationsPage extends JFrame {
         btn.setBorder(BorderFactory.createEmptyBorder(10, 16, 10, 16));
         return btn;
     }
-    
+
     private JButton secondaryButton(String text) {
         JButton btn = new JButton(text);
         btn.setBackground(new Color(149, 165, 166));

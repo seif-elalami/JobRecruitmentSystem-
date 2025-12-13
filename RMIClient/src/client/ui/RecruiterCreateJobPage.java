@@ -40,7 +40,6 @@ public class RecruiterCreateJobPage extends JDialog {
         shell.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
         shell.setBackground(new Color(244, 247, 252));
 
-        // Header
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(new Color(52, 152, 219));
         JLabel title = new JLabel("📝 Create Job Posting", SwingConstants.LEFT);
@@ -56,7 +55,6 @@ public class RecruiterCreateJobPage extends JDialog {
         header.setBorder(BorderFactory.createEmptyBorder(14, 16, 14, 16));
         header.add(titlePanel, BorderLayout.WEST);
 
-        // Form panel
         JPanel formPanel = new JPanel();
         formPanel.setBackground(Color.WHITE);
         formPanel.setLayout(new GridBagLayout());
@@ -66,7 +64,6 @@ public class RecruiterCreateJobPage extends JDialog {
         gbc.insets = new Insets(8, 8, 8, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Title field
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 0;
@@ -80,7 +77,6 @@ public class RecruiterCreateJobPage extends JDialog {
         titleField.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         formPanel.add(titleField, gbc);
 
-        // Description field
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.weightx = 0;
@@ -99,7 +95,6 @@ public class RecruiterCreateJobPage extends JDialog {
         JScrollPane descScroll = new JScrollPane(descriptionArea);
         formPanel.add(descScroll, gbc);
 
-        // Company field
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.weightx = 0;
@@ -115,7 +110,6 @@ public class RecruiterCreateJobPage extends JDialog {
         companyField.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         formPanel.add(companyField, gbc);
 
-        // Location field
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.weightx = 0;
@@ -129,7 +123,6 @@ public class RecruiterCreateJobPage extends JDialog {
         locationField.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         formPanel.add(locationField, gbc);
 
-        // Salary field
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.weightx = 0;
@@ -143,7 +136,6 @@ public class RecruiterCreateJobPage extends JDialog {
         salaryField.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         formPanel.add(salaryField, gbc);
 
-        // Requirements field
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.weightx = 0;
@@ -165,7 +157,6 @@ public class RecruiterCreateJobPage extends JDialog {
         JScrollPane scrollPane = new JScrollPane(formPanel);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
-        // Footer
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         footer.setBackground(shell.getBackground());
 
@@ -191,7 +182,7 @@ public class RecruiterCreateJobPage extends JDialog {
     }
 
     private void createJob() {
-        // Validation
+
         if (titleField.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "❌ Please enter a job title", "Validation Error", JOptionPane.WARNING_MESSAGE);
             return;

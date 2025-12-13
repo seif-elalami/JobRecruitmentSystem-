@@ -86,7 +86,6 @@ public class AuthServiceTest {
             return;
         }
 
-        // ✅ Create User object with correct constructor
         User user = new User(username, password, email, role);
 
         System.out.println("\n📤 Registering user...");
@@ -107,7 +106,6 @@ public class AuthServiceTest {
         e.printStackTrace();
     }
 }
-
 
     private void login() {
         try {

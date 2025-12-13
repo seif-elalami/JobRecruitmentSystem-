@@ -39,25 +39,21 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
         try {
             System.out.println("📝 Registration attempt:  " + user.getEmail());
 
-            // Validate email format
             if (!ValidationUtil.isValidEmail(user.getEmail())) {
                 System.err.println("❌ Registration failed: " + ValidationUtil.getEmailErrorMessage());
                 throw new RemoteException(ValidationUtil.getEmailErrorMessage());
             }
 
-            // Check if email already exists
             User existingUser = getUserByEmail(user.getEmail());
             if (existingUser != null) {
                 System.out.println("❌ Registration failed: Email already exists - " + user.getEmail());
                 throw new RemoteException("Email already exists");
             }
 
-            // Validate password length
             if (user.getPassword() == null || user.getPassword().length() < 6) {
                 throw new RemoteException("Password must be at least 6 characters");
             }
 
-            // Validate phone if provided
             if (user.getPhone() != null && !user.getPhone().isEmpty()) {
                 if (!ValidationUtil.isValidPhone(user.getPhone())) {
                     System.err.println("❌ Registration failed: " + ValidationUtil.getPhoneErrorMessage());
@@ -65,11 +61,10 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
                 }
             }
 
-            // Create user document
             Document doc = new Document();
             doc.append("username", user.getUsername());
             doc.append("email", user.getEmail());
-            // ✅ Hash password with BCrypt before storing
+
             String hashedPassword = PasswordUtil.hashPassword(user.getPassword());
             doc.append("password", hashedPassword);
             doc.append("role", user.getRole());
@@ -78,7 +73,6 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
             doc.append("lastLogin", null);
             doc.append("isActive", true);
 
-        // Role-specific fields
         if ("APPLICANT".equals(user.getRole())) {
             doc.append("skills", user.getSkills());
             doc.append("experience", user.getExperience());
@@ -94,7 +88,6 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
         String userId = doc.getObjectId("_id").toString();
         System.out.println("✅ User registered with ID: " + userId);
 
-        // Create session
         Session session = new Session(userId, user.getEmail(), user.getRole());
 
         return session;
@@ -115,12 +108,9 @@ public Session login(String email, String password) throws RemoteException {
         System.out.println("   Database: " + MongoDBConnection.getInstance().getDatabase().getName());
         System.out.println("   Collection: users");
 
-        // Find user by email (case-insensitive search)
-        // Try exact match first
         Document query = new Document("email", email);
         Document userDoc = userCollection.find(query).first();
 
-        // If not found, try case-insensitive search
         if (userDoc == null) {
             System.out.println("   ⚠️  Exact email match not found, trying case-insensitive search...");
             query = new Document("email", new Document("$regex", "^" + email + "$").append("$options", "i"));
@@ -130,27 +120,25 @@ public Session login(String email, String password) throws RemoteException {
         if (userDoc == null) {
             System.out.println("❌ User not found:  " + email);
             System.out.println("   Checking if database connection is working...");
-            
-            // Debug: List all emails in database
+
             long userCount = userCollection.countDocuments();
             System.out.println("   Total users in database: " + userCount);
-            
+
             if (userCount > 0) {
                 System.out.println("   Sample emails in database:");
                 for (Document doc : userCollection.find().limit(5)) {
                     System.out.println("      - " + doc.getString("email"));
                 }
             }
-            
+
             throw new RemoteException("Invalid email or password");
         }
-        
+
         System.out.println("   ✅ User found in database!");
         System.out.println("   Stored email: " + userDoc.getString("email"));
 
-        // Get stored hashed password
         String storedHashedPassword = userDoc.getString("password");
-        
+
         if (storedHashedPassword == null || storedHashedPassword.isEmpty()) {
             System.err.println("❌ User account has no password set: " + email);
             throw new RemoteException("Invalid email or password");
@@ -159,7 +147,6 @@ public Session login(String email, String password) throws RemoteException {
         System.out.println("   Stored password (first 20 chars): " + storedHashedPassword.substring(0, Math.min(20, storedHashedPassword.length())) + "...");
         System.out.println("   Provided password length: " + (password != null ? password.length() : 0));
 
-        // ✅ CRITICAL FIX:   Use PasswordUtil.verifyPassword() to compare
         boolean passwordMatches = PasswordUtil.verifyPassword(password, storedHashedPassword);
 
         System.out.println("   Password matches?  " + passwordMatches);
@@ -169,14 +156,12 @@ public Session login(String email, String password) throws RemoteException {
             throw new RemoteException("Invalid email or password");
         }
 
-        // Check if account is active
         Boolean isActive = userDoc.getBoolean("isActive");
         if (isActive != null && !isActive) {
             System.out.println("❌ Account is inactive: " + email);
             throw new RemoteException("Account is inactive.  Please contact support.");
         }
 
-        // Get user details
         String userId = userDoc.getObjectId("_id").toString();
         String role = userDoc.getString("role");
 
@@ -184,11 +169,9 @@ public Session login(String email, String password) throws RemoteException {
         System.out.println("   User ID: " + userId);
         System.out.println("   Role: " + role);
 
-        // Update last login time
         Document updateDoc = new Document("$set", new Document("lastLogin", new Date()));
         userCollection.updateOne(query, updateDoc);
 
-        // Create and return session
         Session session = new Session(userId, email, role);
 
         return session;
@@ -207,7 +190,6 @@ public Session loginWithPasskey(String email, String passkey) throws RemoteExcep
     try {
         System.out.println("🔑 Passkey login attempt for: " + email);
 
-        // Find user by email
         Document query = new Document("email", email);
         Document userDoc = userCollection.find(query).first();
 
@@ -216,7 +198,6 @@ public Session loginWithPasskey(String email, String passkey) throws RemoteExcep
             throw new RemoteException("Invalid email or passkey");
         }
 
-        // Get stored passkey (plain text comparison)
         String storedPasskey = userDoc.getString("passkey");
 
         if (storedPasskey == null || storedPasskey.isEmpty()) {
@@ -227,7 +208,6 @@ public Session loginWithPasskey(String email, String passkey) throws RemoteExcep
         System.out.println("   Stored passkey: " + storedPasskey);
         System.out.println("   Provided passkey: " + passkey);
 
-        // Direct comparison (passkey is stored plain-text)
         boolean passkeyMatches = storedPasskey.equals(passkey);
 
         System.out.println("   Passkey matches? " + passkeyMatches);
@@ -237,14 +217,12 @@ public Session loginWithPasskey(String email, String passkey) throws RemoteExcep
             throw new RemoteException("Invalid email or passkey");
         }
 
-        // Check if account is active
         Boolean isActive = userDoc.getBoolean("isActive");
         if (isActive != null && !isActive) {
             System.out.println("❌ Account is inactive: " + email);
             throw new RemoteException("Account is inactive. Please contact support.");
         }
 
-        // Get user details
         String userId = userDoc.getObjectId("_id").toString();
         String role = userDoc.getString("role");
 
@@ -252,11 +230,9 @@ public Session loginWithPasskey(String email, String passkey) throws RemoteExcep
         System.out.println("   User ID: " + userId);
         System.out.println("   Role: " + role);
 
-        // Update last login time
         Document updateDoc = new Document("$set", new Document("lastLogin", new Date()));
         userCollection.updateOne(query, updateDoc);
 
-        // Create and return session
         Session session = new Session(userId, email, role);
 
         return session;
@@ -269,8 +245,6 @@ public Session loginWithPasskey(String email, String passkey) throws RemoteExcep
         throw new RemoteException("Passkey login failed", e);
     }
 }
-
-
 
     @Override
     public boolean logout(String sessionToken) throws RemoteException {
@@ -337,7 +311,6 @@ public Session loginWithPasskey(String email, String passkey) throws RemoteExcep
             throw new RemoteException("Failed to get user", e);
         }
     }
-
 
     @Override
     public User getUserByEmail(String email) throws RemoteException {
@@ -426,13 +399,12 @@ public Session loginWithPasskey(String email, String passkey) throws RemoteExcep
     @Override
     public boolean changePassword(String email, String oldPassword, String newPassword) throws RemoteException {
         try {
-            // Validate new password
+
             if (newPassword == null || newPassword.length() < 6) {
                 System.err.println("❌ Password change failed: Password must be at least 6 characters");
                 return false;
             }
 
-            // Get user by email
             User user = getUserByEmail(email);
 
             if (user == null) {
@@ -440,13 +412,11 @@ public Session loginWithPasskey(String email, String passkey) throws RemoteExcep
                 return false;
             }
 
-            // Verify old password
             if (!user.getPassword().equals(oldPassword)) {
                 System.err.println("❌ Password change failed: Old password incorrect");
                 return false;
             }
 
-            // Update password
             userCollection.updateOne(
                 new Document("email", email),
                 new Document("$set", new Document("password", newPassword))
@@ -499,7 +469,6 @@ public Session loginWithPasskey(String email, String passkey) throws RemoteExcep
     private User documentToUser(Document doc) {
         User user = new User();
 
-        // Common fields
         user.setUserId(doc.getObjectId("_id").toString());
         user.setUsername(doc.getString("username"));
         user.setEmail(doc.getString("email"));
@@ -510,7 +479,6 @@ public Session loginWithPasskey(String email, String passkey) throws RemoteExcep
         user.setLastLogin(doc.getDate("lastLogin"));
         user.setActive(doc.getBoolean("isActive", true));
 
-        // Role-specific fields
         if ("APPLICANT".equals(user.getRole())) {
             user.setSkills(doc.getString("skills"));
             user.setExperience(doc.getString("experience"));

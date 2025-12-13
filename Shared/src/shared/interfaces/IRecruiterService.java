@@ -12,10 +12,6 @@ import java.util.List;
 
 public interface IRecruiterService extends Remote {
 
-    // ========================================
-    // RECRUITER MANAGEMENT
-    // ========================================
-
     String createRecruiter(Recruiter recruiter) throws RemoteException;
 
     Recruiter getRecruiterById(String id) throws RemoteException;
@@ -24,35 +20,19 @@ public interface IRecruiterService extends Remote {
 
     boolean updateRecruiter(Recruiter recruiter) throws RemoteException;
 
-    // ========================================
-    // JOB MANAGEMENT
-    // ========================================
-
     String postJob(Job job) throws RemoteException;
 
     List<Job> getMyJobPostings(String recruiterId) throws RemoteException;
 
     boolean closeJobPosting(String jobId, String recruiterId) throws RemoteException;
 
-    // ========================================
-    // APPLICATION MANAGEMENT
-    // ========================================
-
     List<Application> getApplicationsForJob(String jobId) throws RemoteException;
 
     boolean updateApplicationStatus(String applicationId, String status) throws RemoteException;
 
-    // ========================================
-    // APPLICANT SEARCH (Returns Full Applicant Objects)
-    // ========================================
-
     List<Applicant> searchApplicantsBySkills(String skills) throws RemoteException;
 
     List<Applicant> searchApplicantsByExperience(String experience) throws RemoteException;
-
-    // ========================================
-    // INTERVIEW MANAGEMENT
-    // ========================================
 
     String createInterview(Interview interview) throws RemoteException;
 
@@ -64,7 +44,6 @@ public interface IRecruiterService extends Remote {
 
     Interview getInterviewById(String interviewId) throws RemoteException;
 
- 
     /**
      * Get read-only candidate views for all applicants who applied to a specific job
      * @param jobId The job ID

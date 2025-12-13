@@ -79,15 +79,14 @@ private void login() {
 
             currentSession = session;
 
-            // Redirect to appropriate menu based on role (case-insensitive)
             String role = currentSession.getRole();
             if (role == null) {
                 System.err.println("❌ Error: User role is null!");
                 return;
             }
-            
+
             String normalizedRole = role.toUpperCase().trim();
-            
+
             if (normalizedRole.equals("APPLICANT") || normalizedRole.contains("APPLICANT")) {
                 System.out.println("\n🚀 Opening Applicant Menu...\n");
                 new ApplicantMenu(client, currentSession).run();
@@ -109,14 +108,12 @@ private void login() {
     }
 }
 
-
     private void register() {
         try {
             System.out.println("\n╔════════════════════════════════════════╗");
             System.out.println("║          User Registration             ║");
             System.out.println("╚════════════════════════════════════════╝\n");
 
-            // Get email
             String email = "";
             boolean validEmail = false;
             while (!validEmail) {
@@ -134,7 +131,6 @@ private void login() {
                 }
             }
 
-            // Get password
             String password = "";
             boolean validPassword = false;
             while (!validPassword) {
@@ -161,11 +157,9 @@ private void login() {
                 }
             }
 
-            // Get name
             System.out.print("Full Name: ");
             String name = InputHelper.getString();
 
-            // Get role
             System.out.println("\nSelect Role:");
             System.out.println("1. Applicant (Job Seeker)");
             System.out.println("2. Recruiter (HR)");
@@ -175,22 +169,18 @@ private void login() {
             String role;
             String phone = "";
 
-            // Create User object
             User user = new User();
             user.setUsername(name);
             user.setEmail(email);
             user.setPassword(password);
 
             if (roleChoice == 1) {
-                // ========================================
-                // APPLICANT REGISTRATION
-                // ========================================
+
                 role = "APPLICANT";
                 user.setRole(role);
 
                 System.out.println("\n--- Applicant Profile Setup ---");
 
-                // Get phone (REQUIRED for applicants)
                 boolean validPhone = false;
                 while (!validPhone) {
                     System.out.print("Phone Number (must start with 0 and be 11 digits): ");
@@ -213,14 +203,12 @@ private void login() {
                     }
                 }
 
-                // Optional: Get skills
                 System.out.print("Skills (comma-separated) [Optional, press Enter to skip]: ");
                 String skills = InputHelper.getString();
                 if (!skills.isEmpty()) {
                     user.setSkills(skills);
                 }
 
-                // Optional: Get experience
                 System.out.print("Experience (e.g., '3 years in Java') [Optional, press Enter to skip]: ");
                 String experience = InputHelper.getString();
                 if (!experience.isEmpty()) {
@@ -228,15 +216,12 @@ private void login() {
                 }
 
             } else if (roleChoice == 2) {
-                // ========================================
-                // RECRUITER REGISTRATION
-                // ========================================
+
                 role = "RECRUITER";
                 user.setRole(role);
 
                 System.out.println("\n--- Recruiter Profile Setup ---");
 
-                // Get department (REQUIRED)
                 String department = "";
                 while (department.isEmpty()) {
                     System.out.print("Department (e.g., HR, IT, Sales): ");
@@ -248,20 +233,16 @@ private void login() {
                 }
                 user.setDepartment(department);
 
-                // ✅ Company - REMOVED (not required)
-
-                // Position (OPTIONAL)
                 System.out.print("Position (e.g., HR Manager) [Optional, press Enter to skip]: ");
                 String position = InputHelper.getString();
                 if (!position.isEmpty()) {
                     user.setPosition(position);
                 }
 
-                // Phone (OPTIONAL)
                 System.out.print("Phone (11 digits starting with 0) [Optional, press Enter to skip]: ");
                 phone = InputHelper.getString();
                 if (!phone.isEmpty()) {
-                    // Validate phone format if provided
+
                     if (phone.matches("^0\\d{10}$")) {
                         user.setPhone(phone);
                     } else {
@@ -276,7 +257,6 @@ private void login() {
 
             System.out.println("\n📤 Registering.. .");
 
-            // Register with new User-based method
             Session session = authService.register(user);
 
             if (session != null) {
@@ -296,17 +276,16 @@ private void login() {
 
                 InputHelper.pause();
 
-                // Store session and redirect to appropriate menu
                 currentSession = session;
-                
+
                 String registeredUserRole = currentSession.getRole();
                 if (registeredUserRole == null) {
                     System.err.println("❌ Error: User role is null!");
                     return;
                 }
-                
+
                 String normalizedRegisteredRole = registeredUserRole.toUpperCase().trim();
-                
+
                 if (normalizedRegisteredRole.equals("APPLICANT") || normalizedRegisteredRole.contains("APPLICANT")) {
                     System.out.println("\n🚀 Opening Applicant Menu...\n");
                     new ApplicantMenu(client, currentSession).run();

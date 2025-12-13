@@ -28,7 +28,6 @@ public class RegisterPage extends JFrame {
         this.rmiClient = rmiClient;
         this.authService = rmiClient.getAuthService();
 
-        // Frame setup
         setTitle("Create Account - Job Recruitment System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1000, 900);
@@ -36,7 +35,6 @@ public class RegisterPage extends JFrame {
         setResizable(false);
         setUndecorated(true);
 
-        // Main panel with modern gradient
         JPanel mainPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -48,8 +46,7 @@ public class RegisterPage extends JFrame {
                         getWidth(), getHeight(), new Color(52, 152, 219));
                 g2d.setPaint(gradient);
                 g2d.fillRect(0, 0, getWidth(), getHeight());
-                
-                // Subtle overlay pattern
+
                 g2d.setColor(new Color(255, 255, 255, 5));
                 for (int i = 0; i < getWidth(); i += 50) {
                     g2d.drawLine(i, 0, i, getHeight());
@@ -59,7 +56,6 @@ public class RegisterPage extends JFrame {
         mainPanel.setLayout(null);
         add(mainPanel);
 
-        // Close button
         JButton closeBtn = new JButton("✕");
         closeBtn.setBounds(960, 10, 30, 30);
         closeBtn.setFont(new Font("Arial", Font.BOLD, 20));
@@ -71,7 +67,6 @@ public class RegisterPage extends JFrame {
         closeBtn.addActionListener(e -> System.exit(0));
         mainPanel.add(closeBtn);
 
-        // Card panel (white container)
         JPanel cardPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -90,20 +85,17 @@ public class RegisterPage extends JFrame {
         cardPanel.setOpaque(false);
         mainPanel.add(cardPanel);
 
-        // Pencil icon
         JLabel iconLabel = new JLabel("✏️");
         iconLabel.setFont(new Font("Arial", Font.PLAIN, 50));
         iconLabel.setBounds(425, 15, 50, 50);
         cardPanel.add(iconLabel);
 
-        // Title
         JLabel titleLabel = new JLabel("Create Account");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 32));
         titleLabel.setForeground(new Color(155, 89, 182));
         titleLabel.setBounds(30, 65, 840, 40);
         cardPanel.add(titleLabel);
 
-        // Subtitle
         JLabel subtitleLabel = new JLabel("Join our job recruitment platform");
         subtitleLabel.setFont(new Font("Arial", Font.PLAIN, 13));
         subtitleLabel.setForeground(new Color(127, 140, 141));
@@ -113,7 +105,6 @@ public class RegisterPage extends JFrame {
         int yPos = 140;
         int spacing = 80;
 
-        // Full Name
         JLabel nameLabel = new JLabel("👤 Full Name");
         nameLabel.setFont(new Font("Arial", Font.BOLD, 12));
         nameLabel.setForeground(new Color(44, 62, 80));
@@ -128,7 +119,6 @@ public class RegisterPage extends JFrame {
         cardPanel.add(nameField);
         yPos += spacing;
 
-        // Email
         JLabel emailLabel = new JLabel("📧 Email Address");
         emailLabel.setFont(new Font("Arial", Font.BOLD, 12));
         emailLabel.setForeground(new Color(44, 62, 80));
@@ -143,7 +133,6 @@ public class RegisterPage extends JFrame {
         cardPanel.add(emailField);
         yPos += spacing;
 
-        // Phone
         JLabel phoneLabel = new JLabel("📱 Phone Number");
         phoneLabel.setFont(new Font("Arial", Font.BOLD, 12));
         phoneLabel.setForeground(new Color(44, 62, 80));
@@ -164,7 +153,6 @@ public class RegisterPage extends JFrame {
         cardPanel.add(phoneField);
         yPos += spacing;
 
-        // Password
         JLabel passwordLabel = new JLabel("🔒 Password");
         passwordLabel.setFont(new Font("Arial", Font.BOLD, 12));
         passwordLabel.setForeground(new Color(44, 62, 80));
@@ -189,7 +177,6 @@ public class RegisterPage extends JFrame {
         cardPanel.add(passwordField);
         yPos += spacing;
 
-        // Confirm Password
         JLabel confirmLabel = new JLabel("✓ Confirm Password");
         confirmLabel.setFont(new Font("Arial", Font.BOLD, 12));
         confirmLabel.setForeground(new Color(44, 62, 80));
@@ -208,7 +195,6 @@ public class RegisterPage extends JFrame {
         cardPanel.add(confirmPasswordField);
         yPos += spacing - 10;
 
-        // Role
         JLabel roleLabel = new JLabel("👥 Select Role");
         roleLabel.setFont(new Font("Arial", Font.BOLD, 12));
         roleLabel.setForeground(new Color(44, 62, 80));
@@ -223,13 +209,11 @@ public class RegisterPage extends JFrame {
         roleComboBox.setBorder(BorderFactory.createLineBorder(new Color(236, 240, 241), 2));
         cardPanel.add(roleComboBox);
 
-        // Register Button
         AnimatedButton registerButton = new AnimatedButton("Create Account", new Color(155, 89, 182), new Color(142, 68, 173));
         registerButton.setBounds(30, 725, 820, 50);
         registerButton.addActionListener(e -> handleRegister());
         cardPanel.add(registerButton);
 
-        // Back button
         AnimatedButton backButton = new AnimatedButton("← Back", new Color(149, 165, 166), new Color(120, 144, 156));
         backButton.setBounds(30, 785, 390, 30);
         backButton.addActionListener(e -> {
@@ -334,8 +318,7 @@ public class RegisterPage extends JFrame {
             if (session != null) {
                 JOptionPane.showMessageDialog(this, "✅ Registration successful! Welcome " + name + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 dispose();
-                
-                // Route based on role
+
                 String userRole = session.getRole().toLowerCase();
                 if (userRole.contains("applicant")) {
                     new ApplicantMenuGUI(rmiClient, session);
@@ -352,7 +335,6 @@ public class RegisterPage extends JFrame {
         }
     }
 
-    // Animated Button Class
     private static class AnimatedButton extends JButton {
         private Color baseColor;
         private Color hoverColor;

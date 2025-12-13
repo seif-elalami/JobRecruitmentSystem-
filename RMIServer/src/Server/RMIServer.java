@@ -23,20 +23,18 @@ public class RMIServer {
 
     public static void main(String[] args) {
         try {
-            // Force RMI to advertise localhost to clients to avoid APIPA (169.254.*) addresses
+
             System.setProperty("java.rmi.server.hostname", "127.0.0.1");
             System.out.println("╔════════════════════════════════════════╗");
             System.out.println("║     Job Recruitment System - SERVER   ║");
             System.out.println("╚════════════════════════════════════════╝");
             System.out.println();
 
-            // Step 1: Test MongoDB Connection
             System.out.println("📦 Step 1: Checking MongoDB connection...");
             MongoDBConnection.getInstance().getDatabase();
             System.out.println("   ✅ MongoDB connected successfully");
             System.out.println();
 
-            // Step 2: Start RMI Registry
             System.out.println("🔧 Step 2: Starting RMI Registry on port " + RMI_PORT + "...");
             try {
                 LocateRegistry.createRegistry(RMI_PORT);
@@ -46,7 +44,6 @@ public class RMIServer {
             }
             System.out.println();
 
-            // Step 3: Create Service Instances
             System.out.println("🏗️  Step 3: Creating service instances...");
 
             IApplicantService applicantService = new ApplicantServiceImpl();
@@ -59,7 +56,6 @@ public class RMIServer {
             System.out.println("   ✅ All services created");
             System.out.println();
 
-            // Step 4: Bind Services to RMI Registry
             System.out.println("🔗 Step 4: Binding services to RMI Registry.. .");
 
             String serverURL = "rmi://localhost:" + RMI_PORT + "/";
@@ -103,7 +99,6 @@ public class RMIServer {
             System.out.println("Press Ctrl+C to stop the server...");
             System.out.println("═══════════════════════════════════════════");
 
-            // Keep server running
             Thread.currentThread().join();
 
         } catch (Exception e) {

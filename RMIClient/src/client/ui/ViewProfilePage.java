@@ -17,7 +17,7 @@ public class ViewProfilePage extends JFrame {
         this.rmiClient = rmiClient;
         this.session = session;
         this.applicantService = rmiClient.getApplicantService();
-        
+
         setTitle("My Profile - Job Recruitment System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         initUI();
@@ -57,7 +57,6 @@ public class ViewProfilePage extends JFrame {
             BorderFactory.createEmptyBorder(6, 6, 6, 6)));
         body.add(new JScrollPane(details), BorderLayout.CENTER);
 
-        // Footer with Back button
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 12));
         footer.setBackground(new Color(244, 247, 252));
         JButton backBtn = secondaryButton("Back to Dashboard");

@@ -5,7 +5,6 @@ import java.util.List;
 
 public abstract class NotificationSubject {
 
-    // Transient because we don't want to serialize the observers when sending Interview over RMI
     private transient List<NotificationObserver> observerCollection;
 
     public void registerObserver(NotificationObserver observer) {

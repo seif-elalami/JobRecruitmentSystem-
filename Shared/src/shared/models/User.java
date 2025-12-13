@@ -7,7 +7,6 @@ public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    // Common fields for all users
     private String userId;
     private String username;
     private String email;
@@ -18,20 +17,16 @@ public class User implements Serializable {
     private Date lastLogin;
     private boolean isActive;
 
-    // Applicant-specific fields (only populated if role = APPLICANT)
     private String skills;
     private String experience;
 
-    // Recruiter-specific fields (only populated if role = RECRUITER)
     private String department;
     private String company;
     private String position;
     private String description;
 
-    // Admin passkey (optional, for quick/secure login)
     private String passkey;
 
-    // Constructors
     public User() {
         this.createdAt = new Date();
         this.isActive = true;
@@ -45,7 +40,6 @@ public class User implements Serializable {
         this.role = role;
     }
 
-    // Getters and Setters
     public String getUserId() {
         return userId;
     }
@@ -118,7 +112,6 @@ public class User implements Serializable {
         isActive = active;
     }
 
-    // Applicant-specific getters/setters
     public String getSkills() {
         return skills;
     }
@@ -135,7 +128,6 @@ public class User implements Serializable {
         this.experience = experience;
     }
 
-    // Recruiter-specific getters/setters
     public String getDepartment() {
         return department;
     }

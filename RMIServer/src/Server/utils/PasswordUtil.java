@@ -15,7 +15,7 @@ public class PasswordUtil {
         }
 
         try {
-            // BCrypt automatically generates a salt and hashes the password
+
             String hash = BCrypt.hashpw(password, BCrypt.gensalt());
 
             System.out.println("🔐 Password hashed with BCrypt");
@@ -45,18 +45,15 @@ public class PasswordUtil {
             System.out.println("🔍 Verifying password with BCrypt");
             System.out.println("   Hash format: " + storedHash.substring(0, Math.min(20, storedHash.length())) + "...");
 
-            // Check if it's a valid BCrypt hash
             if (! isValidBCryptHash(storedHash)) {
                 System.err.println("❌ Invalid BCrypt hash format!");
                 System.err.println("   Expected: $2a$10$...");
                 System.err.println("   Actual:   " + storedHash.substring(0, Math.min(20, storedHash.length())));
 
-                // ⚠️ FALLBACK: Try SHA-256 verification for old passwords
                 System.out.println("⚠️  Attempting legacy SHA-256 verification.. .");
                 return verifyPasswordLegacy(password, storedHash);
             }
 
-            // Use BCrypt to verify
             boolean matches = BCrypt.checkpw(password, storedHash);
             System.out.println("   Result: " + (matches ? "✅ MATCH" : "❌ NO MATCH"));
 
@@ -85,23 +82,19 @@ public class PasswordUtil {
      */
     private static boolean verifyPasswordLegacy(String password, String storedHash) {
         try {
-            // Decode stored hash
+
             byte[] combined = java.util.Base64.getDecoder().decode(storedHash);
 
-            // Extract salt (first 16 bytes)
             byte[] salt = new byte[16];
             System.arraycopy(combined, 0, salt, 0, 16);
 
-            // Extract stored password hash
             byte[] storedPasswordHash = new byte[combined.length - 16];
             System.arraycopy(combined, 16, storedPasswordHash, 0, storedPasswordHash.length);
 
-            // Hash the provided password with the same salt
             java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
             md.update(salt);
             byte[] testPasswordHash = md.digest(password.getBytes("UTF-8"));
 
-            // Compare
             boolean matches = java.security.MessageDigest.isEqual(storedPasswordHash, testPasswordHash);
             System.out.println("   Legacy SHA-256 result: " + (matches ? "✅ MATCH" : "❌ NO MATCH"));
 

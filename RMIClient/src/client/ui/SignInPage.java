@@ -21,14 +21,12 @@ public class SignInPage extends JFrame {
         this.rmiClient = rmiClient;
         this.authService = rmiClient.getAuthService();
 
-        // Frame setup
         setTitle("Sign In - Job Recruitment System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(500, 550);
         setLocationRelativeTo(null);
         setResizable(false);
 
-        // Main panel with gradient background
         JPanel mainPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -46,28 +44,24 @@ public class SignInPage extends JFrame {
         mainPanel.setLayout(null);
         add(mainPanel);
 
-        // Title Label
         JLabel titleLabel = new JLabel("Welcome Back");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 32));
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setBounds(50, 40, 400, 40);
         mainPanel.add(titleLabel);
 
-        // Subtitle
         JLabel subtitleLabel = new JLabel("Sign in to your account");
         subtitleLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         subtitleLabel.setForeground(new Color(236, 240, 241));
         subtitleLabel.setBounds(50, 85, 400, 20);
         mainPanel.add(subtitleLabel);
 
-        // Email Label
         JLabel emailLabel = new JLabel("Email Address:");
         emailLabel.setFont(new Font("Arial", Font.PLAIN, 12));
         emailLabel.setForeground(Color.WHITE);
         emailLabel.setBounds(50, 130, 400, 20);
         mainPanel.add(emailLabel);
 
-        // Email Field
         emailField = new JTextField();
         emailField.setBounds(50, 155, 400, 40);
         emailField.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -76,14 +70,12 @@ public class SignInPage extends JFrame {
         emailField.setBorder(BorderFactory.createLineBorder(new Color(52, 152, 219), 2));
         mainPanel.add(emailField);
 
-        // Password Label
         JLabel passwordLabel = new JLabel("Password:");
         passwordLabel.setFont(new Font("Arial", Font.PLAIN, 12));
         passwordLabel.setForeground(Color.WHITE);
         passwordLabel.setBounds(50, 210, 400, 20);
         mainPanel.add(passwordLabel);
 
-        // Password Field
         passwordField = new JPasswordField();
         passwordField.setBounds(50, 235, 400, 40);
         passwordField.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -92,14 +84,12 @@ public class SignInPage extends JFrame {
         passwordField.setBorder(BorderFactory.createLineBorder(new Color(52, 152, 219), 2));
         mainPanel.add(passwordField);
 
-        // Role Label
         JLabel roleLabel = new JLabel("Select Role:");
         roleLabel.setFont(new Font("Arial", Font.PLAIN, 12));
         roleLabel.setForeground(Color.WHITE);
         roleLabel.setBounds(50, 290, 400, 20);
         mainPanel.add(roleLabel);
 
-        // Role ComboBox
         roleComboBox = new JComboBox<>(new String[]{"Applicant", "Recruiter", "Admin"});
         roleComboBox.setBounds(50, 315, 400, 40);
         roleComboBox.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -107,7 +97,6 @@ public class SignInPage extends JFrame {
         roleComboBox.setForeground(Color.BLACK);
         mainPanel.add(roleComboBox);
 
-        // Sign In Button
         JButton signInButton = new JButton("Sign In");
         signInButton.setBounds(50, 390, 400, 45);
         signInButton.setFont(new Font("Arial", Font.BOLD, 16));
@@ -126,7 +115,6 @@ public class SignInPage extends JFrame {
 
         mainPanel.add(signInButton);
 
-        // Back Button
         JButton backButton = new JButton("Back");
         backButton.setBounds(50, 450, 190, 40);
         backButton.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -146,7 +134,6 @@ public class SignInPage extends JFrame {
 
         mainPanel.add(backButton);
 
-        // Register Link
         JButton registerLink = new JButton("Don't have an account? Register here");
         registerLink.setBounds(260, 450, 190, 40);
         registerLink.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -185,7 +172,6 @@ public class SignInPage extends JFrame {
         String password = new String(passwordField.getPassword());
         String role = (String) roleComboBox.getSelectedItem();
 
-        // Validation
         if (email.isEmpty()) {
             JOptionPane.showMessageDialog(this,
                     "❌ Please enter your email address",
@@ -203,17 +189,16 @@ public class SignInPage extends JFrame {
         }
 
         try {
-            // Show loading message
+
             JOptionPane.showMessageDialog(this,
                     "⏳ Authenticating...",
                     "Sign In",
                     JOptionPane.INFORMATION_MESSAGE);
 
-            // Call authentication service
             Session session = authService.login(email, password);
 
             if (session != null) {
-                // Verify role matches (case-insensitive comparison)
+
                 String sessionRole = session.getRole();
                 if (sessionRole == null || sessionRole.trim().isEmpty()) {
                     JOptionPane.showMessageDialog(this,
@@ -223,11 +208,9 @@ public class SignInPage extends JFrame {
                     return;
                 }
 
-                // Normalize both roles for comparison
                 String normalizedSessionRole = sessionRole.toUpperCase().trim();
                 String normalizedSelectedRole = role.toUpperCase().trim();
 
-                // Map common role variations
                 if (normalizedSelectedRole.equals("RECRUITER") || normalizedSelectedRole.contains("RECRUIT")) {
                     normalizedSelectedRole = "RECRUITER";
                 } else if (normalizedSelectedRole.equals("APPLICANT")) {
@@ -236,7 +219,6 @@ public class SignInPage extends JFrame {
                     normalizedSelectedRole = "ADMIN";
                 }
 
-                // Normalize session role to standard format
                 if (normalizedSessionRole.contains("RECRUITER") || normalizedSessionRole.contains("RECRUIT")) {
                     normalizedSessionRole = "RECRUITER";
                 } else if (normalizedSessionRole.contains("APPLICANT")) {
@@ -256,7 +238,6 @@ public class SignInPage extends JFrame {
                     return;
                 }
 
-                // Open appropriate menu based on role
                 dispose();
                 openRoleBasedMenu(session);
 
@@ -293,18 +274,17 @@ public class SignInPage extends JFrame {
 
         String role = session.getRole().toUpperCase().trim();
 
-        // Normalize role to handle variations
         if (role.contains("RECRUITER") || role.contains("RECRUIT")) {
-            // Open Recruiter Menu
+
             new RecruiterMenuGUI(rmiClient, session);
         } else if (role.contains("APPLICANT")) {
-            // Open Applicant Menu
+
             new ApplicantMenuGUI(rmiClient, session);
         } else if (role.contains("ADMIN")) {
-            // Open Admin Menu
+
             new AdminMenuGUI(rmiClient, session);
         } else {
-            // Unknown role - show error and go back to welcome page
+
             JOptionPane.showMessageDialog(null,
                     "❌ Error: Unknown user role: " + session.getRole() + "\nPlease contact support.",
                     "Error",

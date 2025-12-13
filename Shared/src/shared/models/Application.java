@@ -9,7 +9,6 @@ import java.util.Date;
 public class Application implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    // Attributes as specified
     private String applicationID;
     private String jobID;
     private String applicantID;
@@ -17,17 +16,14 @@ public class Application implements Serializable {
     private ApplicationState currentState;
     private String coverLetter;
 
-    // Legacy compatibility
     private String status;
 
-    // Default constructor
     public Application() {
         this.submissionDate = new Date();
         this.currentState = new ApplicationState();
         this.status = "APPLIED";
     }
 
-    // Constructor with parameters
     public Application(String jobID, String applicantID, String coverLetter) {
         this.jobID = jobID;
         this.applicantID = applicantID;
@@ -36,8 +32,6 @@ public class Application implements Serializable {
         this.currentState = new ApplicationState();
         this.status = "APPLIED";
     }
-
-    // State Pattern Methods
 
     /**
      * Submit the application (initialize in Applied state)
@@ -97,10 +91,8 @@ public class Application implements Serializable {
      */
     public void updateJobPosting() {
         System.out.println("🔄 Updating job posting for application: " + applicationID);
-        // Job posting update logic handled by service layer
-    }
 
-    // State Transition Methods
+    }
 
     /**
      * Move to Under Review state
@@ -142,7 +134,6 @@ public class Application implements Serializable {
         }
     }
 
-    // Getters
     public String getApplicationID() {
         return applicationID;
     }
@@ -191,7 +182,6 @@ public class Application implements Serializable {
         return coverLetter;
     }
 
-    // Setters
     public void setApplicationID(String applicationID) {
         this.applicationID = applicationID;
     }
@@ -237,7 +227,7 @@ public class Application implements Serializable {
 
     public void setStatus(String status) {
         this.status = status;
-        // Sync state object with status string
+
         if (currentState == null) {
             currentState = new ApplicationState();
         }

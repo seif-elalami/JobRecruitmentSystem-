@@ -19,7 +19,6 @@ public class AdminMenuGUI extends JFrame {
         this.rmiClient = rmiClient;
         this.session = session;
 
-        // Frame setup
         setTitle("Admin Dashboard - Job Recruitment System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1200, 800);
@@ -27,7 +26,6 @@ public class AdminMenuGUI extends JFrame {
         setResizable(false);
         setUndecorated(true);
 
-        // Main panel with gradient
         JPanel mainPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -39,8 +37,7 @@ public class AdminMenuGUI extends JFrame {
                         getWidth(), getHeight(), new Color(108, 52, 131));
                 g2d.setPaint(gradient);
                 g2d.fillRect(0, 0, getWidth(), getHeight());
-                
-                // Subtle overlay pattern
+
                 g2d.setColor(new Color(255, 255, 255, 5));
                 for (int i = 0; i < getWidth(); i += 50) {
                     g2d.drawLine(i, 0, i, getHeight());
@@ -50,7 +47,6 @@ public class AdminMenuGUI extends JFrame {
         mainPanel.setLayout(null);
         add(mainPanel);
 
-        // Close button
         JButton closeBtn = new JButton("✕");
         closeBtn.setBounds(1160, 10, 30, 30);
         closeBtn.setFont(new Font("Arial", Font.BOLD, 20));
@@ -62,7 +58,6 @@ public class AdminMenuGUI extends JFrame {
         closeBtn.addActionListener(e -> System.exit(0));
         mainPanel.add(closeBtn);
 
-        // Header panel
         JPanel headerPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -78,14 +73,12 @@ public class AdminMenuGUI extends JFrame {
         headerPanel.setOpaque(false);
         mainPanel.add(headerPanel);
 
-        // Welcome text
         JLabel welcomeLabel = new JLabel("👑 Welcome, Admin (" + session.getUserEmail() + ")");
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 26));
         welcomeLabel.setForeground(Color.WHITE);
         welcomeLabel.setBounds(40, 20, 600, 50);
         headerPanel.add(welcomeLabel);
 
-        // Logout button
         JButton logoutBtn = new JButton("Logout");
         logoutBtn.setFont(new Font("Arial", Font.BOLD, 14));
         logoutBtn.setBackground(new Color(231, 76, 60));
@@ -96,7 +89,7 @@ public class AdminMenuGUI extends JFrame {
         logoutBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         logoutBtn.addActionListener(e -> {
             try {
-                // Attempt remote logout if sessionId is available
+
                 boolean ok = false;
                 if (session.getSessionId() != null) {
                     ok = rmiClient.getAuthService().logout(session.getSessionId());
@@ -105,13 +98,12 @@ public class AdminMenuGUI extends JFrame {
             } catch (Exception ex) {
                 System.err.println("Logout error: " + ex.getMessage());
             }
-            // Return to Welcome page
+
             dispose();
             new WelcomePage(rmiClient).setVisible(true);
         });
         headerPanel.add(logoutBtn);
 
-        // Content panel
         JPanel contentPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -127,14 +119,12 @@ public class AdminMenuGUI extends JFrame {
         contentPanel.setOpaque(false);
         mainPanel.add(contentPanel);
 
-        // Title
         JLabel titleLabel = new JLabel("🛡️ System Administration");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 30));
         titleLabel.setForeground(new Color(44, 62, 80));
         titleLabel.setBounds(50, 25, 400, 40);
         contentPanel.add(titleLabel);
 
-        // Features grid (2x3 layout)
         String[][] features = {
             {"👥", "Manage Users", "Create, edit, and\ndelete user accounts"},
             {"📊", "View Reports", "Generate system\nanalytics and reports"},
@@ -180,8 +170,7 @@ public class AdminMenuGUI extends JFrame {
         cardPanel.setBounds(x, y, width, height);
         cardPanel.setOpaque(false);
         cardPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        
-        // Add hover effect
+
         cardPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent evt) {
@@ -197,20 +186,17 @@ public class AdminMenuGUI extends JFrame {
             }
         });
 
-        // Icon
         JLabel iconLabel = new JLabel(icon);
         iconLabel.setFont(new Font("Arial", Font.BOLD, 50));
         iconLabel.setBounds(20, 15, 60, 60);
         cardPanel.add(iconLabel);
 
-        // Title
         JLabel titleLabel = new JLabel(title);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 15));
         titleLabel.setForeground(new Color(44, 62, 80));
         titleLabel.setBounds(20, 80, 280, 20);
         cardPanel.add(titleLabel);
 
-        // Description
         JLabel descLabel = new JLabel("<html>" + description + "</html>");
         descLabel.setFont(new Font("Arial", Font.PLAIN, 12));
         descLabel.setForeground(new Color(127, 140, 141));

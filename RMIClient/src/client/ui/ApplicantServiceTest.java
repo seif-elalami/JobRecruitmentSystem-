@@ -72,7 +72,6 @@ public class ApplicantServiceTest {
         System.out.print("Phone (must start with 0 and be 11 digits, e.g., 01234567890): ");
         String phone = InputHelper.getString();
 
-        // Client-side validation hint
         if (! phone.isEmpty() && !phone.matches("^0\\d{10}$")) {
             System.out.println("⚠️  Warning: Phone format might be invalid!");
             System.out.println("   Phone must start with 0 and be exactly 11 digits.");

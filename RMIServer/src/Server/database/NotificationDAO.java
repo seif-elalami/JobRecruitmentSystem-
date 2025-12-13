@@ -49,7 +49,6 @@ public class NotificationDAO {
         try {
             Document query = new Document("recipientId", recipientId);
 
-            // Sort by date descending
             for (Document doc : notificationCollection.find(query).sort(new Document("date", -1))) {
                 Notification notification = new Notification();
                 notification.setId(doc.getObjectId("_id").toString());
@@ -57,7 +56,7 @@ public class NotificationDAO {
                 notification.setMessage(doc.getString("message"));
                 notification.setDate(doc.getDate("date"));
                 notification.setRead(doc.getBoolean("isRead", false));
-                
+
                 notifications.add(notification);
             }
         } catch (Exception e) {

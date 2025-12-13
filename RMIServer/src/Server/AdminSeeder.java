@@ -16,7 +16,7 @@ public class AdminSeeder {
 
     public static void main(String[] args) {
         try {
-            // Admin credentials
+
             String adminEmail = "admin@jobsystem.com";
             String adminPassword = "Admin@123456";
             String adminUsername = "Admin";
@@ -25,11 +25,9 @@ public class AdminSeeder {
             System.out.println("🔑 Admin Seeder - Creating admin account...");
             System.out.println("================================================");
 
-            // Connect to MongoDB
             MongoDatabase database = MongoDBConnection.getInstance().getDatabase();
             MongoCollection<Document> userCollection = database.getCollection("users");
 
-            // Check if admin already exists
             Document existingAdmin = userCollection.find(new Document("email", adminEmail)).first();
             if (existingAdmin != null) {
                 System.out.println("⚠️  Admin account already exists!");
@@ -38,10 +36,8 @@ public class AdminSeeder {
                 System.exit(0);
             }
 
-            // Hash the password
             String hashedPassword = PasswordUtil.hashPassword(adminPassword);
 
-            // Create admin document
             Document adminDoc = new Document()
                     .append("username", adminUsername)
                     .append("email", adminEmail)
@@ -53,24 +49,20 @@ public class AdminSeeder {
                     .append("lastLogin", null)
                     .append("isActive", true);
 
-            // Debug: Verify the hash before storing
             System.out.println("   Hash before DB insert: " + hashedPassword);
             System.out.println("   Hash length: " + hashedPassword.length());
 
-            // Insert into database
             userCollection.insertOne(adminDoc);
 
-            // Verify it was stored correctly
             Document storedAdmin = userCollection.find(new Document("email", adminEmail)).first();
             if (storedAdmin != null) {
                 String storedHash = storedAdmin.getString("password");
                 System.out.println("   Hash after DB retrieval: " + storedHash);
                 System.out.println("   Stored length: " + (storedHash != null ? storedHash.length() : "NULL"));
-                
-                // Verify password immediately
+
                 boolean verifyResult = PasswordUtil.verifyPassword(adminPassword, storedHash);
                 System.out.println("   Password verification: " + (verifyResult ? "✅ SUCCESS" : "❌ FAILED"));
-                
+
                 if (!verifyResult) {
                     System.err.println("\n⚠️  WARNING: Password verification failed even after storage!");
                     System.err.println("   This might indicate a database truncation issue.");

@@ -13,14 +13,12 @@ public class LinkedInService  extends UnicastRemoteObject implements ILinkedInSe
 
      public LinkedInService() throws RemoteException {}
 
-     
      public candidateDTO getCandidateFromLinkedIn(String linkedinId) throws RemoteException {
-       
+
           LinkedInApiData apiData = new LinkedInApiData(
                 linkedinId,
                 "Ahmed Ali", 5, "Experienced Software Engineer" ,   List.of("Java", "Spring Boot", "Docker"),"203","omar@example.com", "01012345678","Bachelor's in Computer Science" 
         );
-         
 
        Adapter adapter = new Adapter(apiData);
 
@@ -35,24 +33,6 @@ public class LinkedInService  extends UnicastRemoteObject implements ILinkedInSe
         List.of(adapter.getSkills().split(","))
        );
 
-
-
-
-
-
-
-
-
-
      }
-
-
-
-
-
-
-    
-
-
 
 }

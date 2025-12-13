@@ -89,15 +89,21 @@ public class WelcomePage extends JFrame {
 
         // Sign In Button with animation
         AnimatedButton signInButton = new AnimatedButton("🔐 Sign In", new Color(52, 152, 219), new Color(41, 128, 185));
-        signInButton.setBounds(250, 360, 280, 70);
+        signInButton.setBounds(200, 360, 250, 70);
         signInButton.addActionListener(e -> openSignInPage());
         mainPanel.add(signInButton);
 
         // Register Button with animation
         AnimatedButton registerButton = new AnimatedButton("✏️ Register", new Color(46, 204, 113), new Color(39, 174, 96));
-        registerButton.setBounds(670, 360, 280, 70);
+        registerButton.setBounds(475, 360, 250, 70);
         registerButton.addActionListener(e -> openRegisterPage());
         mainPanel.add(registerButton);
+
+        // Admin Login Button with animation
+        AnimatedButton adminButton = new AnimatedButton("🛡️ Admin Login", new Color(231, 76, 60), new Color(192, 57, 43));
+        adminButton.setBounds(750, 360, 250, 70);
+        adminButton.addActionListener(e -> openAdminLoginPage());
+        mainPanel.add(adminButton);
 
         // Feature Cards
         createFeatureCard(mainPanel, "👤", "For Applicants", "Discover exciting opportunities\nand manage your applications", 100, 520);
@@ -249,6 +255,18 @@ public class WelcomePage extends JFrame {
     private void openRegisterPage() {
         dispose();
         new RegisterPage(rmiClient);
+    }
+
+    /**
+     * Open Admin Login Page
+     */
+    private void openAdminLoginPage() {
+        dispose();
+        try {
+            new AdminLoginPage(rmiClient);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error opening admin login: " + ex.getMessage());
+        }
     }
 
     public static void main(String[] args) {

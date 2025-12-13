@@ -50,8 +50,8 @@ public class Main {
         MongoClient testClient = null;
         try {
             System.out.print("🔍 Checking MongoDB connection...   ");
-            // Use port 27020 to match MongoDBConnection configuration
-            testClient = new MongoClient("localhost", 27020);
+            // Use port 27017 to match MongoDBConnection configuration
+            testClient = new MongoClient("localhost", 27017);
             MongoDatabase database = testClient.getDatabase("JobRecruitmentDB");
 
             // Ping the database to verify connection

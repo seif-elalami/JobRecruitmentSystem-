@@ -1,38 +1,21 @@
 package client.ui;
 
 import client.RMIClient;
-import shared.interfaces.IApplicantService;
-import shared.interfaces.IApplicationService;
-import shared.interfaces.IJobService;
 import shared.models.Session;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ApplicantMenuGUI extends JFrame {
 
     private RMIClient rmiClient;
     private Session session;
-    private IJobService jobService;
-    private IApplicationService applicationService;
-    private IApplicantService applicantService;
 
     public ApplicantMenuGUI(RMIClient rmiClient, Session session) {
         this.rmiClient = rmiClient;
         this.session = session;
-
-        try {
-            this.jobService = rmiClient.getJobService();
-            this.applicationService = rmiClient.getApplicationService();
-            this.applicantService = rmiClient.getApplicantService();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Failed to initialize services: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
 
         // Frame setup
         setTitle("Applicant Dashboard - Job Recruitment System");
@@ -84,8 +67,10 @@ public class ApplicantMenuGUI extends JFrame {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setColor(new Color(44, 62, 80));
-                g2d.fillRect(0, 0, getWidth(), getHeight());
+                // Soft gradient app bar
+                GradientPaint gp = new GradientPaint(0, 0, new Color(29, 45, 68), getWidth(), 0, new Color(58, 123, 213));
+                g2d.setPaint(gp);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
             }
         };
         headerPanel.setLayout(null);
@@ -95,10 +80,22 @@ public class ApplicantMenuGUI extends JFrame {
 
         // Welcome text
         JLabel welcomeLabel = new JLabel("👋 Welcome, " + session.getUserEmail() + "!");
-        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 26));
+        welcomeLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
         welcomeLabel.setForeground(Color.WHITE);
-        welcomeLabel.setBounds(40, 20, 600, 50);
+        welcomeLabel.setBounds(40, 22, 600, 46);
         headerPanel.add(welcomeLabel);
+
+        // Logout button on header
+        JButton logoutBtn = new JButton("Logout");
+        logoutBtn.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        logoutBtn.setForeground(Color.WHITE);
+        logoutBtn.setBackground(new Color(220, 53, 69));
+        logoutBtn.setBorder(BorderFactory.createEmptyBorder(8, 14, 8, 14));
+        logoutBtn.setFocusPainted(false);
+        logoutBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        logoutBtn.setBounds(1060, 24, 100, 40);
+        logoutBtn.addActionListener(e -> logout());
+        headerPanel.add(logoutBtn);
 
         // Content panel
         JPanel contentPanel = new JPanel() {
@@ -118,7 +115,7 @@ public class ApplicantMenuGUI extends JFrame {
 
         // Title
         JLabel titleLabel = new JLabel("📋 My Dashboard");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 30));
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
         titleLabel.setForeground(new Color(44, 62, 80));
         titleLabel.setBounds(50, 25, 400, 40);
         contentPanel.add(titleLabel);
@@ -126,17 +123,18 @@ public class ApplicantMenuGUI extends JFrame {
         // Features grid (2x3 layout)
         String[][] features = {
             {"🔍", "Browse Jobs", "Explore job\nopportunities"},
-            {"📝", "Apply to Job", "Submit an\napplication"},
+            {"📄", "Upload Resume", "Manage your\nresume"},
             {"💼", "My Applications", "Track your\napplications"},
-            {"✏️", "Update Profile", "Edit your contact\nand skills"},
-            {"👤", "View Profile", "Review your\ninformation"},
-            {"🚪", "Logout", "Sign out from the\nsystem"}
+            {"🔔", "Notifications", "View your system\nnotifications"},
+            {"👤", "Update Profile", "Edit your profile\ninformation"},
+            {"📘", "View Resume", "See your\nlatest resume"},
+            {"👀", "View Profile", "View your profile\ndetails"}
         };
 
         int x = 50;
         int y = 85;
-        int width = 320;
-        int height = 180;
+        int width = 340;
+        int height = 190;
 
         for (int i = 0; i < 6; i++) {
             int row = i / 3;
@@ -158,11 +156,12 @@ public class ApplicantMenuGUI extends JFrame {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                // Card background
                 g2d.setColor(Color.WHITE);
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
-                g2d.setColor(new Color(189, 195, 199));
-                g2d.setStroke(new BasicStroke(1));
-                g2d.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 15, 15);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 18, 18);
+                // Subtle shadow
+                g2d.setColor(new Color(0, 0, 0, 25));
+                g2d.drawRoundRect(1, 1, getWidth() - 2, getHeight() - 2, 18, 18);
             }
         };
         cardPanel.setLayout(null);
@@ -174,7 +173,7 @@ public class ApplicantMenuGUI extends JFrame {
         cardPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent evt) {
-                cardPanel.setBackground(new Color(236, 240, 241));
+                cardPanel.setBackground(new Color(245, 250, 255));
             }
             @Override
             public void mouseExited(MouseEvent evt) {
@@ -188,22 +187,22 @@ public class ApplicantMenuGUI extends JFrame {
 
         // Icon
         JLabel iconLabel = new JLabel(icon);
-        iconLabel.setFont(new Font("Arial", Font.BOLD, 50));
-        iconLabel.setBounds(20, 15, 60, 60);
+        iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 48));
+        iconLabel.setBounds(24, 18, 60, 60);
         cardPanel.add(iconLabel);
 
         // Title
         JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 15));
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
         titleLabel.setForeground(new Color(44, 62, 80));
-        titleLabel.setBounds(20, 80, 280, 20);
+        titleLabel.setBounds(20, 82, 280, 22);
         cardPanel.add(titleLabel);
 
         // Description
         JLabel descLabel = new JLabel("<html>" + description + "</html>");
-        descLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        descLabel.setForeground(new Color(127, 140, 141));
-        descLabel.setBounds(20, 105, 280, 60);
+        descLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        descLabel.setForeground(new Color(91, 105, 120));
+        descLabel.setBounds(20, 108, 280, 60);
         cardPanel.add(descLabel);
 
         parent.add(cardPanel);
@@ -212,22 +211,69 @@ public class ApplicantMenuGUI extends JFrame {
     private void handleFeatureClick(int index) {
         switch(index) {
             case 0:
-                new BrowseJobsPage(this, jobService).setVisible(true);
+                // Browse Jobs
+                dispose();
+                try {
+                    new BrowseJobsPage(rmiClient, session);
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(this, "Error opening Browse Jobs: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    new ApplicantMenuGUI(rmiClient, session);
+                }
                 break;
             case 1:
-                new ApplyJobPage(this, jobService, applicationService, session).setVisible(true);
+                // Upload Resume page
+                dispose();
+                try {
+                    new UploadResumePage(rmiClient, session);
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(this, "Error opening Upload Resume: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    new ApplicantMenuGUI(rmiClient, session);
+                }
                 break;
             case 2:
-                new MyApplicationsPage(this, applicationService, jobService, session).setVisible(true);
+                // My Applications (with state pattern)
+                dispose();
+                try {
+                    new MyApplicationsPage(rmiClient, session);
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(this, "Error opening Applications: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    new ApplicantMenuGUI(rmiClient, session);
+                }
                 break;
             case 3:
-                new UpdateProfilePage(this, applicantService, session).setVisible(true);
+                // Notifications
+                dispose();
+                new ApplicantNotificationsGUI(rmiClient, session);
                 break;
             case 4:
-                new ViewProfilePage(this, applicantService, session).setVisible(true);
+                // Update Profile
+                dispose();
+                try {
+                    new UpdateProfilePage(rmiClient, session);
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(this, "Error opening Update Profile: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    new ApplicantMenuGUI(rmiClient, session);
+                }
                 break;
             case 5:
-                logout();
+                // View Resume
+                dispose();
+                try {
+                    new ViewResumePage(rmiClient, session);
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(this, "Error opening View Resume: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    new ApplicantMenuGUI(rmiClient, session);
+                }
+                break;
+            case 6:
+                // View Profile
+                dispose();
+                try {
+                    new ViewProfilePage(rmiClient, session);
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(this, "Error opening Profile: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    new ApplicantMenuGUI(rmiClient, session);
+                }
                 break;
         }
     }

@@ -89,7 +89,7 @@ public class RMIServer {
             System.out.println();
             System.out.println("Server Details:");
             System.out.println("  • RMI Port: " + RMI_PORT);
-            System.out.println("  • MongoDB:  localhost:27020");
+            System.out.println("  • MongoDB:  localhost:27017");
             System.out.println("  • Status: Ready to accept connections");
             System.out.println();
             System.out.println("Available Services:");

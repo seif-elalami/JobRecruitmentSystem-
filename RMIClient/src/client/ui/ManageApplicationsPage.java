@@ -2,6 +2,7 @@ package client.ui;
 
 import shared.interfaces.IApplicationService;
 import shared.models.Application;
+import shared.models.ApplicationState;
 import shared.models.Session;
 
 import javax.swing.*;
@@ -158,6 +159,22 @@ public class ManageApplicationsPage extends JDialog {
         reviewBtn.addActionListener(e -> updateSelectedStatus("UNDER_REVIEW"));
         footer.add(reviewBtn);
 
+        // View Details button with State Pattern
+        JButton detailsBtn = new JButton("📄 View Details");
+        detailsBtn.setBackground(new Color(108, 92, 231));
+        detailsBtn.setForeground(Color.WHITE);
+        detailsBtn.setBorderPainted(false);
+        detailsBtn.addActionListener(e -> {
+            int row = applicationsTable.getSelectedRow();
+            if (row >= 0) {
+                Application app = currentApplications.get(row);
+                showApplicationDetails(app);
+            } else {
+                JOptionPane.showMessageDialog(this, "Please select an application", "Info", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+        footer.add(detailsBtn);
+
         JButton closeBtn = new JButton("Close");
         closeBtn.setBackground(new Color(52, 152, 219));
         closeBtn.setForeground(Color.WHITE);
@@ -219,5 +236,41 @@ public class ManageApplicationsPage extends JDialog {
         } else {
             JOptionPane.showMessageDialog(this, "Please select an application", "Info", JOptionPane.INFORMATION_MESSAGE);
         }
+    }
+
+    private void showApplicationDetails(Application app) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("═══ APPLICATION DETAILS ═══\n\n");
+        sb.append("Application ID: ").append(app.getApplicationId()).append("\n");
+        sb.append("Applicant ID: ").append(app.getApplicantId()).append("\n");
+        sb.append("Job ID: ").append(app.getJobId()).append("\n");
+        sb.append("Status: ").append(app.getStatus()).append("\n");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        if (app.getApplicationDate() != null) {
+            sb.append("Application Date: ").append(sdf.format(app.getApplicationDate())).append("\n");
+        }
+        sb.append("\nCover Letter:\n").append(app.getCoverLetter() != null ? app.getCoverLetter() : "N/A").append("\n\n");
+
+        // State Pattern Information
+        ApplicationState state = app.getCurrentState();
+        if (state != null) {
+            sb.append("═══ APPLICATION STATE (State Pattern) ═══\n");
+            sb.append("Current State: ").append(state.getStateName()).append("\n");
+            sb.append("Is Final State: ").append(state.isFinalState() ? "Yes" : "No").append("\n");
+            sb.append("Is Accepted: ").append(state.isAccepted() ? "Yes" : "No").append("\n");
+            sb.append("Is Rejected: ").append(state.isRejected() ? "Yes" : "No").append("\n");
+        } else {
+            sb.append("\n⚠️ State Pattern: Not initialized\n");
+        }
+
+        JTextArea textArea = new JTextArea(sb.toString());
+        textArea.setEditable(false);
+        textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        textArea.setCaretPosition(0);
+
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(600, 400));
+
+        JOptionPane.showMessageDialog(this, scrollPane, "Application Details - State Pattern", JOptionPane.INFORMATION_MESSAGE);
     }
 }

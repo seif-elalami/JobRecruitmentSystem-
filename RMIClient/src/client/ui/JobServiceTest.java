@@ -20,8 +20,8 @@ public class JobServiceTest {
 
     public void run() {
         try {
-            service = client.getJobService();
-            reportService = client.getReportService();
+            service = (shared.interfaces.IJobService) java.rmi.Naming.lookup("rmi://localhost:1099/JobService");
+            reportService = (shared.interfaces.IReportService) java.rmi.Naming.lookup("rmi://localhost:1099/ReportService");
 
             boolean back = false;
             while (!back) {

@@ -5,7 +5,6 @@ import shared.interfaces.IJobService;
 import shared.interfaces.IApplicationService;
 import shared.interfaces.IAuthService;
 import shared.interfaces.IRecruiterService;
-import shared.interfaces.IReportService;
 
 import java.rmi.Naming;
 import java.rmi.RemoteException;
@@ -20,7 +19,6 @@ public class RMIClient {
     private IApplicationService applicationService;
     private IAuthService authService;
     private IRecruiterService recruiterService;
-    private IReportService reportService;
 
     public RMIClient() throws Exception {
         connectToServer();
@@ -47,10 +45,7 @@ public class RMIClient {
             authService = (IAuthService) Naming.lookup(serverURL + "AuthService");
             System.out.println("   ✅ AuthService connected");
 
-            reportService = (IReportService) Naming.lookup(serverURL + "ReportService");
-            System.out.println("   ✅ ReportService connected");
-
-            System.out. println("✅ All services connected successfully!");
+            System.out.println("✅ All services connected successfully!");
 
         } catch (Exception e) {
             System.err.println("❌ Failed to connect to RMI Server!");
@@ -79,16 +74,12 @@ public class RMIClient {
         return recruiterService;
     }
 
-    public IReportService getReportService() {
-        return reportService;
-    }
-
     public boolean testConnection() {
         try {
             authService.getUserByEmail("test@test.com");
             return true;
         } catch (RemoteException e) {
-            System.err.println("❌ Connection test failed: " + e. getMessage());
+            System.err.println("❌ Connection test failed: " + e.getMessage());
             return false;
         }
     }

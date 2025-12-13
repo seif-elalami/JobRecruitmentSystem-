@@ -19,8 +19,8 @@ public class ReportTester {
             RMIClient client = new RMIClient();
             System.out.println("✅ Connected!\n");
 
-            IJobService jobService = client.getJobService();
-            IReportService reportService = client.getReportService();
+            IJobService jobService = (IJobService) java.rmi.Naming.lookup("rmi://localhost:1099/JobService");
+            IReportService reportService = (IReportService) java.rmi.Naming.lookup("rmi://localhost:1099/ReportService");
 
             // Get all jobs
             List<Job> jobs = jobService.getAllJobs();

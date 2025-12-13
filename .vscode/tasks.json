@@ -1,0 +1,10 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Compile RMIClient",
+			"type": "shell",
+			"command": "\"$Env:JAVA_HOME\\bin\\javac.exe\" -d \".\\RMIClient\\bin\" -cp \".\\Shared\\bin;.\u0000\\RMIClient\\lib\\mongo-java-driver-3.12.14.jar\" (Get-ChildItem -Path \".\\RMIClient\\src\" -Recurse -Filter *.java).FullName"
+		}
+	]
+}

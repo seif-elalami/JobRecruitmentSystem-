@@ -29,13 +29,18 @@ public class InterviewServiceImpl {
 
     public String createInterview(Interview interview) throws RemoteException {
         try {
+            // Register Observers
+            registerObservers(interview);
+            
+            interview.setStatus("SCHEDULED"); // Triggers notification
+            
             Document doc = new Document();
             doc.append("jobId", interview.getJobId());
             doc.append("applicantId", interview.getApplicantId());
             doc.append("recruiterId", interview.getRecruiterId());
             doc.append("scheduledDate", interview.getScheduledDate());
             doc.append("location", interview.getLocation());
-            doc.append("status", "SCHEDULED");
+            doc.append("status", interview.getStatus());
             doc.append("notes", interview.getNotes());
             doc.append("createdAt", new Date());
 
@@ -62,7 +67,9 @@ public class InterviewServiceImpl {
                 return null;
             }
 
-            return documentToInterview(doc);
+            Interview interview = documentToInterview(doc);
+            registerObservers(interview); // Create new observers for the fetched object
+            return interview;
 
         } catch (Exception e) {
             System.err.println("❌ Error getting interview: " + e.getMessage());
@@ -77,7 +84,9 @@ public class InterviewServiceImpl {
             Document query = new Document("recruiterId", recruiterId);
 
             for (Document doc : interviewCollection. find(query)) {
-                interviews.add(documentToInterview(doc));
+                Interview interview = documentToInterview(doc);
+                registerObservers(interview);
+                interviews.add(interview);
             }
 
             return interviews;
@@ -90,6 +99,10 @@ public class InterviewServiceImpl {
 
     public boolean updateInterview(Interview interview) throws RemoteException {
         try {
+            registerObservers(interview);
+            // Trigger notification by re-setting the status (simulating the change processing)
+            interview.setStatus(interview.getStatus());
+            
             Document query = new Document("_id", new ObjectId(interview.getInterviewId()));
 
             Document update = new Document();
@@ -115,6 +128,13 @@ public class InterviewServiceImpl {
 
     public boolean cancelInterview(String interviewId) throws RemoteException {
         try {
+            // Fetch first to get the object and notify
+            Interview interview = getInterviewById(interviewId);
+            if (interview != null) {
+                registerObservers(interview);
+                interview.setStatus("CANCELLED"); // Triggers notification
+            }
+            
             Document query = new Document("_id", new ObjectId(interviewId));
             Document update = new Document("$set", new Document("status", "CANCELLED").append("cancelledAt", new Date()));
 
@@ -128,6 +148,12 @@ public class InterviewServiceImpl {
             System. err.println("❌ Error cancelling interview: " + e. getMessage());
             return false;
         }
+    }
+
+    private void registerObservers(Interview interview) {
+        interview.registerObserver(new Server.observer.EmailNotificationObserver());
+        // Pass recruiter ID so notification can be saved for them
+        interview.registerObserver(new Server.observer.SystemNotificationObserver(interview.getRecruiterId()));
     }
 
     private Interview documentToInterview(Document doc) {

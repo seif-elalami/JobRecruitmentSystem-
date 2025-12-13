@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/JobRecruitmentSystem-.iml" filepath="$PROJECT_DIR$/.idea/JobRecruitmentSystem-.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RMIClient/RMIClient.iml" filepath="$PROJECT_DIR$/RMIClient/RMIClient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RMIServer/RMIServer.iml" filepath="$PROJECT_DIR$/RMIServer/RMIServer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Shared/Shared.iml" filepath="$PROJECT_DIR$/Shared/Shared.iml" />
+    </modules>
+  </component>
+</project>

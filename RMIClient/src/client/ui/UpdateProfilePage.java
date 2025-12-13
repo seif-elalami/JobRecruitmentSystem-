@@ -1,5 +1,6 @@
 package client.ui;
 
+import client.RMIClient;
 import shared.interfaces.IApplicantService;
 import shared.models.Applicant;
 import shared.models.Session;
@@ -9,7 +10,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UpdateProfilePage extends JDialog {
+public class UpdateProfilePage extends JFrame {
+    private final RMIClient rmiClient;
     private final IApplicantService applicantService;
     private final Session session;
 
@@ -19,17 +21,21 @@ public class UpdateProfilePage extends JDialog {
     private final JTextField expField = new JTextField();
     private final JTextArea resumeArea = new JTextArea();
 
-    public UpdateProfilePage(Frame owner, IApplicantService applicantService, Session session) {
-        super(owner, "Update Profile", true);
-        this.applicantService = applicantService;
+    public UpdateProfilePage(RMIClient rmiClient, Session session) throws Exception {
+        this.rmiClient = rmiClient;
         this.session = session;
+        this.applicantService = rmiClient.getApplicantService();
+        
+        setTitle("Update Profile - Job Recruitment System");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         initUI();
         load();
+        setVisible(true);
     }
 
     private void initUI() {
-        setSize(720, 600);
-        setLocationRelativeTo(getOwner());
+        setSize(720, 660);
+        setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
         JPanel shell = new JPanel(new BorderLayout(16, 16));
@@ -83,8 +89,19 @@ public class UpdateProfilePage extends JDialog {
         save.addActionListener(e -> save());
         addHoverEffect(save);
 
-        JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton backBtn = secondaryButton("Back to Dashboard");
+        backBtn.addActionListener(e -> {
+            dispose();
+            try {
+                new ApplicantMenuGUI(rmiClient, session);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+            }
+        });
+
+        JPanel footer = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 12));
         footer.setBackground(shell.getBackground());
+        footer.add(backBtn);
         footer.add(save);
 
         shell.add(header, BorderLayout.NORTH);
@@ -98,9 +115,9 @@ public class UpdateProfilePage extends JDialog {
         try {
             Applicant profile = applicantService.getApplicantById(session.getUserId());
             if (profile == null) {
-                JOptionPane.showMessageDialog(this, "Profile not found", "Update Profile", JOptionPane.WARNING_MESSAGE);
-                dispose();
-                return;
+                profile = new Applicant();
+                profile.setId(session.getUserId());
+                profile.setEmail(session.getUserEmail());
             }
             phoneField.setText(profile.getPhone() != null ? profile.getPhone() : "");
             skillsField.setText(profile.getSkills() != null ? profile.getSkills() : "");
@@ -117,9 +134,12 @@ public class UpdateProfilePage extends JDialog {
         try {
             Applicant profile = applicantService.getApplicantById(session.getUserId());
             if (profile == null) {
-                JOptionPane.showMessageDialog(this, "Profile not found", "Update Profile", JOptionPane.WARNING_MESSAGE);
-                return;
+                profile = new Applicant();
+                profile.setId(session.getUserId());
+                profile.setEmail(session.getUserEmail());
             }
+            if (profile.getId() == null || profile.getId().isEmpty()) profile.setId(session.getUserId());
+            if (profile.getEmail() == null || profile.getEmail().isEmpty()) profile.setEmail(session.getUserEmail());
             if (!phoneField.getText().trim().isEmpty()) profile.setPhone(phoneField.getText().trim());
             String skills = skillsField.getText();
             if (skills != null) {
@@ -138,7 +158,13 @@ public class UpdateProfilePage extends JDialog {
             boolean ok = applicantService.updateApplicant(profile);
             if (ok) {
                 JOptionPane.showMessageDialog(this, "Profile updated", "Update Profile", JOptionPane.INFORMATION_MESSAGE);
+                // Navigate back to Applicant dashboard instead of closing app
                 dispose();
+                try {
+                    new ApplicantMenuGUI(rmiClient, session);
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, "Error returning: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
             } else {
                 JOptionPane.showMessageDialog(this, "Update failed", "Update Profile", JOptionPane.WARNING_MESSAGE);
             }
@@ -168,6 +194,18 @@ public class UpdateProfilePage extends JDialog {
         btn.setForeground(Color.WHITE);
         btn.setFocusPainted(false);
         btn.setBorder(BorderFactory.createEmptyBorder(10, 18, 10, 18));
+        return btn;
+    }
+
+    private JButton secondaryButton(String text) {
+        JButton btn = new JButton(text);
+        btn.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        btn.setForeground(new Color(28, 48, 74));
+        btn.setBackground(Color.WHITE);
+        btn.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(28, 48, 74), 1),
+            BorderFactory.createEmptyBorder(8, 14, 8, 14)));
+        btn.setFocusPainted(false);
         return btn;
     }
 

@@ -22,8 +22,8 @@ public class ReportPage extends JFrame {
 
     public ReportPage(RMIClient rmiClient) throws Exception {
         this.rmiClient = rmiClient;
-        this.reportService = rmiClient.getReportService();
-        this.jobService = rmiClient.getJobService();
+        this.reportService = (shared.interfaces.IReportService) java.rmi.Naming.lookup("rmi://localhost:1099/ReportService");
+        this.jobService = (shared.interfaces.IJobService) java.rmi.Naming.lookup("rmi://localhost:1099/JobService");
 
         setTitle("Generate Reports - Job Recruitment System");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

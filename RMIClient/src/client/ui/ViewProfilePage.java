@@ -1,5 +1,6 @@
 package client.ui;
 
+import client.RMIClient;
 import shared.interfaces.IApplicantService;
 import shared.models.Applicant;
 import shared.models.Session;
@@ -7,23 +8,28 @@ import shared.models.Session;
 import javax.swing.*;
 import java.awt.*;
 
-public class ViewProfilePage extends JDialog {
+public class ViewProfilePage extends JFrame {
+    private final RMIClient rmiClient;
     private final IApplicantService applicantService;
     private final Session session;
 
-    public ViewProfilePage(Frame owner, IApplicantService applicantService, Session session) {
-        super(owner, "My Profile", true);
-        this.applicantService = applicantService;
+    public ViewProfilePage(RMIClient rmiClient, Session session) throws Exception {
+        this.rmiClient = rmiClient;
         this.session = session;
+        this.applicantService = rmiClient.getApplicantService();
+        
+        setTitle("My Profile - Job Recruitment System");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         initUI();
         load();
+        setVisible(true);
     }
 
     private final JTextArea details = new JTextArea();
 
     private void initUI() {
-        setSize(520, 420);
-        setLocationRelativeTo(getOwner());
+        setSize(520, 480);
+        setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
         JPanel shell = new JPanel(new BorderLayout(12, 12));
@@ -51,9 +57,36 @@ public class ViewProfilePage extends JDialog {
             BorderFactory.createEmptyBorder(6, 6, 6, 6)));
         body.add(new JScrollPane(details), BorderLayout.CENTER);
 
+        // Footer with Back button
+        JPanel footer = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 12));
+        footer.setBackground(new Color(244, 247, 252));
+        JButton backBtn = secondaryButton("Back to Dashboard");
+        backBtn.addActionListener(e -> {
+            dispose();
+            try {
+                new ApplicantMenuGUI(rmiClient, session);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+            }
+        });
+        footer.add(backBtn);
+
         shell.add(header, BorderLayout.NORTH);
         shell.add(body, BorderLayout.CENTER);
+        shell.add(footer, BorderLayout.SOUTH);
         add(shell, BorderLayout.CENTER);
+    }
+
+    private JButton secondaryButton(String text) {
+        JButton btn = new JButton(text);
+        btn.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        btn.setForeground(new Color(28, 48, 74));
+        btn.setBackground(Color.WHITE);
+        btn.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(28, 48, 74), 1),
+            BorderFactory.createEmptyBorder(6, 12, 6, 12)));
+        btn.setFocusPainted(false);
+        return btn;
     }
 
     private void load() {

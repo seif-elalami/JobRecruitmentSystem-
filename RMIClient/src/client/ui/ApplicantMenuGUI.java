@@ -111,7 +111,7 @@ public class ApplicantMenuGUI extends JFrame {
             {"🔍", "Browse Jobs", "Explore job\nopportunities"},
             {"📄", "Upload Resume", "Manage your\nresume"},
             {"💼", "My Applications", "Track your\napplications"},
-            {"⭐", "Saved Jobs", "View your saved\npositions"},
+            {"🔔", "Notifications", "View your system\nnotifications"},
             {"👤", "My Profile", "Edit your profile\ninformation"},
             {"🚪", "Logout", "Sign out from the\nsystem"}
         };
@@ -204,7 +204,8 @@ public class ApplicantMenuGUI extends JFrame {
                 JOptionPane.showMessageDialog(this, "💼 My Applications feature coming soon!", "Feature", JOptionPane.INFORMATION_MESSAGE);
                 break;
             case 3:
-                JOptionPane.showMessageDialog(this, "⭐ Saved Jobs feature coming soon!", "Feature", JOptionPane.INFORMATION_MESSAGE);
+                dispose();
+                new ApplicantNotificationsGUI(rmiClient, session);
                 break;
             case 4:
                 JOptionPane.showMessageDialog(this, "👤 Profile feature coming soon!", "Feature", JOptionPane.INFORMATION_MESSAGE);

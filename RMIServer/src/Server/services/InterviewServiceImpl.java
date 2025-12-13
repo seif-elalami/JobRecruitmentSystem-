@@ -152,7 +152,8 @@ public class InterviewServiceImpl {
 
     private void registerObservers(Interview interview) {
         interview.registerObserver(new Server.observer.EmailNotificationObserver());
-        interview.registerObserver(new Server.observer.SystemNotificationObserver());
+        // Pass recruiter ID so notification can be saved for them
+        interview.registerObserver(new Server.observer.SystemNotificationObserver(interview.getRecruiterId()));
     }
 
     private Interview documentToInterview(Document doc) {

@@ -334,7 +334,16 @@ public class RegisterPage extends JFrame {
             if (session != null) {
                 JOptionPane.showMessageDialog(this, "✅ Registration successful! Welcome " + name + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 dispose();
-                new ApplicantMenuGUI(rmiClient, session);
+                
+                // Route based on role
+                String userRole = session.getRole().toLowerCase();
+                if (userRole.contains("applicant")) {
+                    new ApplicantMenuGUI(rmiClient, session);
+                } else if (userRole.contains("recruiter")) {
+                    new RecruiterMenuGUI(rmiClient, session);
+                } else if (userRole.contains("admin")) {
+                    new AdminMenuGUI(rmiClient, session);
+                }
             } else {
                 JOptionPane.showMessageDialog(this, "❌ Registration failed. Email may already exist.", "Error", JOptionPane.ERROR_MESSAGE);
             }

@@ -255,5 +255,22 @@ public List<Applicant> searchApplicantsByExperience(String experience) throws Re
         applicant.setExperience(doc. getInteger("experience", 0));
 
         return applicant;
+    
+    }
+
+    // ========================================
+    // NOTIFICATIONS
+    // ========================================
+
+    @Override
+    public List<shared.models.Notification> getNotifications(String applicantId) throws RemoteException {
+        try {
+            return Server.database.NotificationDAO.getInstance().getNotificationsByRecipientId(applicantId);
+        } catch (Exception e) {
+            System.err.println("❌ Error getting notifications: " + e.getMessage());
+            e.printStackTrace();
+            throw new RemoteException("Failed to get notifications", e);
+        }
     }
 }
+

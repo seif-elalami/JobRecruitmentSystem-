@@ -115,7 +115,8 @@ public class RecruiterMenuGUI extends JFrame {
             {"🔍", "Search Candidates", "Find candidates by\nskills"},
             {"📅", "Schedule Interview", "Schedule interviews\nwith applicants"},
             {"📊", "Job Postings", "Manage your active\njob postings"},
-            {"⚙️", "Settings", "Account settings and\npreferences"}
+            {"⚙️", "Settings", "Account settings and\npreferences"},
+            {"🔔", "Notifications", "View your system\nnotifications"}
         };
 
         int x = 50;
@@ -123,7 +124,7 @@ public class RecruiterMenuGUI extends JFrame {
         int width = 320;
         int height = 180;
 
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < features.length; i++) {
             int row = i / 3;
             int col = i % 3;
             int posX = x + col * (width + 20);
@@ -213,6 +214,10 @@ public class RecruiterMenuGUI extends JFrame {
                 break;
             case 5:
                 JOptionPane.showMessageDialog(this, "⚙️ Settings feature coming soon!", "Feature", JOptionPane.INFORMATION_MESSAGE);
+                break;
+            case 6:
+                dispose();
+                new RecruiterNotificationsGUI(rmiClient, session);
                 break;
         }
     }

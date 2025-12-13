@@ -227,27 +227,45 @@ public List<Application> getApplicationsByJobId(String jobId) throws RemoteExcep
     @Override
     public boolean updateApplicationStatus(String applicationId, String status) throws RemoteException {
         try {
-            System.out.println("Updating application status.. .");
+            System.out.println("Updating application status...");
             System.out.println("   Application ID: " + applicationId);
             System.out.println("   New Status: " + status);
 
             // Validate status
-            if (! status.equals("PENDING") && !status.equals("ACCEPTED") &&
+            if (!status.equals("PENDING") && !status.equals("ACCEPTED") &&
                 !status.equals("REJECTED") && !status.equals("UNDER_REVIEW")) {
-                System.err.println("❌ Invalid status:  " + status);
+                System.err.println("❌ Invalid status: " + status);
                 return false;
             }
 
+            // Get current application to find applicantId
             Document query = new Document("_id", new ObjectId(applicationId));
-            Document update = new Document("$set", new Document("status", status));
+            Document currentDoc = applicationCollection.find(query).first();
+            
+            if (currentDoc == null) {
+                System.out.println("❌ Application not found: " + applicationId);
+                return false;
+            }
 
+            String applicantId = currentDoc.getString("applicantId");
+
+            Document update = new Document("$set", new Document("status", status));
             long modifiedCount = applicationCollection.updateOne(query, update).getModifiedCount();
 
             if (modifiedCount > 0) {
-                System.out. println("✅ Application status updated to: " + status);
+                System.out.println("✅ Application status updated to: " + status);
+                
+                // Trigger Notification
+                try {
+                    Server.observer.SystemNotificationObserver observer = new Server.observer.SystemNotificationObserver(applicantId);
+                    observer.update("Your application for job ID " + currentDoc.getString("jobId") + " has been updated to: " + status);
+                } catch (Exception e) {
+                    System.err.println("⚠️ Failed to send notification: " + e.getMessage());
+                }
+                
                 return true;
             } else {
-                System.out.println("❌ Application not found or not updated");
+                System.out.println("❌ Application not updated");
                 return false;
             }
 

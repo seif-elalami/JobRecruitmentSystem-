@@ -585,6 +585,21 @@ public boolean updateRecruiter(Recruiter recruiter) throws RemoteException {
         return applicant;
     }
     // ========================================
+    // NOTIFICATIONS
+    // ========================================
+
+    @Override
+    public List<shared.models.Notification> getNotifications(String recruiterId) throws RemoteException {
+        try {
+            return Server.database.NotificationDAO.getInstance().getNotificationsByRecipientId(recruiterId);
+        } catch (Exception e) {
+            System.err.println("❌ Error getting notifications: " + e.getMessage());
+            e.printStackTrace();
+            throw new RemoteException("Failed to get notifications", e);
+        }
+    }
+
+    // ========================================
     // Helper Methods
     // ========================================
 
@@ -617,4 +632,6 @@ public boolean updateRecruiter(Recruiter recruiter) throws RemoteException {
 
         return recruiter;
     }
+
+
 }

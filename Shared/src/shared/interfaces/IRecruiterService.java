@@ -9,6 +9,7 @@ import shared.models.Interview;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
+import shared.models.Notification;
 
 public interface IRecruiterService extends Remote {
 
@@ -96,4 +97,10 @@ public interface IRecruiterService extends Remote {
      * @return List of matching candidates (read-only)
      */
     List<ICandidateView> searchCandidatesByMinExperience(int minYears) throws RemoteException;
+
+    // ========================================
+    // NOTIFICATIONS
+    // ========================================
+
+    List<Notification> getNotifications(String recruiterId) throws RemoteException;
 }

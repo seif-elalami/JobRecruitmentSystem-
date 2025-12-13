@@ -7,22 +7,26 @@ import shared.models.Applicant;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.UpdateOptions;
 import org.bson.Document;
-import org.bson. types.ObjectId;
+import org.bson.types.ObjectId;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ApplicantServiceImpl extends UnicastRemoteObject implements IApplicantService {
 
     private MongoCollection<Document> applicantCollection;
+    private MongoCollection<Document> userCollection;
 
     public ApplicantServiceImpl() throws RemoteException {
         super();
         MongoDatabase database = MongoDBConnection.getInstance().getDatabase();
         applicantCollection = database.getCollection("applicants");
+        userCollection = database.getCollection("users");
         System.out.println("✅ ApplicantService initialized");
     }
 
@@ -47,24 +51,14 @@ public class ApplicantServiceImpl extends UnicastRemoteObject implements IApplic
                 throw new RemoteException(ValidationUtil.getEmailErrorMessage());
             }
 
-            // Create document
-            Document doc = new Document();
-            doc.append("name", applicant.getName());
-            doc.append("email", applicant. getEmail());
-            doc.append("phone", applicant.getPhone());
-            doc.append("resume", applicant.getResume());
-            doc.append("skills", applicant.getSkills());
-            doc.append("education", applicant.getEducation());
-            doc.append("experience", applicant.getExperience());
+            ObjectId objectId = applicant.getId() != null ? new ObjectId(applicant.getId()) : new ObjectId();
+            applicant.setId(objectId.toString());
 
-            applicantCollection.insertOne(doc);
+            upsertApplicantDocument(objectId, applicant);
 
-            String id = doc.getObjectId("_id").toString();
-            applicant.setId(id);
+            System.out.println("✅ Applicant created:  " + applicant.getName() + " (ID: " + objectId + ")");
 
-            System.out.println("✅ Applicant created:  " + applicant.getName() + " (ID: " + id + ")");
-
-            return id;
+            return objectId.toString();
 
         } catch (RemoteException e) {
             throw e;  // Re-throw validation errors
@@ -78,14 +72,26 @@ public class ApplicantServiceImpl extends UnicastRemoteObject implements IApplic
     @Override
     public Applicant getApplicantById(String id) throws RemoteException {
         try {
-            Document doc = applicantCollection.find(new Document("_id", new ObjectId(id))).first();
+            ObjectId objectId = new ObjectId(id);
+            Document doc = applicantCollection.find(new Document("_id", objectId)).first();
 
-            if (doc == null) {
-                return null;
+            if (doc != null) {
+                return documentToApplicant(doc);
             }
 
-            return documentToApplicant(doc);
+            Document userDoc = userCollection.find(new Document("_id", objectId)).first();
+            if (userDoc != null) {
+                Applicant applicant = documentToApplicantFromUser(userDoc);
+                applicant.setId(id);
+                upsertApplicantDocument(objectId, applicant);
+                return applicant;
+            }
 
+            return null;
+
+        } catch (IllegalArgumentException e) {
+            System.err.println("❌ Invalid applicant ID format: " + id);
+            return null;
         } catch (Exception e) {
             System.err.println("❌ Error getting applicant: " + e.getMessage());
             throw new RemoteException("Failed to get applicant", e);
@@ -97,11 +103,20 @@ public class ApplicantServiceImpl extends UnicastRemoteObject implements IApplic
         try {
             Document doc = applicantCollection.find(new Document("email", email)).first();
 
-            if (doc == null) {
-                return null;
+            if (doc != null) {
+                return documentToApplicant(doc);
             }
 
-            return documentToApplicant(doc);
+            Document userDoc = userCollection.find(new Document("email", email)).first();
+            if (userDoc != null) {
+                Applicant applicant = documentToApplicantFromUser(userDoc);
+                ObjectId objectId = userDoc.getObjectId("_id");
+                applicant.setId(objectId.toString());
+                upsertApplicantDocument(objectId, applicant);
+                return applicant;
+            }
+
+            return null;
 
         } catch (Exception e) {
             System.err.println("❌ Error getting applicant: " + e.getMessage());
@@ -170,20 +185,21 @@ public class ApplicantServiceImpl extends UnicastRemoteObject implements IApplic
                 throw new RemoteException(ValidationUtil.getEmailErrorMessage());
             }
 
-            Document query = new Document("_id", new ObjectId(applicant.getId()));
+            ObjectId objectId = applicant.getId() != null ? new ObjectId(applicant.getId()) : null;
 
-            Document update = new Document();
-            update.append("name", applicant.getName());
-            update.append("email", applicant.getEmail());
-            update.append("phone", applicant.getPhone());
-            update.append("resume", applicant.getResume());
-            update.append("skills", applicant.getSkills());
-            update.append("education", applicant.getEducation());
-            update.append("experience", applicant.getExperience());
+            if (objectId == null && applicant.getEmail() != null) {
+                Document existing = applicantCollection.find(new Document("email", applicant.getEmail())).first();
+                if (existing != null && existing.getObjectId("_id") != null) {
+                    objectId = existing.getObjectId("_id");
+                    applicant.setId(objectId.toString());
+                }
+            }
 
-            Document updateDoc = new Document("$set", update);
+            if (objectId == null) {
+                throw new RemoteException("Applicant ID is required for update");
+            }
 
-            applicantCollection.updateOne(query, updateDoc);
+            upsertApplicantDocument(objectId, applicant);
 
             System.out.println("✅ Applicant updated: " + applicant.getName());
 
@@ -240,20 +256,83 @@ public List<Applicant> searchApplicantsByExperience(String experience) throws Re
         applicant.setId(doc.getObjectId("_id").toString());
         applicant.setName(doc.getString("name"));
         applicant.setEmail(doc.getString("email"));
-        applicant.setPhone(doc. getString("phone"));
+        applicant.setPhone(doc.getString("phone"));
         applicant.setResume(doc.getString("resume"));
 
-        @SuppressWarnings("unchecked")
-        List<String> skills = (List<String>) doc.get("skills");
-        if (skills != null) {
-            for (String skill : skills) {
-                applicant.addSkill(skill);
+        applicant.setSkills(normalizeSkillsToString(doc.get("skills")));
+        applicant.setEducation(doc.getString("education"));
+        applicant.setExperience(parseExperience(doc.get("experience")));
+
+        return applicant;
+    }
+
+    private Applicant documentToApplicantFromUser(Document doc) {
+        Applicant applicant = new Applicant();
+        applicant.setId(doc.getObjectId("_id").toString());
+        applicant.setName(doc.getString("username"));
+        applicant.setEmail(doc.getString("email"));
+        applicant.setPhone(doc.getString("phone"));
+        applicant.setSkills(normalizeSkillsToString(doc.get("skills")));
+        applicant.setExperience(parseExperience(doc.get("experience")));
+        return applicant;
+    }
+
+    private void upsertApplicantDocument(ObjectId objectId, Applicant applicant) {
+        Document payload = new Document("_id", objectId);
+        payload.append("name", applicant.getName());
+        payload.append("email", applicant.getEmail());
+        payload.append("phone", applicant.getPhone());
+        payload.append("resume", applicant.getResume());
+        payload.append("skills", normalizeSkillsToString(applicant.getSkills()));
+        payload.append("education", applicant.getEducation());
+        int years = applicant.getYearsExperience();
+        if (years == 0 && applicant.getExperience() != null) {
+            years = parseExperience(applicant.getExperience());
+        }
+        payload.append("experience", Integer.toString(years));
+
+        applicantCollection.replaceOne(new Document("_id", objectId), payload, new UpdateOptions().upsert(true));
+    }
+
+    private String normalizeSkillsToString(Object rawSkills) {
+        if (rawSkills == null) {
+            return "";
+        }
+
+        if (rawSkills instanceof List<?>) {
+            List<?> list = (List<?>) rawSkills;
+            List<String> normalized = new ArrayList<>();
+            for (Object item : list) {
+                if (item != null) {
+                    normalized.add(item.toString());
+                }
+            }
+            return String.join(",", normalized);
+        }
+
+        return Objects.toString(rawSkills, "");
+    }
+
+    private int parseExperience(Object rawExperience) {
+        if (rawExperience instanceof Number) {
+            return ((Number) rawExperience).intValue();
+        }
+
+        if (rawExperience instanceof String) {
+            try {
+                return Integer.parseInt(((String) rawExperience).trim());
+            } catch (NumberFormatException ignored) {
+                String digits = ((String) rawExperience).replaceAll("[^0-9]", "");
+                if (!digits.isEmpty()) {
+                    try {
+                        return Integer.parseInt(digits);
+                    } catch (NumberFormatException ignoredAgain) {
+                        return 0;
+                    }
+                }
             }
         }
 
-        applicant.setEducation(doc. getString("education"));
-        applicant.setExperience(doc. getInteger("experience", 0));
-
-        return applicant;
+        return 0;
     }
 }

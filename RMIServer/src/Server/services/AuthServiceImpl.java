@@ -171,6 +171,74 @@ public Session login(String email, String password) throws RemoteException {
     }
 }
 
+@Override
+public Session loginWithPasskey(String email, String passkey) throws RemoteException {
+    try {
+        System.out.println("🔑 Passkey login attempt for: " + email);
+
+        // Find user by email
+        Document query = new Document("email", email);
+        Document userDoc = userCollection.find(query).first();
+
+        if (userDoc == null) {
+            System.out.println("❌ User not found: " + email);
+            throw new RemoteException("Invalid email or passkey");
+        }
+
+        // Get stored passkey (plain text comparison)
+        String storedPasskey = userDoc.getString("passkey");
+
+        if (storedPasskey == null || storedPasskey.isEmpty()) {
+            System.out.println("❌ No passkey configured for user: " + email);
+            throw new RemoteException("Invalid email or passkey");
+        }
+
+        System.out.println("   Stored passkey: " + storedPasskey);
+        System.out.println("   Provided passkey: " + passkey);
+
+        // Direct comparison (passkey is stored plain-text)
+        boolean passkeyMatches = storedPasskey.equals(passkey);
+
+        System.out.println("   Passkey matches? " + passkeyMatches);
+
+        if (!passkeyMatches) {
+            System.out.println("❌ Invalid passkey for: " + email);
+            throw new RemoteException("Invalid email or passkey");
+        }
+
+        // Check if account is active
+        Boolean isActive = userDoc.getBoolean("isActive");
+        if (isActive != null && !isActive) {
+            System.out.println("❌ Account is inactive: " + email);
+            throw new RemoteException("Account is inactive. Please contact support.");
+        }
+
+        // Get user details
+        String userId = userDoc.getObjectId("_id").toString();
+        String role = userDoc.getString("role");
+
+        System.out.println("✅ Passkey login successful!");
+        System.out.println("   User ID: " + userId);
+        System.out.println("   Role: " + role);
+
+        // Update last login time
+        Document updateDoc = new Document("$set", new Document("lastLogin", new Date()));
+        userCollection.updateOne(query, updateDoc);
+
+        // Create and return session
+        Session session = new Session(userId, email, role);
+
+        return session;
+
+    } catch (RemoteException e) {
+        throw e;
+    } catch (Exception e) {
+        System.err.println("❌ Passkey login error: " + e.getMessage());
+        e.printStackTrace();
+        throw new RemoteException("Passkey login failed", e);
+    }
+}
+
 
 
     @Override
@@ -264,6 +332,28 @@ public Session login(String email, String password) throws RemoteException {
     }
 
     @Override
+    public java.util.List<User> getAllUsers() throws RemoteException {
+        try {
+            System.out.println("🔍 Retrieving all users from database...");
+
+            java.util.List<User> users = new java.util.ArrayList<>();
+
+            for (Document userDoc : userCollection.find()) {
+                User user = documentToUser(userDoc);
+                users.add(user);
+            }
+
+            System.out.println("✅ Retrieved " + users.size() + " users");
+            return users;
+
+        } catch (Exception e) {
+            System.err.println("❌ Error getting all users: " + e.getMessage());
+            e.printStackTrace();
+            throw new RemoteException("Failed to get all users", e);
+        }
+    }
+
+    @Override
     public boolean changePassword(String email, String oldPassword, String newPassword) throws RemoteException {
         try {
             // Validate new password
@@ -319,27 +409,6 @@ public Session login(String email, String password) throws RemoteException {
         }
     }
 
-
-    public List<User> getAllUsers() throws RemoteException {
-    try {
-        System.out.println("   🔍 Getting all users");
-
-        List<User> users = new ArrayList<>();
-
-        for (Document doc : userCollection.find()) {  // ✅ Use existing userCollection
-            User user = documentToUser(doc);
-            users.add(user);
-        }
-
-        System.out.println("   ✅ Found " + users.size() + " user(s)");
-        return users;
-
-    } catch (Exception e) {
-        System.err.println("   ❌ Error:  " + e.getMessage());
-        e.printStackTrace();
-        throw new RemoteException("Failed to get users", e);
-    }
-}
     /**
      * Helper method to update last login time
      */

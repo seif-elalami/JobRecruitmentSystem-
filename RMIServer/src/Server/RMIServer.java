@@ -21,6 +21,8 @@ public class RMIServer {
 
     public static void main(String[] args) {
         try {
+            // Force RMI to advertise localhost to clients to avoid APIPA (169.254.*) addresses
+            System.setProperty("java.rmi.server.hostname", "127.0.0.1");
             System.out.println("╔════════════════════════════════════════╗");
             System.out.println("║     Job Recruitment System - SERVER   ║");
             System.out.println("╚════════════════════════════════════════╝");

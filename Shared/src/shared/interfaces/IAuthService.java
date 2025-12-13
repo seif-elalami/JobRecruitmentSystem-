@@ -28,6 +28,14 @@ public interface IAuthService extends Remote {
     Session login(String email, String password) throws RemoteException;
 
     /**
+     * Login with passkey (for admin quick-access)
+     * @param email User's email
+     * @param passkey Admin passkey (stored plain-text in database)
+     * @return Session object if successful
+     */
+    Session loginWithPasskey(String email, String passkey) throws RemoteException;
+
+    /**
      * Logout user
      * @param sessionToken Session token
      * @return true if successful
@@ -54,6 +62,12 @@ public interface IAuthService extends Remote {
      * @return User object if found, null otherwise
      */
     User getUserByEmail(String email) throws RemoteException;
+
+    /**
+     * Get all users in the system
+     * @return List of all users
+     */
+    java.util.List<User> getAllUsers() throws RemoteException;
 
     /**
      * Change user password

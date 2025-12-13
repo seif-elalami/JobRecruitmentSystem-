@@ -28,6 +28,9 @@ public class User implements Serializable {
     private String position;
     private String description;
 
+    // Admin passkey (optional, for quick/secure login)
+    private String passkey;
+
     // Constructors
     public User() {
         this.createdAt = new Date();
@@ -163,6 +166,14 @@ public class User implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getPasskey() {
+        return passkey;
+    }
+
+    public void setPasskey(String passkey) {
+        this.passkey = passkey;
     }
 
     @Override

@@ -2,164 +2,129 @@ package shared.models;
 
 import shared.interfaces.ICandidateView;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-// ✅ REMOVE Serializable - only implement ICandidateView
-public class Applicant implements ICandidateView {  // ← Fixed!
+/**
+ * Applicant now extends User to reuse core identity fields
+ * and implements ICandidateView for UI/DTO projections.
+ */
+public class Applicant extends User implements ICandidateView {
     private static final long serialVersionUID = 1L;
 
-    // Fields
+    // Applicant-specific fields (not present in User)
     private String applicantId;
     private String resumeID;
-    private String name;
-    private String email;
-    private String phone;
     private String resume;
     private String resumePath;
-    private List<String> skills;
     private String education;
-    private int experience;
-    private int yearsExperience;
+    private int yearsExperience; // numeric projection of User's experience
     private List<Application> applications;
 
     // Constructors
     public Applicant() {
-        this.skills = new ArrayList<>();
+        super();
         this.applications = new ArrayList<>();
+        // Ensure role defaults to APPLICANT
+        setRole("APPLICANT");
     }
 
+    /**
+     * Construct Applicant from an existing User record.
+     * Copies core fields and sets applicant-specific projections.
+     */
+    public Applicant(User user) {
+        this();
+        if (user != null) {
+            setUserId(user.getUserId());
+            setUsername(user.getUsername());
+            setEmail(user.getEmail());
+            setPassword(user.getPassword());
+            setRole(user.getRole() == null ? "APPLICANT" : user.getRole());
+            setPhone(user.getPhone());
+            setCreatedAt(user.getCreatedAt());
+            setLastLogin(user.getLastLogin());
+            setActive(user.isActive());
+
+            // Optional descriptive fields present in User
+            setDepartment(user.getDepartment());
+            setCompany(user.getCompany());
+            setPosition(user.getPosition());
+            setDescription(user.getDescription());
+
+            // Map experience string to numeric years if possible
+            this.yearsExperience = parseYearsFromExperience(user.getExperience());
+        }
+    }
+
+    // Backward-compatible parameter constructor used by client tests
     public Applicant(String name, String email, String phone,
                      String resume, String education, int experience) {
-        this.name = name;
-        this.email = email;
-        this.phone = phone;
+        this();
+        setUsername(name);
+        setEmail(email);
+        setPhone(phone);
         this.resume = resume;
         this.education = education;
-        this.experience = experience;
-        this.yearsExperience = experience;
-        this.skills = new ArrayList<>();
-        this.applications = new ArrayList<>();
+        setExperience(experience); // updates yearsExperience and User.experience
     }
 
     // Getters
     @Override
-    public String getId() {
-        return applicantId;
-    }
-
-    public String getApplicantId() {
-        return applicantId;
-    }
-
-    public String getResumeID() {
-        return resumeID;
-    }
-
+    public String getId() { return applicantId; }
+    public String getApplicantId() { return applicantId; }
+    public String getResumeID() { return resumeID; }
     @Override
-    public String getName() {
-        return name;
-    }
-
+    public String getName() { return getUsername(); }
     @Override
-    public String getEmail() {
-        return email;
-    }
-
+    public String getEmail() { return super.getEmail(); }
     @Override
-    public String getPhone() {
-        return phone;
-    }
-
+    public String getPhone() { return super.getPhone(); }
     @Override
-    public String getResume() {
-        return resume;
-    }
-
-    public String getResumePath() {
-        return resumePath;
-    }
-
+    public String getResume() { return resume; }
+    public String getResumePath() { return resumePath; }
     @Override
-    public List<String> getSkills() {
-        return skills;
-    }
-
+    public String getSkills() { return super.getSkills(); }
     @Override
-    public String getEducation() {
-        return education;
-    }
-
+    public String getEducation() { return education; }
     @Override
-    public int getExperience() {
-        return experience;
-    }
-
-    public int getYearsExperience() {
-        return yearsExperience;
-    }
-
-    public List<Application> getApplications() {
-        return applications;
-    }
+    public String getExperience() { return super.getExperience(); }
+    public int getYearsExperience() { return yearsExperience; }
+    public List<Application> getApplications() { return applications; }
 
     // Setters
-    public void setId(String id) {
-        this.applicantId = id;
-    }
+    public void setId(String id) { this.applicantId = id; }
+    public void setApplicantId(String applicantId) { this.applicantId = applicantId; }
+    public void setResumeID(String resumeID) { this.resumeID = resumeID; }
+    public void setResume(String resume) { this.resume = resume; }
+    public void setResumePath(String resumePath) { this.resumePath = resumePath; }
+    public void setEducation(String education) { this.education = education; }
+    public void setYearsExperience(int yearsExperience) { this.yearsExperience = yearsExperience; }
+    public void setApplications(List<Application> applications) { this.applications = applications; }
 
-    public void setApplicantId(String applicantId) {
-        this.applicantId = applicantId;
+    // Backward-compatibility setters used by server services
+    public void setName(String name) { super.setUsername(name); }
+    public void setExperience(int years) {
+        this.yearsExperience = years;
+        super.setExperience(Integer.toString(years));
     }
-
-    public void setResumeID(String resumeID) {
-        this.resumeID = resumeID;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public void setResume(String resume) {
-        this.resume = resume;
-    }
-
-    public void setResumePath(String resumePath) {
-        this.resumePath = resumePath;
-    }
-    public void setSkills(List<String> skills) {
-        this.skills = skills;
-    }
-
-    public void setEducation(String education) {
-        this.education = education;
-    }
-
-    public void setExperience(int experience) {
-        this.experience = experience;
-    }
-
-    public void setYearsExperience(int yearsExperience) {
-        this.yearsExperience = yearsExperience;
-        this.experience = yearsExperience;
-    }
-
-    public void setApplications(List<Application> applications) {
-        this.applications = applications;
+    public void setSkills(List<String> skillsList) {
+        if (skillsList == null || skillsList.isEmpty()) {
+            super.setSkills("");
+        } else {
+            super.setSkills(String.join(",", skillsList));
+        }
     }
 
     // Helper and Action Methods
     public void addSkill(String skill) {
-        if (this.skills == null) {
-            this.skills = new ArrayList<>();
+        // Append to User.skills string safely
+        String current = super.getSkills();
+        if (current == null || current.isEmpty()) {
+            super.setSkills(skill);
+        } else {
+            super.setSkills(current + "," + skill);
         }
-        this.skills.add(skill);
     }
 
     public void addApplication(Application application) {
@@ -187,12 +152,31 @@ public class Applicant implements ICandidateView {  // ← Fixed!
     public String toString() {
         return "Applicant{" +
                 "id='" + applicantId + '\'' +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                ", phone='" + phone + '\'' +
+                ", name='" + getUsername() + '\'' +
+                ", email='" + getEmail() + '\'' +
+                ", phone='" + getPhone() + '\'' +
                 ", education='" + education + '\'' +
-                ", experience=" + experience + " years" +
-                ", skills=" + skills +
+                ", experience=" + yearsExperience + " years" +
+                ", skills=" + mapSkillsStringToList(getSkills()) +
                 '}';
+    }
+
+    // Helpers
+    private List<String> mapSkillsStringToList(String skillsStr) {
+        if (skillsStr == null || skillsStr.trim().isEmpty()) return new ArrayList<>();
+        return new ArrayList<>(Arrays.asList(skillsStr.split("\s*,\s*")));
+    }
+
+    public int parseYearsFromExperience(String expStr) {
+        if (expStr == null) return 0;
+        try {
+            // Try pure integer first
+            return Integer.parseInt(expStr.trim());
+        } catch (NumberFormatException ignored) {
+            // Try patterns like "5 years", "3+ years"
+            String digits = expStr.replaceAll("[^0-9]", "");
+            if (digits.isEmpty()) return 0;
+            try { return Integer.parseInt(digits); } catch (NumberFormatException e) { return 0; }
+        }
     }
 }

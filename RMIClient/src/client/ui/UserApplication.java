@@ -79,11 +79,14 @@ public class UserApplication {
 
                 currentSession = session;
 
-                // Redirect to appropriate menu based on role
-                if (currentSession.getRole().equals("APPLICANT")) {
+                // Redirect to appropriate menu based on role (case-insensitive)
+                String role = currentSession.getRole();
+                if (role != null && role.equalsIgnoreCase("APPLICANT")) {
                     new ApplicantMenu(client, currentSession).run();
-                } else if (currentSession.getRole().equals("RECRUITER")) {
+                } else if (role != null && role.equalsIgnoreCase("RECRUITER")) {
                     new RecruiterMenu(client, currentSession).run();
+                } else {
+                    System.out.println("⚠️  No console menu implemented for role: " + role);
                 }
 
             } else {

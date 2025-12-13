@@ -1,21 +1,38 @@
 package client.ui;
 
 import client.RMIClient;
+import shared.interfaces.IApplicantService;
+import shared.interfaces.IApplicationService;
+import shared.interfaces.IJobService;
 import shared.models.Session;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ApplicantMenuGUI extends JFrame {
 
     private RMIClient rmiClient;
     private Session session;
+    private IJobService jobService;
+    private IApplicationService applicationService;
+    private IApplicantService applicantService;
 
     public ApplicantMenuGUI(RMIClient rmiClient, Session session) {
         this.rmiClient = rmiClient;
         this.session = session;
+
+        try {
+            this.jobService = rmiClient.getJobService();
+            this.applicationService = rmiClient.getApplicationService();
+            this.applicantService = rmiClient.getApplicantService();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Failed to initialize services: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
 
         // Frame setup
         setTitle("Applicant Dashboard - Job Recruitment System");
@@ -109,10 +126,10 @@ public class ApplicantMenuGUI extends JFrame {
         // Features grid (2x3 layout)
         String[][] features = {
             {"🔍", "Browse Jobs", "Explore job\nopportunities"},
-            {"📄", "Upload Resume", "Manage your\nresume"},
+            {"📝", "Apply to Job", "Submit an\napplication"},
             {"💼", "My Applications", "Track your\napplications"},
-            {"⭐", "Saved Jobs", "View your saved\npositions"},
-            {"👤", "My Profile", "Edit your profile\ninformation"},
+            {"✏️", "Update Profile", "Edit your contact\nand skills"},
+            {"👤", "View Profile", "Review your\ninformation"},
             {"🚪", "Logout", "Sign out from the\nsystem"}
         };
 
@@ -195,19 +212,19 @@ public class ApplicantMenuGUI extends JFrame {
     private void handleFeatureClick(int index) {
         switch(index) {
             case 0:
-                JOptionPane.showMessageDialog(this, "🔍 Browse Jobs feature coming soon!", "Feature", JOptionPane.INFORMATION_MESSAGE);
+                new BrowseJobsPage(this, jobService).setVisible(true);
                 break;
             case 1:
-                JOptionPane.showMessageDialog(this, "📄 Upload Resume feature coming soon!", "Feature", JOptionPane.INFORMATION_MESSAGE);
+                new ApplyJobPage(this, jobService, applicationService, session).setVisible(true);
                 break;
             case 2:
-                JOptionPane.showMessageDialog(this, "💼 My Applications feature coming soon!", "Feature", JOptionPane.INFORMATION_MESSAGE);
+                new MyApplicationsPage(this, applicationService, jobService, session).setVisible(true);
                 break;
             case 3:
-                JOptionPane.showMessageDialog(this, "⭐ Saved Jobs feature coming soon!", "Feature", JOptionPane.INFORMATION_MESSAGE);
+                new UpdateProfilePage(this, applicantService, session).setVisible(true);
                 break;
             case 4:
-                JOptionPane.showMessageDialog(this, "👤 Profile feature coming soon!", "Feature", JOptionPane.INFORMATION_MESSAGE);
+                new ViewProfilePage(this, applicantService, session).setVisible(true);
                 break;
             case 5:
                 logout();

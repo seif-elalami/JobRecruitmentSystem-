@@ -218,9 +218,24 @@ public class SignInPage extends JFrame {
         });
         linksPanel.add(registerLink);
 
+        // Admin passkey shortcut
+        JButton adminPasskeyBtn = new JButton("👑 Admin Passkey");
+        adminPasskeyBtn.setBounds(50, 50, 350, 35);
+        adminPasskeyBtn.setFont(new Font("Arial", Font.BOLD, 12));
+        adminPasskeyBtn.setBackground(new Color(155, 89, 182));
+        adminPasskeyBtn.setForeground(Color.WHITE);
+        adminPasskeyBtn.setBorderPainted(false);
+        adminPasskeyBtn.setFocusPainted(false);
+        adminPasskeyBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        adminPasskeyBtn.addActionListener(e -> {
+            dispose();
+            new AdminLoginPage(rmiClient);
+        });
+        linksPanel.add(adminPasskeyBtn);
+
         // Back button
         AnimatedButton backButton = new AnimatedButton("← Back", new Color(149, 165, 166), new Color(120, 144, 156));
-        backButton.setBounds(50, 50, 350, 35);
+        backButton.setBounds(50, 90, 350, 35);
         linksPanel.add(backButton);
         backButton.addActionListener(e -> {
             dispose();

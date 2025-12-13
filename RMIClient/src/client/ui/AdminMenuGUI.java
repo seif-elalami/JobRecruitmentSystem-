@@ -197,22 +197,22 @@ public class AdminMenuGUI extends JFrame {
     private void handleFeatureClick(int index) {
         switch(index) {
             case 0:
-                JOptionPane.showMessageDialog(this, "👥 Manage Users feature coming soon!", "Feature", JOptionPane.INFORMATION_MESSAGE);
+                new ManageUsersPage(this, rmiClient.getAuthService(), session).setVisible(true);
                 break;
             case 1:
-                JOptionPane.showMessageDialog(this, "📊 View Reports feature coming soon!", "Feature", JOptionPane.INFORMATION_MESSAGE);
+                new SystemReportsPage(this, session).setVisible(true);
                 break;
             case 2:
-                JOptionPane.showMessageDialog(this, "💼 Manage Jobs feature coming soon!", "Feature", JOptionPane.INFORMATION_MESSAGE);
+                new ManageJobsPage(this, rmiClient.getJobService(), session).setVisible(true);
                 break;
             case 3:
-                JOptionPane.showMessageDialog(this, "📋 Manage Applications feature coming soon!", "Feature", JOptionPane.INFORMATION_MESSAGE);
+                new ManageApplicationsPage(this, rmiClient.getApplicationService(), session).setVisible(true);
                 break;
             case 4:
-                JOptionPane.showMessageDialog(this, "🔐 Permissions feature coming soon!", "Feature", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "🔐 User role management coming soon!", "Feature", JOptionPane.INFORMATION_MESSAGE);
                 break;
             case 5:
-                JOptionPane.showMessageDialog(this, "📝 View Logs feature coming soon!", "Feature", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "📝 System logs feature coming soon!", "Feature", JOptionPane.INFORMATION_MESSAGE);
                 break;
         }
     }

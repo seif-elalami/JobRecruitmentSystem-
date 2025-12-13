@@ -241,7 +241,7 @@ public List<Applicant> searchApplicantsByExperience(String experience) throws Re
             Document query = new Document("_id", new ObjectId(id));
             applicantCollection.deleteOne(query);
 
-            System.out. println("✅ Applicant deleted: " + id);
+            System.out.println("✅ Applicant deleted: " + id);
 
             return true;
 

@@ -2,12 +2,12 @@ package client.ui;
 
 import shared.interfaces.ICandidateView;
 import client.RMIClient;
-import client. utils.InputHelper;
+import client.utils.InputHelper;
 import shared.interfaces.IJobService;
-import shared.interfaces. IApplicationService;
+import shared.interfaces.IApplicationService;
 import shared.interfaces.IRecruiterService;
 import shared.interfaces.IAuthService;
-import shared. models.Job;
+import shared.models.Job;
 import shared.models.Application;
 import shared.models.Session;
 import shared.models.Interview;
@@ -95,28 +95,21 @@ public class RecruiterMenu {
                 searchByExperienceLevel();
                 break;
 
-            // Applicant Search (Full Access)
-            case 14:
-                searchApplicantsBySkills();
-                break;
-            case 15:
-                searchApplicantsByExperience();
-                break;
 
             // Interview Management
-            case 16:
+            case 14:
                 scheduleInterview();
                 break;
-            case 17:
+            case 15:
                 viewMyInterviews();
                 break;
-            case 18:
+            case 16:
                 viewInterviewDetails();
                 break;
-            case 19:
+            case 17:
                 updateInterview();
                 break;
-            case 20:
+            case 18:
                 cancelInterview();
                 break;
 
@@ -167,17 +160,14 @@ public class RecruiterMenu {
     System.out.println("  13. Search by Experience Level");
     System.out.println();
 
-    System.out.println("👥 Applicant Search (Full Access):");
-    System.out.println("  14. Search Applicants by Skills");
-    System.out.println("  15. Search Applicants by Experience");
-    System.out.println();
+
 
     System.out.println("📅 Interview Management:");
-    System.out.println("  16. Schedule Interview");
-    System.out.println("  17. View My Interviews");
-    System.out.println("  18. View Interview Details");
-    System.out.println("  19. Update Interview");
-    System.out.println("  20. Cancel Interview");
+    System.out.println("  14. Schedule Interview");
+    System.out.println("  15. View My Interviews");
+    System.out.println("  16. View Interview Details");
+    System.out.println("  17. Update Interview");
+    System.out.println("  18. Cancel Interview");
     System.out.println();
 
     System.out.println("  0.   Logout");
@@ -189,12 +179,47 @@ public class RecruiterMenu {
         try {
             System.out.println("=== CREATE JOB POSTING ===\n");
 
-            System. out.print("Job Title: ");
+            // Title
+            System.out.print("Job Title: ");
             String title = InputHelper.getString();
+            if (title.trim().isEmpty()) {
+                System.out.println("❌ Job title cannot be empty!");
+                return;
+            }
 
+            // Description
             System.out.print("Job Description: ");
             String description = InputHelper.getString();
+            if (description.trim().isEmpty()) {
+                System.out.println("❌ Job description cannot be empty!");
+                return;
+            }
 
+            // Company
+            System.out.print("Company Name: ");
+            String company = InputHelper.getString();
+            if (company.trim().isEmpty()) {
+                System.out.println("❌ Company name cannot be empty!");
+                return;
+            }
+
+            // Location
+            System.out.print("Job Location: ");
+            String location = InputHelper.getString();
+            if (location.trim().isEmpty()) {
+                System.out.println("❌ Job location cannot be empty!");
+                return;
+            }
+
+            // Salary
+            System.out.print("Salary (annual): ");
+            double salary = InputHelper.getDouble();
+            if (salary <= 0) {
+                System.out.println("❌ Salary must be a positive number!");
+                return;
+            }
+
+            // Requirements
             System.out.println("Requirements (enter one per line, type 'done' when finished):");
             List<String> requirements = new ArrayList<>();
             while (true) {
@@ -208,8 +233,16 @@ public class RecruiterMenu {
                 }
             }
 
-            // Create job with recruiterId from session
+            if (requirements.isEmpty()) {
+                System.out.println("❌ At least one requirement is needed!");
+                return;
+            }
+
+            // Create job with all fields
             Job job = new Job(title, description, requirements, session.getUserId());
+            job.setCompany(company);
+            job.setLocation(location);
+            job.setSalary(salary);
 
             System.out.println("\n📤 Creating job posting...");
 
@@ -218,11 +251,13 @@ public class RecruiterMenu {
             System.out.println("✅ Job posted successfully!");
             System.out.println("   Job ID: " + jobId);
             System.out.println("   Title: " + title);
+            System.out.println("   Company: " + company);
+            System.out.println("   Location: " + location);
+            System.out.println("   Salary: $" + String.format("%,.2f", salary));
             System.out.println("   Requirements: " + requirements.size());
 
         } catch (Exception e) {
-            System.err. println("❌ Failed to create job posting: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("❌ Failed to create job posting: " + e.getMessage());
         }
     }
 
@@ -236,9 +271,9 @@ public class RecruiterMenu {
             List<Job> jobs = jobService.getJobsByRecruiterId(session.getUserId());
 
             if (jobs.isEmpty()) {
-                System.out. println("⚠️  You haven't posted any jobs yet!");
+                System.out.println("⚠️  You haven't posted any jobs yet!");
             } else {
-                System.out.println("✅ You have " + jobs. size() + " job posting(s):\n");
+                System.out.println("✅ You have " + jobs.size() + " job posting(s):\n");
                 for (int i = 0; i < jobs.size(); i++) {
                     Job job = jobs.get(i);
                     System.out.println("--- Job " + (i + 1) + " ---");
@@ -259,12 +294,12 @@ public class RecruiterMenu {
 
             System.out.println("📤 Fetching applications...");
 
-            List<Application> applications = applicationService. getAllApplications();
+            List<Application> applications = applicationService.getAllApplications();
 
             if (applications.isEmpty()) {
-                System. out.println("⚠️  No applications found!");
+                System.out.println("⚠️  No applications found!");
             } else {
-                System.out. println("✅ Found " + applications.size() + " application(s):\n");
+                System.out.println("✅ Found " + applications.size() + " application(s):\n");
                 for (int i = 0; i < applications.size(); i++) {
                     Application app = applications.get(i);
                     System.out.println("--- Application " + (i + 1) + " ---");
@@ -294,12 +329,12 @@ public class RecruiterMenu {
                 return;
             }
 
-            System. out.println("✅ Application found:\n");
+            System.out.println("✅ Application found:\n");
             displayApplication(application);
 
             System.out.println("\nUpdate Status:");
             System.out.println("1.  Approve (ACCEPTED)");
-            System.out. println("2. Reject (REJECTED)");
+            System.out.println("2. Reject (REJECTED)");
             System.out.println("3. Under Review (UNDER_REVIEW)");
             System.out.println("0. Cancel");
             System.out.print("Choice: ");
@@ -346,7 +381,7 @@ public class RecruiterMenu {
 
             // First, show recruiter's jobs
             System.out.println("📤 Fetching your job postings...");
-            List<Job> jobs = jobService. getJobsByRecruiterId(session.getUserId());
+            List<Job> jobs = jobService.getJobsByRecruiterId(session.getUserId());
 
             if (jobs.isEmpty()) {
                 System.out.println("⚠️  You haven't posted any jobs yet!");
@@ -384,7 +419,7 @@ public class RecruiterMenu {
             }
 
             if (InputHelper.confirm("Are you sure you want to close this job posting? ")) {
-                System.out. println("\n📤 Closing job.. .");
+                System.out.println("\n📤 Closing job...");
                 boolean closed = jobService.closeJob(jobId);
 
                 if (closed) {
@@ -393,11 +428,11 @@ public class RecruiterMenu {
                     System.out.println("❌ Failed to close job posting!");
                 }
             } else {
-                System. out.println("⚠️  Cancelled");
+                System.out.println("⚠️  Cancelled");
             }
 
         } catch (Exception e) {
-            System.err.println("❌ Error closing job:  " + e.getMessage());
+            System.err.println("❌ Error closing job: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -415,7 +450,7 @@ public class RecruiterMenu {
             System.out.println("║     Match Candidates to Job (CVs)      ║");
             System.out.println("╚════════════════════════════════════════╝\n");
 
-            System.out. print("Enter Job ID: ");
+            System.out.print("Enter Job ID: ");
             String jobId = InputHelper.getString();
 
             System.out.println("\n📤 Fetching candidates who applied to this job...");
@@ -482,7 +517,7 @@ public class RecruiterMenu {
             }
 
         } catch (Exception e) {
-            System.err. println("❌ Error viewing candidate:  " + e.getMessage());
+            System.err.println("❌ Error viewing candidate: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -496,7 +531,7 @@ public class RecruiterMenu {
             System.out.println("║     Search Candidates by Skills        ║");
             System.out.println("╚════════════════════════════════════════╝\n");
 
-            System. out.print("Enter skills to search for (e.g., 'Java, RMI, MongoDB'): ");
+            System.out.print("Enter skills to search for (e.g., 'Java, RMI, MongoDB'): ");
             String skills = InputHelper.getString();
 
             System.out.println("\n🔍 Searching for candidates with skills: " + skills + "...");
@@ -531,11 +566,11 @@ public class RecruiterMenu {
      */
     private void searchByExperienceLevel() {
         try {
-            System.out. println("\n╔════════════════════════════════════════╗");
-            System.out. println("║   Search by Experience Level           ║");
+            System.out.println("\n╔════════════════════════════════════════╗");
+            System.out.println("║   Search by Experience Level           ║");
             System.out.println("╚════════════════════════════════════════╝\n");
 
-            System. out.print("Enter minimum years of experience required: ");
+            System.out.print("Enter minimum years of experience required: ");
             int minYears = InputHelper.getInt();
 
             System.out.println("\n🔍 Searching for candidates with at least " + minYears + " years of experience...");
@@ -567,53 +602,73 @@ public class RecruiterMenu {
     // ========================================
     // INTERVIEW MANAGEMENT
     // ========================================
+private void scheduleInterview() {
+    try {
+        System.out.println("=== SCHEDULE INTERVIEW ===\n");
 
-    private void scheduleInterview() {
-        try {
-            System.out.println("=== SCHEDULE INTERVIEW ===\n");
+        System.out.print("Job ID: ");
+        String jobId = InputHelper.getString();
 
-            System.out. print("Job ID: ");
-            String jobId = InputHelper.getString();
-
-            System.out.print("Applicant ID: ");
-            String applicantId = InputHelper.getString();
-
-            System.out.print("Interview Date (DD/MM/YYYY): ");
-            String dateStr = InputHelper.getString();
-
-            System.out.print("Interview Time (HH:MM, 24-hour format): ");
-            String timeStr = InputHelper.getString();
-
-            // Parse date and time
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-            Date scheduledDate = sdf.parse(dateStr + " " + timeStr);
-
-            System.out.print("Location (e.g., 'Online - Zoom' or 'Office - Room 301'): ");
-            String location = InputHelper.getString();
-
-            System.out.print("Notes [Optional, press Enter to skip]: ");
-            String notes = InputHelper.getString();
-
-            // Create interview
-            Interview interview = new Interview(jobId, applicantId, session.getUserId(), scheduledDate, location);
-            if (! notes.isEmpty()) {
-                interview.setNotes(notes);
-            }
-
-            System.out.println("\n📤 Scheduling interview.. .");
-            String interviewId = recruiterService.createInterview(interview);
-
-            System.out.println("✅ Interview scheduled successfully!");
-            System. out.println("   Interview ID: " + interviewId);
-            System.out.println("   Date & Time: " + sdf.format(scheduledDate));
-            System.out.println("   Location: " + location);
-            System.out.println("   Status:  SCHEDULED");
-
-        } catch (Exception e) {
-            System.err.println("❌ Error scheduling interview: " + e.getMessage());
-            e.printStackTrace();
+        // Job ID validation
+        Job job = jobService.getJobById(jobId);
+        if (job == null) {
+            System.out.println("❌ Error: This job does not exist. Please enter a valid Job ID.");
+            return;
         }
+
+        System.out.print("Applicant (Candidate) ID: ");
+        String applicantId = InputHelper.getString();
+
+        // Candidate ID validation
+        ICandidateView candidate = recruiterService.getCandidateById(applicantId);
+        if (candidate == null) {
+            System.out.println("❌ Error: This candidate does not exist. Please enter a valid Candidate ID.");
+            return;
+        }
+
+        System.out.print("Interview Date (DD/MM/YYYY): ");
+        String dateStr = InputHelper.getString();
+
+        System.out.print("Interview Time (HH:MM, 24-hour format): ");
+        String timeStr = InputHelper.getString();
+
+        // Parse date and time
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        Date scheduledDate = sdf.parse(dateStr + " " + timeStr);
+
+        // Optional: check that the interview is not set in the past
+        if (scheduledDate.before(new Date())) {
+            System.out.println("❌ Error: Interview date and time must be in the future.");
+            return;
+        }
+
+        System.out.print("Location (e.g., 'Online - Zoom' or 'Office - Room 301'): ");
+        String location = InputHelper.getString();
+
+        System.out.print("Notes [Optional, press Enter to skip]: ");
+        String notes = InputHelper.getString();
+
+        // Create interview
+        Interview interview = new Interview(jobId, applicantId, session.getUserId(), scheduledDate, location);
+        if (!notes.isEmpty()) {
+            interview.setNotes(notes);
+        }
+
+        System.out.println("\n📤 Scheduling interview...");
+        String interviewId = recruiterService.createInterview(interview);
+
+        System.out.println("✅ Interview scheduled successfully!");
+        System.out.println("   Interview ID: " + interviewId);
+        System.out.println("   Date & Time: " + sdf.format(scheduledDate));
+        System.out.println("   Location: " + location);
+        System.out.println("   Status:  SCHEDULED");
+
+    } catch (Exception e) {
+        System.err.println("❌ Error scheduling interview: " + e.getMessage());
+        e.printStackTrace();
     }
+}
+
 
     /**
      * Helper method to schedule interview directly from candidate matching
@@ -649,7 +704,7 @@ public class RecruiterMenu {
             String interviewId = recruiterService.createInterview(interview);
 
             System.out.println("✅ Interview scheduled successfully!");
-            System. out.println("   Interview ID:  " + interviewId);
+            System.out.println("   Interview ID: " + interviewId);
 
         } catch (Exception e) {
             System.err.println("❌ Error scheduling interview: " + e.getMessage());
@@ -658,15 +713,15 @@ public class RecruiterMenu {
 
     private void viewMyInterviews() {
         try {
-            System.out. println("=== MY INTERVIEWS ===\n");
+            System.out.println("=== MY INTERVIEWS ===\n");
 
-            System.out. println("📤 Fetching your interviews...");
+            System.out.println("📤 Fetching your interviews...");
             List<Interview> interviews = recruiterService.getMyInterviews(session.getUserId());
 
             if (interviews.isEmpty()) {
-                System.out. println("⚠️  You haven't scheduled any interviews yet!");
+                System.out.println("⚠️  You haven't scheduled any interviews yet!");
             } else {
-                System. out.println("✅ You have " + interviews.size() + " interview(s):\n");
+                System.out.println("✅ You have " + interviews.size() + " interview(s):\n");
 
                 for (int i = 0; i < interviews.size(); i++) {
                     Interview interview = interviews.get(i);
@@ -686,7 +741,7 @@ public class RecruiterMenu {
         try {
             System.out.println("=== UPDATE INTERVIEW ===\n");
 
-            System.out. print("Enter Interview ID: ");
+            System.out.print("Enter Interview ID: ");
             String interviewId = InputHelper.getString();
 
             System.out.println("\n📤 Fetching interview details...");
@@ -878,19 +933,19 @@ public class RecruiterMenu {
         System.out.println("\n╔════════════════════════════════════════╗");
         System.out.println("║ Search Applicants by Experience        ║");
         System.out.println("║        (Full Access)                   ║");
-        System.out. println("╚════════════════════════════════════════╝\n");
+        System.out.println("╚════════════════════════════════════════╝\n");
 
         System.out.print("Enter experience to search for (e.g., '5 years', '3'): ");
         String experience = InputHelper.getString();
 
-        System.out.println("\n🔍 Searching applicants with experience:  " + experience + "...");
+        System.out.println("\n🔍 Searching applicants with experience: " + experience + "...");
 
         List<Applicant> applicants = recruiterService.searchApplicantsByExperience(experience);
 
-        if (applicants. isEmpty()) {
+        if (applicants.isEmpty()) {
             System.out.println("\n⚠️  No applicants found with that experience!");
         } else {
-            System.out.println("\n✅ Found " + applicants. size() + " applicant(s):\n");
+            System.out.println("\n✅ Found " + applicants.size() + " applicant(s):\n");
 
             for (int i = 0; i < applicants.size(); i++) {
                 Applicant app = applicants.get(i);
@@ -902,7 +957,7 @@ public class RecruiterMenu {
         }
 
     } catch (Exception e) {
-        System.err.println("❌ Error searching applicants:  " + e.getMessage());
+        System.err.println("❌ Error searching applicants: " + e.getMessage());
         e.printStackTrace();
     }
 }
@@ -914,7 +969,7 @@ private void viewInterviewDetails() {
         System.out.println("║       View Interview Details           ║");
         System.out.println("╚════════════════════════════════════════╝\n");
 
-        System.out.print("Enter Interview ID:  ");
+        System.out.print("Enter Interview ID: ");
         String interviewId = InputHelper.getString();
 
         System.out.println("\n📤 Fetching interview details...");
@@ -939,7 +994,7 @@ private void viewInterviewDetails() {
 private void updateMyProfile() {
     try {
         System.out.println("\n╔════════════════════════════════════════╗");
-        System.out. println("║         Update My Profile              ║");
+        System.out.println("║         Update My Profile              ║");
         System.out.println("╚════════════════════════════════════════╝");
 
         shared.models.Recruiter recruiter = recruiterService.getRecruiterById(session.getUserId());
@@ -949,13 +1004,13 @@ private void updateMyProfile() {
             return;
         }
 
-        System.out. println("\nCurrent Profile:");
+        System.out.println("\nCurrent Profile:");
         System.out.println("  Name:        " + recruiter.getName());
-        System.out.println("  Email:      " + recruiter. getEmail());
+        System.out.println("  Email:      " + recruiter.getEmail());
         System.out.println("  Phone:      " + (recruiter.getPhone() != null ? recruiter.getPhone() : "Not set"));
-        System.out. println("  Company:    " + (recruiter.getCompany() != null ? recruiter.getCompany() : "Not set"));
+        System.out.println("  Company:    " + (recruiter.getCompany() != null ? recruiter.getCompany() : "Not set"));
         System.out.println("  Department: " + (recruiter.getDepartment() != null ? recruiter.getDepartment() : "Not set"));
-        System.out. println("  Position:   " + (recruiter.getPosition() != null ? recruiter.getPosition() : "Not set"));
+        System.out.println("  Position:   " + (recruiter.getPosition() != null ? recruiter.getPosition() : "Not set"));
 
         System.out.println("\n--- Enter new details (press Enter to keep current) ---\n");
 
@@ -977,10 +1032,10 @@ private void updateMyProfile() {
             recruiter.setDepartment(department);
         }
 
-        System. out.print("New Position: ");
-        String position = InputHelper. getString();
-        if (!position. isEmpty()) {
-            recruiter. setPosition(position);
+        System.out.print("New Position: ");
+        String position = InputHelper.getString();
+        if (!position.isEmpty()) {
+            recruiter.setPosition(position);
         }
 
         // ✅ NEW: Add password update option
@@ -993,17 +1048,17 @@ private void updateMyProfile() {
             String newPassword = InputHelper.getString();
 
             if (newPassword.isEmpty()) {
-                System.out. println("⚠️  Password not changed (empty input)");
+                System.out.println("⚠️  Password not changed (empty input)");
                 recruiter.setPassword(null);
             } else if (newPassword.length() < 6) {
                 System.out.println("⚠️  Password not changed (too short - min 6 characters)");
                 recruiter.setPassword(null);
             } else {
                 System.out.print("Confirm new password: ");
-                String confirmPassword = InputHelper. getString();
+                String confirmPassword = InputHelper.getString();
 
                 if (!newPassword.equals(confirmPassword)) {
-                    System.out.println("⚠️  Passwords don't match!  Password not changed.");
+                    System.out.println("⚠️  Passwords don't match! Password not changed.");
                     recruiter.setPassword(null);
                 } else {
                     recruiter.setPassword(newPassword);

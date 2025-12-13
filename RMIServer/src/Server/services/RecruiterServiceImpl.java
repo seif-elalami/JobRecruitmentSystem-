@@ -168,67 +168,67 @@ public Recruiter getRecruiterByEmail(String email) throws RemoteException {
     }
 }
 
-   @Override
-public boolean updateRecruiter(Recruiter recruiter) throws RemoteException {
-    try {
-        System.out. println("📝 Updating recruiter: " + recruiter.getId());
+    @Override
+    public boolean updateRecruiter(Recruiter recruiter) throws RemoteException {
+        try {
+            System.out.println("📝 Updating recruiter: " + recruiter.getId());
 
-        // Validation - Email Format
-        if (! ValidationUtil.isValidEmail(recruiter.getEmail())) {
-            System.err.println("❌ Invalid email format");
-            throw new RemoteException(ValidationUtil.getEmailErrorMessage());
-        }
-
-        // Validation - Phone Number (if provided)
-        if (recruiter.getPhone() != null && !recruiter.getPhone().isEmpty()) {
-            if (!ValidationUtil.isValidPhone(recruiter. getPhone())) {
-                System.err.println("❌ Invalid phone format");
-                throw new RemoteException(ValidationUtil.getPhoneErrorMessage());
+            // Validation - Email Format
+            if (!ValidationUtil.isValidEmail(recruiter.getEmail())) {
+                System.err.println("❌ Invalid email format");
+                throw new RemoteException(ValidationUtil.getEmailErrorMessage());
             }
-        }
 
-        // ✅ Query:  Find by ID and ensure role is RECRUITER
-        Document query = new Document("_id", new ObjectId(recruiter.getId()))
-                        .append("role", "RECRUITER");
+            // Validation - Phone Number (if provided)
+            if (recruiter.getPhone() != null && !recruiter.getPhone().isEmpty()) {
+                if (!ValidationUtil.isValidPhone(recruiter.getPhone())) {
+                    System.err.println("❌ Invalid phone format");
+                    throw new RemoteException(ValidationUtil.getPhoneErrorMessage());
+                }
+            }
 
-        // ✅ Build update document
-        Document update = new Document();
-        update.append("username", recruiter.getUsername());
-        update.append("email", recruiter.getEmail());
-        update.append("phone", recruiter.getPhone());
-        update.append("company", recruiter.getCompany());
-        update.append("department", recruiter.getDepartment());
-        update.append("position", recruiter.getPosition());
-        update.append("description", recruiter.getDescription());
-        update.append("role", "RECRUITER");  // ✅ Keep role as RECRUITER
+            // ✅ Query:  Find by ID and ensure role is RECRUITER
+            Document query = new Document("_id", new ObjectId(recruiter.getId()))
+                    .append("role", "RECRUITER");
 
-        // Only update password if provided
-        if (recruiter.getPassword() != null && !recruiter. getPassword().isEmpty()) {
-            String hashedPassword = PasswordUtil.hashPassword(recruiter.getPassword());
-            update.append("password", hashedPassword);
-        }
+            // ✅ Build update document
+            Document update = new Document();
+            update.append("username", recruiter.getUsername());
+            update.append("email", recruiter.getEmail());
+            update.append("phone", recruiter.getPhone());
+            update.append("company", recruiter.getCompany());
+            update.append("department", recruiter.getDepartment());
+            update.append("position", recruiter.getPosition());
+            update.append("description", recruiter.getDescription());
+            update.append("role", "RECRUITER"); // ✅ Keep role as RECRUITER
 
-        Document updateDoc = new Document("$set", update);
+            // Only update password if provided
+            if (recruiter.getPassword() != null && !recruiter.getPassword().isEmpty()) {
+                String hashedPassword = PasswordUtil.hashPassword(recruiter.getPassword());
+                update.append("password", hashedPassword);
+            }
 
-        // ✅ Update in users collection
-        long modifiedCount = userCollection.updateOne(query, updateDoc).getModifiedCount();
+            Document updateDoc = new Document("$set", update);
 
-        if (modifiedCount > 0) {
-            System.out.println("✅ Recruiter updated successfully:  " + recruiter.getName());
-            return true;
-        } else {
-            System.out.println("⚠️  No changes made (recruiter not found or no changes)");
+            // ✅ Update in users collection
+            long modifiedCount = userCollection.updateOne(query, updateDoc).getModifiedCount();
+
+            if (modifiedCount > 0) {
+                System.out.println("✅ Recruiter updated successfully:  " + recruiter.getName());
+                return true;
+            } else {
+                System.out.println("⚠️  No changes made (recruiter not found or no changes)");
+                return false;
+            }
+
+        } catch (RemoteException e) {
+            throw e;
+        } catch (Exception e) {
+            System.err.println("❌ Error updating recruiter: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
-
-    } catch (RemoteException e) {
-        throw e;
-    } catch (Exception e) {
-        System.err.println("❌ Error updating recruiter: " + e.getMessage());
-        e.printStackTrace();
-        return false;
     }
-}
 
     // ========================================
     // 1. Job Posting Management
@@ -400,6 +400,12 @@ public boolean updateRecruiter(Recruiter recruiter) throws RemoteException {
             throw new RemoteException("Failed to get candidates", e);
         }
     }
+
+    @Override
+public List<Applicant> matchCandidatesToJob(String jobId) throws RemoteException {
+    // Example: return all applicants (you can add matching logic later)
+    return applicantService.getAllApplicants();
+}
 
     @Override
     public ICandidateView getCandidateById(String candidateId) throws RemoteException {
@@ -616,5 +622,8 @@ public boolean updateRecruiter(Recruiter recruiter) throws RemoteException {
         }
 
         return recruiter;
+
     }
 }
+
+

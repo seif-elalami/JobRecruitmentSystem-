@@ -56,11 +56,11 @@ public class ConsoleUI {
         System.out.println("\n╔════════════════════════════════════════╗");
         System.out.println("║           Main Menu                    ║");
         System.out.println("╚════════════════════════════════════════╝");
-        System.out. println("1. Start Server");
-        System.out. println("2. Start Client");
+        System.out.println("1. Start Server");
+        System.out.println("2. Start Client");
         System.out.println("3. Start Both");
         System.out.println("4. Interactive Tests (Dev Mode)");
-        System.out. println("5. User Application (Production Mode)");
+        System.out.println("5. User Application (Production Mode)");
         System.out.println("0. Exit");
         System.out.println("═══════════════════════════════════════════");
         System.out.print("Choice: ");
@@ -70,7 +70,7 @@ public class ConsoleUI {
         System.out.println("⚠️  Server must be started separately!");
         System.out.println("\nTo start the server:");
         System.out.println("1. Open a new terminal");
-        System.out. println("2. Run: cd RMIServer");
+        System.out.println("2. Run: cd RMIServer");
         System.out.println("3. Run: java -cp \"bin;../Shared/bin;lib/*\" server.Main");
         System.out.println("\nOr open RMIServer/src/server/Main.java in VS Code and click Run");
         InputHelper.pause();
@@ -95,7 +95,7 @@ public class ConsoleUI {
             System.err.println("Error: " + e.getMessage());
             System.err.println("\n💡 Make sure:");
             System.err.println("   1. MongoDB is running (port 27017)");
-            System.err. println("   2. RMI Server is running (port 1099)");
+            System.err.println("   2. RMI Server is running (port 1099)");
             InputHelper.pause();
         }
     }
@@ -103,9 +103,9 @@ public class ConsoleUI {
     private void startBoth() {
         System.out.println("⚠️  Cannot start both from client!");
         System.out.println("\nPlease start server and client separately:");
-        System.out. println("\n📋 Step 1: Start MongoDB");
+        System.out.println("\n📋 Step 1: Start MongoDB");
         System.out.println("   mongod --port 27020 --dbpath D:\\mongodb-data\\JobRecruitmentDB");
-        System.out. println("\n📋 Step 2: Start Server");
+        System.out.println("\n📋 Step 2: Start Server");
         System.out.println("   Open RMIServer/src/server/Main.java and click Run");
         System.out.println("\n📋 Step 3: Start Client");
         System.out.println("   Choose option 2 from this menu");
@@ -161,7 +161,7 @@ public class ConsoleUI {
         System.out.println("1. Test Applicant Service");
         System.out.println("2. Test Recruiter Service");
         System.out.println("3. Test Job Service");
-        System.out. println("4. Test Application Service");
+        System.out.println("4. Test Application Service");
         System.out.println("5. Test Auth Service");
         System.out.println("0. Back to Main Menu");
         System.out.print("\nChoice: ");

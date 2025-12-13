@@ -1,7 +1,7 @@
 package client.ui;
 
 import client.RMIClient;
-import client. utils.InputHelper;
+import client.utils.InputHelper;
 import shared.models.User;
 import shared.models.Session;
 import shared.interfaces.IAuthService;

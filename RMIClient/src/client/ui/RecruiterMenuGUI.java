@@ -5,227 +5,80 @@ import shared.models.Session;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class RecruiterMenuGUI extends JFrame {
 
-    @SuppressWarnings("unused")
-    private RMIClient rmiClient;
-    @SuppressWarnings("unused")
-    private Session session;
-
     public RecruiterMenuGUI(RMIClient rmiClient, Session session) {
-        this.rmiClient = rmiClient;
-        this.session = session;
-
-        // Frame setup
-        setTitle("Recruiter Dashboard - Job Recruitment System");
+        setTitle("Recruiter Home - Job Recruitment System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1200, 800);
+        setSize(600, 500);
         setLocationRelativeTo(null);
         setResizable(false);
-        setUndecorated(true);
 
-        // Main panel with gradient
-        JPanel mainPanel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-                GradientPaint gradient = new GradientPaint(0, 0, new Color(46, 204, 113), 
-                        getWidth(), getHeight(), new Color(39, 174, 96));
-                g2d.setPaint(gradient);
-                g2d.fillRect(0, 0, getWidth(), getHeight());
-                
-                // Subtle overlay pattern
-                g2d.setColor(new Color(255, 255, 255, 5));
-                for (int i = 0; i < getWidth(); i += 50) {
-                    g2d.drawLine(i, 0, i, getHeight());
-                }
-            }
-        };
-        mainPanel.setLayout(null);
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+        mainPanel.setBackground(new Color(236, 240, 241));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         add(mainPanel);
 
-        // Close button
-        JButton closeBtn = new JButton("✕");
-        closeBtn.setBounds(1160, 10, 30, 30);
-        closeBtn.setFont(new Font("Arial", Font.BOLD, 20));
-        closeBtn.setBackground(Color.WHITE);
-        closeBtn.setForeground(new Color(46, 204, 113));
-        closeBtn.setBorderPainted(false);
-        closeBtn.setFocusPainted(false);
-        closeBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        closeBtn.addActionListener(e -> System.exit(0));
-        mainPanel.add(closeBtn);
-
-        // Header panel
-        JPanel headerPanel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setColor(new Color(44, 62, 80));
-                g2d.fillRect(0, 0, getWidth(), getHeight());
-            }
-        };
-        headerPanel.setLayout(null);
-        headerPanel.setBounds(0, 0, 1200, 90);
-        headerPanel.setOpaque(false);
-        mainPanel.add(headerPanel);
-
-        // Welcome text
-        JLabel welcomeLabel = new JLabel("👔 Welcome, " + session.getUserEmail() + "!");
-        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 26));
+        // Header
+        JPanel headerPanel = new JPanel();
+        headerPanel.setBackground(new Color(41, 128, 185));
+        headerPanel.setPreferredSize(new Dimension(0, 60));
+        JLabel welcomeLabel = new JLabel("Welcome, " + session.getUserEmail() + " (Recruiter)");
+        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 20));
         welcomeLabel.setForeground(Color.WHITE);
-        welcomeLabel.setBounds(40, 20, 600, 50);
         headerPanel.add(welcomeLabel);
+        mainPanel.add(headerPanel, BorderLayout.NORTH);
 
-        // Content panel
-        JPanel contentPanel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setColor(new Color(236, 240, 241));
-                g2d.fillRect(0, 0, getWidth(), getHeight());
-            }
-        };
-        contentPanel.setLayout(null);
-        contentPanel.setBounds(0, 90, 1200, 710);
-        contentPanel.setOpaque(false);
-        mainPanel.add(contentPanel);
+        // Center panel - Main menu buttons
+        JPanel centerPanel = new JPanel();
+        centerPanel.setBackground(Color.WHITE);
+        centerPanel.setLayout(new GridLayout(4, 1, 30, 30));
+        centerPanel.setBorder(BorderFactory.createEmptyBorder(40, 60, 40, 60));
 
-        // Title
-        JLabel titleLabel = new JLabel("📋 Recruiter Dashboard");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 30));
-        titleLabel.setForeground(new Color(44, 62, 80));
-        titleLabel.setBounds(50, 25, 400, 40);
-        contentPanel.add(titleLabel);
+        JButton profileBtn = new JButton("Recruiter Profile");
+        JButton jobMgmtBtn = new JButton("Job Management");
+        JButton appMgmtBtn = new JButton("Application Management");
+        JButton candidateBtn = new JButton("Candidate Matching & Search");
 
-        // Features grid (2x3 layout)
-        String[][] features = {
-            {"📝", "Post Job", "Create and publish\nnew job listings"},
-            {"👥", "View Applications", "Review applications\nfrom candidates"},
-            {"🔍", "Search Candidates", "Find candidates by\nskills"},
-            {"📅", "Schedule Interview", "Schedule interviews\nwith applicants"},
-            {"📊", "Job Postings", "Manage your active\njob postings"},
-            {"⚙️", "Settings", "Account settings and\npreferences"}
-        };
+        profileBtn.setFont(new Font("Arial", Font.BOLD, 18));
+        jobMgmtBtn.setFont(new Font("Arial", Font.BOLD, 18));
+        appMgmtBtn.setFont(new Font("Arial", Font.BOLD, 18));
+        candidateBtn.setFont(new Font("Arial", Font.BOLD, 18));
 
-        int x = 50;
-        int y = 85;
-        int width = 320;
-        int height = 180;
+        profileBtn.addActionListener(e -> {
+            dispose();
+            new RecruiterProfileScreen(rmiClient, session);
+        });
+        jobMgmtBtn.addActionListener(e -> JOptionPane.showMessageDialog(this, "Job Management screen not implemented yet."));
+        appMgmtBtn.addActionListener(e -> JOptionPane.showMessageDialog(this, "Application Management screen not implemented yet."));
+        candidateBtn.addActionListener(e -> JOptionPane.showMessageDialog(this, "Candidate Matching & Search screen not implemented yet."));
 
-        for (int i = 0; i < 6; i++) {
-            int row = i / 3;
-            int col = i % 3;
-            int posX = x + col * (width + 20);
-            int posY = y + row * (height + 20);
+        centerPanel.add(profileBtn);
+        centerPanel.add(jobMgmtBtn);
+        centerPanel.add(appMgmtBtn);
+        centerPanel.add(candidateBtn);
 
-            createFeatureCard(contentPanel, features[i][0], features[i][1], features[i][2], posX, posY, width, height, i);
-        }
+        mainPanel.add(centerPanel, BorderLayout.CENTER);
+
+        // Footer
+        JPanel footerPanel = new JPanel();
+        footerPanel.setBackground(new Color(52, 73, 94));
+        footerPanel.setPreferredSize(new Dimension(0, 50));
+        JButton logoutButton = new JButton("Logout");
+        logoutButton.setFont(new Font("Arial", Font.BOLD, 14));
+        logoutButton.setBackground(new Color(231, 76, 60));
+        logoutButton.setForeground(Color.WHITE);
+        logoutButton.setFocusPainted(false);
+        logoutButton.setBorderPainted(false);
+        logoutButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        logoutButton.addActionListener(e -> {
+            dispose();
+            new WelcomePage(rmiClient);
+        });
+        footerPanel.add(logoutButton);
+        mainPanel.add(footerPanel, BorderLayout.SOUTH);
 
         setVisible(true);
-    }
-
-    private void createFeatureCard(JPanel parent, String icon, String title, String description, 
-                                   int x, int y, int width, int height, int index) {
-        JPanel cardPanel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setColor(Color.WHITE);
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
-                g2d.setColor(new Color(189, 195, 199));
-                g2d.setStroke(new BasicStroke(1));
-                g2d.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 15, 15);
-            }
-        };
-        cardPanel.setLayout(null);
-        cardPanel.setBounds(x, y, width, height);
-        cardPanel.setOpaque(false);
-        cardPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        
-        // Add hover effect
-        cardPanel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent evt) {
-                cardPanel.setBackground(new Color(236, 240, 241));
-            }
-            @Override
-            public void mouseExited(MouseEvent evt) {
-                cardPanel.setBackground(Color.WHITE);
-            }
-            @Override
-            public void mouseClicked(MouseEvent evt) {
-                handleFeatureClick(index);
-            }
-        });
-
-        // Icon
-        JLabel iconLabel = new JLabel(icon);
-        iconLabel.setFont(new Font("Arial", Font.BOLD, 50));
-        iconLabel.setBounds(20, 15, 60, 60);
-        cardPanel.add(iconLabel);
-
-        // Title
-        JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 15));
-        titleLabel.setForeground(new Color(44, 62, 80));
-        titleLabel.setBounds(20, 80, 280, 20);
-        cardPanel.add(titleLabel);
-
-        // Description
-        JLabel descLabel = new JLabel("<html>" + description + "</html>");
-        descLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        descLabel.setForeground(new Color(127, 140, 141));
-        descLabel.setBounds(20, 105, 280, 60);
-        cardPanel.add(descLabel);
-
-        parent.add(cardPanel);
-    }
-
-    private void handleFeatureClick(int index) {
-        switch(index) {
-            case 0:
-                JOptionPane.showMessageDialog(this, "📝 Post Job feature coming soon!", "Feature", JOptionPane.INFORMATION_MESSAGE);
-                break;
-            case 1:
-                JOptionPane.showMessageDialog(this, "👥 View Applications feature coming soon!", "Feature", JOptionPane.INFORMATION_MESSAGE);
-                break;
-            case 2:
-                JOptionPane.showMessageDialog(this, "🔍 Search Candidates feature coming soon!", "Feature", JOptionPane.INFORMATION_MESSAGE);
-                break;
-            case 3:
-                JOptionPane.showMessageDialog(this, "📅 Schedule Interview feature coming soon!", "Feature", JOptionPane.INFORMATION_MESSAGE);
-                break;
-            case 4:
-                JOptionPane.showMessageDialog(this, "📊 Job Postings feature coming soon!", "Feature", JOptionPane.INFORMATION_MESSAGE);
-                break;
-            case 5:
-                JOptionPane.showMessageDialog(this, "⚙️ Settings feature coming soon!", "Feature", JOptionPane.INFORMATION_MESSAGE);
-                break;
-        }
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                RMIClient rmiClient = new RMIClient();
-                Session mockSession = new Session("User", "recruiter@example.com", "Recruiter");
-                new RecruiterMenuGUI(rmiClient, mockSession);
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "Failed to start: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
     }
 }

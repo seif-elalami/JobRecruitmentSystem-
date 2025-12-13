@@ -8,9 +8,7 @@ public interface ICandidateView extends Serializable {
     String getName();
     String getEmail();
     String getPhone();
-    // Return raw skills string to avoid collision with User.getSkills()
-    String getSkills();
-    // Return raw experience string to align with User.getExperience()
+    List<String> getSkills();
     String getExperience();
     String getEducation();
     String getResume();

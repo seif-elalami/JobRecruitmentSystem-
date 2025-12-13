@@ -148,7 +148,7 @@ public class UserServiceImpl {
             return users;
 
         } catch (Exception e) {
-            System.err. println("❌ Error getting users by role: " + e.getMessage());
+            System.err.println("❌ Error getting users by role: " + e.getMessage());
             throw new RemoteException("Failed to get users", e);
         }
     }
@@ -159,13 +159,13 @@ public class UserServiceImpl {
     public boolean updateUser(User user) throws RemoteException {
         try {
             // Validate email
-            if (!ValidationUtil.isValidEmail(user. getEmail())) {
-                throw new RemoteException(ValidationUtil. getEmailErrorMessage());
+            if (!ValidationUtil.isValidEmail(user.getEmail())) {
+                throw new RemoteException(ValidationUtil.getEmailErrorMessage());
             }
 
             // Validate phone if provided
             if (user.getPhone() != null && !user.getPhone().isEmpty()) {
-                if (!ValidationUtil. isValidPhone(user.getPhone())) {
+                if (!ValidationUtil.isValidPhone(user.getPhone())) {
                     throw new RemoteException(ValidationUtil.getPhoneErrorMessage());
                 }
             }
@@ -174,11 +174,11 @@ public class UserServiceImpl {
 
             Document update = new Document();
             update.append("username", user.getUsername());
-            update.append("email", user. getEmail());
+            update.append("email", user.getEmail());
             update.append("phone", user.getPhone());
 
             // Only update password if provided
-            if (user. getPassword() != null && !user.getPassword().isEmpty()) {
+            if (user.getPassword() != null && !user.getPassword().isEmpty()) {
                 update.append("password", user.getPassword());
             }
 
@@ -190,14 +190,14 @@ public class UserServiceImpl {
                 update.append("department", user.getDepartment());
                 update.append("company", user.getCompany());
                 update.append("position", user.getPosition());
-                update. append("description", user.getDescription());
+                update.append("description", user.getDescription());
             }
 
             Document updateDoc = new Document("$set", update);
 
             userCollection.updateOne(query, updateDoc);
 
-            System.out.println("✅ User updated: " + user. getEmail());
+            System.out.println("✅ User updated: " + user.getEmail());
 
             return true;
 
@@ -241,7 +241,7 @@ public class UserServiceImpl {
             return users;
 
         } catch (Exception e) {
-            System.err. println("❌ Error searching users by skills: " + e.getMessage());
+            System.err.println("❌ Error searching users by skills: " + e.getMessage());
             throw new RemoteException("Failed to search users", e);
         }
     }
@@ -257,7 +257,7 @@ public class UserServiceImpl {
                     .append("experience", new Document("$regex", experience).append("$options", "i"));
 
             for (Document doc : userCollection.find(query)) {
-                users. add(documentToUser(doc));
+                users.add(documentToUser(doc));
             }
 
             return users;

@@ -40,7 +40,7 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
             System.out.println("📝 Registration attempt:  " + user.getEmail());
 
             // Validate email format
-            if (!ValidationUtil.isValidEmail(user. getEmail())) {
+            if (!ValidationUtil.isValidEmail(user.getEmail())) {
                 System.err.println("❌ Registration failed: " + ValidationUtil.getEmailErrorMessage());
                 throw new RemoteException(ValidationUtil.getEmailErrorMessage());
             }
@@ -60,7 +60,7 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
             // Validate phone if provided
             if (user.getPhone() != null && !user.getPhone().isEmpty()) {
                 if (!ValidationUtil.isValidPhone(user.getPhone())) {
-                    System.err.println("❌ Registration failed: " + ValidationUtil. getPhoneErrorMessage());
+                    System.err.println("❌ Registration failed: " + ValidationUtil.getPhoneErrorMessage());
                     throw new RemoteException(ValidationUtil.getPhoneErrorMessage());
                 }
             }
@@ -86,7 +86,7 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
             doc.append("department", user.getDepartment());
             doc.append("company", user.getCompany());
             doc.append("position", user.getPosition());
-            doc.append("description", user. getDescription());
+            doc.append("description", user.getDescription());
         }
 
         userCollection.insertOne(doc);
@@ -102,7 +102,7 @@ public class AuthServiceImpl extends UnicastRemoteObject implements IAuthService
         } catch (RemoteException e) {
             throw e;
         } catch (Exception e) {
-            System.err. println("❌ Registration error:  " + e.getMessage());
+            System.err.println("❌ Registration error: " + e.getMessage());
             e.printStackTrace();
             throw new RemoteException("Registration failed", e);
         }

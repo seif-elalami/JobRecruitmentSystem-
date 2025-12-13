@@ -42,13 +42,57 @@ public class JobServiceImpl extends UnicastRemoteObject implements IJobService {
             System.out.println("   Title: " + job.getTitle());
             System.out.println("   Recruiter ID: " + job.getRecruiterId());
 
-            // Validation:  Ensure recruiterId is set
-            if (job.getRecruiterId() == null || job.getRecruiterId().isEmpty()) {
-                System.out.println("   ⚠️  No recruiter ID provided, setting to UNKNOWN");
-                job.setRecruiterId("UNKNOWN");
+            // ========================================
+            // VALIDATION: Check for empty parameters
+            // ========================================
+            List<String> validationErrors = new ArrayList<>();
+
+            // Title validation
+            if (job.getTitle() == null || job.getTitle().trim().isEmpty()) {
+                validationErrors.add("Job title is required");
             }
 
+            // Description validation
+            if (job.getDescription() == null || job.getDescription().trim().isEmpty()) {
+                validationErrors.add("Job description is required");
+            }
+
+            // Company validation
+            if (job.getCompany() == null || job.getCompany().trim().isEmpty()) {
+                validationErrors.add("Company name is required");
+            }
+
+            // Location validation
+            if (job.getLocation() == null || job.getLocation().trim().isEmpty()) {
+                validationErrors.add("Job location is required");
+            }
+
+            // Salary validation
+            if (job.getSalary() <= 0) {
+                validationErrors.add("Salary must be a positive number");
+            }
+
+            // Requirements validation (at least one requirement)
+            if (job.getRequirements() == null || job.getRequirements().isEmpty()) {
+                validationErrors.add("At least one job requirement is required");
+            }
+
+            // RecruiterID validation
+            if (job.getRecruiterId() == null || job.getRecruiterId().trim().isEmpty()) {
+                validationErrors.add("Recruiter ID is required");
+            }
+
+            // If validation errors exist, throw exception
+            if (!validationErrors.isEmpty()) {
+                String errorMsg = "Job validation failed: " + String.join(", ", validationErrors);
+                System.err.println("❌ " + errorMsg);
+                throw new RemoteException(errorMsg);
+            }
+
+            System.out.println("✅ Validation passed");
+
             Document doc = new Document();
+
             doc.append("title", job.getTitle());
             doc.append("description", job.getDescription());
             doc.append("requirements", job.getRequirements());

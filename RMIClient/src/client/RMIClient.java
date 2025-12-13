@@ -1,9 +1,9 @@
 package client;
 
 import shared.interfaces.IApplicantService;
-import shared. interfaces.IJobService;
-import shared.interfaces. IApplicationService;
-import shared. interfaces.IAuthService;
+import shared.interfaces.IJobService;
+import shared.interfaces.IApplicationService;
+import shared.interfaces.IAuthService;
 import shared.interfaces.IRecruiterService;
 
 import java.rmi.Naming;
@@ -45,7 +45,7 @@ public class RMIClient {
             authService = (IAuthService) Naming.lookup(serverURL + "AuthService");
             System.out.println("   ✅ AuthService connected");
 
-            System.out. println("✅ All services connected successfully!");
+            System.out.println("✅ All services connected successfully!");
 
         } catch (Exception e) {
             System.err.println("❌ Failed to connect to RMI Server!");
@@ -79,7 +79,7 @@ public class RMIClient {
             authService.getUserByEmail("test@test.com");
             return true;
         } catch (RemoteException e) {
-            System.err.println("❌ Connection test failed: " + e. getMessage());
+            System.err.println("❌ Connection test failed: " + e.getMessage());
             return false;
         }
     }

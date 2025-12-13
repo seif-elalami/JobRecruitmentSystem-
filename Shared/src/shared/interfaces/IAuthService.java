@@ -70,6 +70,21 @@ public interface IAuthService extends Remote {
     java.util.List<User> getAllUsers() throws RemoteException;
 
     /**
+     * Delete user by ID (admin only)
+     * @param userId User ID to delete
+     * @return true if deleted
+     */
+    boolean deleteUser(String userId) throws RemoteException;
+
+    /**
+     * Set user active flag (soft deactivate)
+     * @param userId User ID
+     * @param active true to activate, false to deactivate
+     * @return true if updated
+     */
+    boolean setUserActive(String userId, boolean active) throws RemoteException;
+
+    /**
      * Change user password
      * @param email User's email
      * @param oldPassword Current password

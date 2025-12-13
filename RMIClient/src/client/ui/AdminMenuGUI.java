@@ -85,6 +85,32 @@ public class AdminMenuGUI extends JFrame {
         welcomeLabel.setBounds(40, 20, 600, 50);
         headerPanel.add(welcomeLabel);
 
+        // Logout button
+        JButton logoutBtn = new JButton("Logout");
+        logoutBtn.setFont(new Font("Arial", Font.BOLD, 14));
+        logoutBtn.setBackground(new Color(231, 76, 60));
+        logoutBtn.setForeground(Color.WHITE);
+        logoutBtn.setBorderPainted(false);
+        logoutBtn.setFocusPainted(false);
+        logoutBtn.setBounds(1050, 25, 100, 40);
+        logoutBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        logoutBtn.addActionListener(e -> {
+            try {
+                // Attempt remote logout if sessionId is available
+                boolean ok = false;
+                if (session.getSessionId() != null) {
+                    ok = rmiClient.getAuthService().logout(session.getSessionId());
+                }
+                System.out.println("Logout invoked, result=" + ok);
+            } catch (Exception ex) {
+                System.err.println("Logout error: " + ex.getMessage());
+            }
+            // Return to Welcome page
+            dispose();
+            new WelcomePage(rmiClient).setVisible(true);
+        });
+        headerPanel.add(logoutBtn);
+
         // Content panel
         JPanel contentPanel = new JPanel() {
             @Override

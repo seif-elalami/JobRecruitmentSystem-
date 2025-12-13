@@ -354,6 +354,45 @@ public Session loginWithPasskey(String email, String passkey) throws RemoteExcep
     }
 
     @Override
+    public boolean deleteUser(String userId) throws RemoteException {
+        try {
+            System.out.println("🗑️ Deleting user: " + userId);
+            ObjectId objectId = new ObjectId(userId);
+            Document query = new Document("_id", objectId);
+            var result = userCollection.deleteOne(query);
+            boolean ok = result != null && result.getDeletedCount() > 0;
+            System.out.println(ok ? "✅ User deleted" : "⚠️ User not found");
+            return ok;
+        } catch (IllegalArgumentException e) {
+            System.err.println("❌ Invalid userId format");
+            return false;
+        } catch (Exception e) {
+            System.err.println("❌ Delete user error: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public boolean setUserActive(String userId, boolean active) throws RemoteException {
+        try {
+            System.out.println((active ? "✅ Activating" : "🚫 Deactivating") + " user: " + userId);
+            ObjectId objectId = new ObjectId(userId);
+            Document query = new Document("_id", objectId);
+            Document update = new Document("$set", new Document("isActive", active));
+            var result = userCollection.updateOne(query, update);
+            boolean ok = result != null && result.getModifiedCount() > 0;
+            System.out.println(ok ? "✅ User updated" : "⚠️ User not found or unchanged");
+            return ok;
+        } catch (IllegalArgumentException e) {
+            System.err.println("❌ Invalid userId format");
+            return false;
+        } catch (Exception e) {
+            System.err.println("❌ setUserActive error: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
     public boolean changePassword(String email, String oldPassword, String newPassword) throws RemoteException {
         try {
             // Validate new password

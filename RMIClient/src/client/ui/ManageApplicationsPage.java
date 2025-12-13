@@ -88,7 +88,7 @@ public class ManageApplicationsPage extends JDialog {
         });
         footer.add(refreshBtn);
 
-        JButton approveBtn = new JButton("✅ Approve");
+        JButton approveBtn = new JButton("✅ Accept");
         approveBtn.setBackground(new Color(76, 175, 80));
         approveBtn.setForeground(Color.WHITE);
         approveBtn.setBorderPainted(false);
@@ -142,6 +142,22 @@ public class ManageApplicationsPage extends JDialog {
         });
         footer.add(rejectBtn);
 
+        // Pending state
+        JButton pendingBtn = new JButton("⏳ Set Pending");
+        pendingBtn.setBackground(new Color(100, 100, 100));
+        pendingBtn.setForeground(Color.WHITE);
+        pendingBtn.setBorderPainted(false);
+        pendingBtn.addActionListener(e -> updateSelectedStatus("APPLIED"));
+        footer.add(pendingBtn);
+
+        // Under Review state
+        JButton reviewBtn = new JButton("🔍 Under Review");
+        reviewBtn.setBackground(new Color(52, 152, 219));
+        reviewBtn.setForeground(Color.WHITE);
+        reviewBtn.setBorderPainted(false);
+        reviewBtn.addActionListener(e -> updateSelectedStatus("UNDER_REVIEW"));
+        footer.add(reviewBtn);
+
         JButton closeBtn = new JButton("Close");
         closeBtn.setBackground(new Color(52, 152, 219));
         closeBtn.setForeground(Color.WHITE);
@@ -180,6 +196,28 @@ public class ManageApplicationsPage extends JDialog {
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "❌ Error loading applications: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
+        }
+    }
+
+    private void updateSelectedStatus(String status) {
+        int row = applicationsTable.getSelectedRow();
+        if (row >= 0) {
+            try {
+                Application selectedApp = currentApplications.get(row);
+                boolean success = applicationService.updateApplicationStatus(selectedApp.getApplicationId(), status);
+                if (success) {
+                    applicationsTable.setValueAt(status, row, 3);
+                    JOptionPane.showMessageDialog(this, "✅ Status updated to " + status, "Success", JOptionPane.INFORMATION_MESSAGE);
+                    loadApplications();
+                } else {
+                    JOptionPane.showMessageDialog(this, "❌ Failed to update status", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "❌ Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Please select an application", "Info", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 }

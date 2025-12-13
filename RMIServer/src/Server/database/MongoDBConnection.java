@@ -9,7 +9,7 @@ public class MongoDBConnection {
     private MongoDatabase database;
 
     private static final String HOST = "localhost";
-    private static final int PORT = 27020;
+    private static final int PORT = 27017;
     private static final String DATABASE_NAME = "JobRecruitmentDB";
 
     private MongoDBConnection() {
@@ -23,6 +23,7 @@ public class MongoDBConnection {
         } catch (Exception e) {
             System.err.println("❌ MongoDB Connection Error: " + e.getMessage());
             e.printStackTrace();
+            database = null;
         }
     }
 

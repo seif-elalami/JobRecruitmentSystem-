@@ -53,7 +53,8 @@ public class RMIServer {
             IApplicationService applicationService = new ApplicationServiceImpl();
             IAuthService authService = new AuthServiceImpl();
             IReportService reportService = new ReportServiceImpl();
-
+            IlinkService ilinkService = new IlinkServiceImpl();
+            
             System.out.println("   ✅ All services created");
             System.out.println();
 
@@ -79,6 +80,9 @@ public class RMIServer {
 
             Naming.rebind(serverURL + "ReportService", reportService);
             System.out.println("   ✅ ReportService bound");
+
+            Naming.rebind(serverURL + "IlinkService", ilinkService);
+            System.out.println("   ✅ IlinkService bound");
 
             System.out.println();
             System.out.println("╔════════════════════════════════════════╗");

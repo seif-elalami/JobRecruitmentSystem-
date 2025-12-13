@@ -63,13 +63,17 @@ public class candidateDTO implements ICandidateView, Serializable  {
     }
 
     
-    public int getExperience() {
-        return experience;
+    @Override
+    public String getExperience() {
+        return String.valueOf(experience);
     }
 
-    
-    public java.util.List<String> getSkills() {
-        return skills;
+    @Override
+    public String getSkills() {
+        if (skills == null || skills.isEmpty()) {
+            return "";
+        }
+        return String.join(",", skills);
     }
 
 

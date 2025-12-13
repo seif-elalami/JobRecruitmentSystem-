@@ -31,8 +31,8 @@ public class LinkedInService  extends UnicastRemoteObject implements ILinkedInSe
         adapter.getPhone(),
         adapter.getResume(),
         adapter.getEducation(),
-        adapter.getExperience(),
-        adapter.getSkills()
+        Integer.parseInt(adapter.getExperience()),
+        List.of(adapter.getSkills().split(","))
        );
 
 

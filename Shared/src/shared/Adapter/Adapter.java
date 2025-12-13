@@ -24,8 +24,13 @@ public class Adapter implements ICandidateView {
   }
 
   
-  public List<String> getSkills() {
-      return linkedIn.getSkill();
+@Override
+  public String getSkills() {
+      List<String> skillList = linkedIn.getSkill();
+      if (skillList == null || skillList.isEmpty()) {
+          return "";
+      }
+      return String.join(",", skillList);
   }
 
   
@@ -51,9 +56,9 @@ public class Adapter implements ICandidateView {
 
 
     
-    public int getExperience() {
-        return linkedIn.getexperience();
-        
+    @Override
+    public String getExperience() {
+        return String.valueOf(linkedIn.getexperience());
     }
 
 

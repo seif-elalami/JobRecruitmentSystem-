@@ -40,6 +40,7 @@ public class RecruiterMenu {
     }
 
  public void show() {
+      System.out.println("DEBUG: Entered RecruiterMenu!");
     boolean running = true;
 
     while (running) {
@@ -1258,4 +1259,15 @@ private void changePasswordSecurely() {
             System.out.println("Notes:           " + interview.getNotes());
         }
     }
+    public static int getInt() {
+    while (true) {
+        try {
+            String input = InputHelper.getString();
+            return Integer.parseInt(input);
+        } catch (NumberFormatException e) {
+            System.out.print("❌ Invalid number! Try again: ");
+        }
+    }
+}
+
 }

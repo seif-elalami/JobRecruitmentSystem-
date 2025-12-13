@@ -213,10 +213,44 @@ public class SignInPage extends JFrame {
             Session session = authService.login(email, password);
 
             if (session != null) {
-                // Verify role matches
-                if (!session.getRole().equalsIgnoreCase(role)) {
+                // Verify role matches (case-insensitive comparison)
+                String sessionRole = session.getRole();
+                if (sessionRole == null || sessionRole.trim().isEmpty()) {
                     JOptionPane.showMessageDialog(this,
-                            "❌ The selected role does not match your account role (" + session.getRole() + ")",
+                            "❌ Error: User role is missing. Please contact support.",
+                            "Role Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // Normalize both roles for comparison
+                String normalizedSessionRole = sessionRole.toUpperCase().trim();
+                String normalizedSelectedRole = role.toUpperCase().trim();
+
+                // Map common role variations
+                if (normalizedSelectedRole.equals("RECRUITER") || normalizedSelectedRole.contains("RECRUIT")) {
+                    normalizedSelectedRole = "RECRUITER";
+                } else if (normalizedSelectedRole.equals("APPLICANT")) {
+                    normalizedSelectedRole = "APPLICANT";
+                } else if (normalizedSelectedRole.equals("ADMIN") || normalizedSelectedRole.equals("ADMINISTRATOR")) {
+                    normalizedSelectedRole = "ADMIN";
+                }
+
+                // Normalize session role to standard format
+                if (normalizedSessionRole.contains("RECRUITER") || normalizedSessionRole.contains("RECRUIT")) {
+                    normalizedSessionRole = "RECRUITER";
+                } else if (normalizedSessionRole.contains("APPLICANT")) {
+                    normalizedSessionRole = "APPLICANT";
+                } else if (normalizedSessionRole.contains("ADMIN")) {
+                    normalizedSessionRole = "ADMIN";
+                }
+
+                if (!normalizedSessionRole.equals(normalizedSelectedRole)) {
+                    JOptionPane.showMessageDialog(this,
+                            "❌ The selected role does not match your account role.\n" +
+                            "Selected: " + role + "\n" +
+                            "Your role: " + sessionRole + "\n\n" +
+                            "Please select the correct role and try again.",
                             "Role Mismatch",
                             JOptionPane.ERROR_MESSAGE);
                     return;
@@ -247,17 +281,36 @@ public class SignInPage extends JFrame {
      * Open menu based on user role
      */
     private void openRoleBasedMenu(Session session) {
-        String role = session.getRole().toLowerCase();
+        if (session == null || session.getRole() == null) {
+            JOptionPane.showMessageDialog(null,
+                    "❌ Error: Invalid session or role",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            dispose();
+            new WelcomePage(rmiClient);
+            return;
+        }
 
-        if (role.contains("applicant")) {
-            // Open Applicant Menu
-            new ApplicantMenuGUI(rmiClient, session);
-        } else if (role.contains("recruiter")) {
+        String role = session.getRole().toUpperCase().trim();
+
+        // Normalize role to handle variations
+        if (role.contains("RECRUITER") || role.contains("RECRUIT")) {
             // Open Recruiter Menu
             new RecruiterMenuGUI(rmiClient, session);
-        } else if (role.contains("admin")) {
+        } else if (role.contains("APPLICANT")) {
+            // Open Applicant Menu
+            new ApplicantMenuGUI(rmiClient, session);
+        } else if (role.contains("ADMIN")) {
             // Open Admin Menu
             new AdminMenuGUI(rmiClient, session);
+        } else {
+            // Unknown role - show error and go back to welcome page
+            JOptionPane.showMessageDialog(null,
+                    "❌ Error: Unknown user role: " + session.getRole() + "\nPlease contact support.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            dispose();
+            new WelcomePage(rmiClient);
         }
     }
 

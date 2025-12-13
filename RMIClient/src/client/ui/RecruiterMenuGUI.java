@@ -7,18 +7,24 @@ import javax.swing.*;
 import java.awt.*;
 
 public class RecruiterMenuGUI extends JFrame {
+    private JPanel cardPanel;
+    private CardLayout cardLayout;
 
     public RecruiterMenuGUI(RMIClient rmiClient, Session session) {
         setTitle("Recruiter Home - Job Recruitment System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(600, 500);
+        setSize(600, 600);
         setLocationRelativeTo(null);
         setResizable(false);
 
-        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
-        mainPanel.setBackground(new Color(236, 240, 241));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        add(mainPanel);
+        // CardLayout setup for "home" and feature panels
+        cardLayout = new CardLayout();
+        cardPanel = new JPanel(cardLayout);
+
+        // --- Home Menu Panel (main menu) ---
+        JPanel homePanel = new JPanel(new BorderLayout(10, 10));
+        homePanel.setBackground(new Color(236, 240, 241));
+        homePanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         // Header
         JPanel headerPanel = new JPanel();
@@ -28,38 +34,46 @@ public class RecruiterMenuGUI extends JFrame {
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 20));
         welcomeLabel.setForeground(Color.WHITE);
         headerPanel.add(welcomeLabel);
-        mainPanel.add(headerPanel, BorderLayout.NORTH);
+        homePanel.add(headerPanel, BorderLayout.NORTH);
 
-        // Center panel - Main menu buttons
+        // Buttons
         JPanel centerPanel = new JPanel();
         centerPanel.setBackground(Color.WHITE);
-        centerPanel.setLayout(new GridLayout(4, 1, 30, 30));
+        centerPanel.setLayout(new GridLayout(5, 1, 30, 30));
         centerPanel.setBorder(BorderFactory.createEmptyBorder(40, 60, 40, 60));
 
         JButton profileBtn = new JButton("Recruiter Profile");
         JButton jobMgmtBtn = new JButton("Job Management");
         JButton appMgmtBtn = new JButton("Application Management");
         JButton candidateBtn = new JButton("Candidate Matching & Search");
+        JButton interviewBtn = new JButton("Interview Management");
 
         profileBtn.setFont(new Font("Arial", Font.BOLD, 18));
         jobMgmtBtn.setFont(new Font("Arial", Font.BOLD, 18));
         appMgmtBtn.setFont(new Font("Arial", Font.BOLD, 18));
         candidateBtn.setFont(new Font("Arial", Font.BOLD, 18));
+        interviewBtn.setFont(new Font("Arial", Font.BOLD, 18));
 
         profileBtn.addActionListener(e -> {
             dispose();
             new RecruiterProfileScreen(rmiClient, session);
         });
-        jobMgmtBtn.addActionListener(e -> JOptionPane.showMessageDialog(this, "Job Management screen not implemented yet."));
-        appMgmtBtn.addActionListener(e -> JOptionPane.showMessageDialog(this, "Application Management screen not implemented yet."));
-        candidateBtn.addActionListener(e -> JOptionPane.showMessageDialog(this, "Candidate Matching & Search screen not implemented yet."));
+        // Show Job Management panel
+        jobMgmtBtn.addActionListener(e -> cardLayout.show(cardPanel, "JobManagement"));
+        // Show Application Management panel
+        appMgmtBtn.addActionListener(e -> cardLayout.show(cardPanel, "AppManagement"));
+        // Show Candidate Matching & Search panel
+        candidateBtn.addActionListener(e -> cardLayout.show(cardPanel, "CandidateMatching"));
+        // Show Interview Management panel
+        interviewBtn.addActionListener(e -> cardLayout.show(cardPanel, "InterviewManagement"));
 
         centerPanel.add(profileBtn);
         centerPanel.add(jobMgmtBtn);
         centerPanel.add(appMgmtBtn);
         centerPanel.add(candidateBtn);
+        centerPanel.add(interviewBtn);
 
-        mainPanel.add(centerPanel, BorderLayout.CENTER);
+        homePanel.add(centerPanel, BorderLayout.CENTER);
 
         // Footer
         JPanel footerPanel = new JPanel();
@@ -77,8 +91,54 @@ public class RecruiterMenuGUI extends JFrame {
             new WelcomePage(rmiClient);
         });
         footerPanel.add(logoutButton);
-        mainPanel.add(footerPanel, BorderLayout.SOUTH);
+        homePanel.add(footerPanel, BorderLayout.SOUTH);
 
+        // --- Job Management Panel ---
+        JobManagementPanel jobPanel = new JobManagementPanel(rmiClient, session);
+        JButton backBtnJob = new JButton("← Back to Menu");
+        backBtnJob.setFont(new Font("Arial", Font.PLAIN, 14));
+        backBtnJob.addActionListener(e -> cardLayout.show(cardPanel, "HomeMenu"));
+        JPanel jobPanelWithBack = new JPanel(new BorderLayout());
+        jobPanelWithBack.add(backBtnJob, BorderLayout.NORTH);
+        jobPanelWithBack.add(jobPanel, BorderLayout.CENTER);
+
+        // --- Application Management Panel ---
+        ApplicationManagementPanel appManagementPanel = new ApplicationManagementPanel(rmiClient, session);
+        JButton backBtnAppMgmt = new JButton("← Back to Menu");
+        backBtnAppMgmt.setFont(new Font("Arial", Font.PLAIN, 14));
+        backBtnAppMgmt.addActionListener(e -> cardLayout.show(cardPanel, "HomeMenu"));
+        JPanel appMgmtPanelWithBack = new JPanel(new BorderLayout());
+        appMgmtPanelWithBack.add(backBtnAppMgmt, BorderLayout.NORTH);
+        appMgmtPanelWithBack.add(appManagementPanel, BorderLayout.CENTER);
+
+        // --- Candidate Matching & Search Panel ---
+        CandidateMatchingPanel candidatePanel = new CandidateMatchingPanel(rmiClient, session);
+        JButton backBtnCandidate = new JButton("← Back to Menu");
+        backBtnCandidate.setFont(new Font("Arial", Font.PLAIN, 14));
+        backBtnCandidate.addActionListener(e -> cardLayout.show(cardPanel, "HomeMenu"));
+        JPanel candidatePanelWithBack = new JPanel(new BorderLayout());
+        candidatePanelWithBack.add(backBtnCandidate, BorderLayout.NORTH);
+        candidatePanelWithBack.add(candidatePanel, BorderLayout.CENTER);
+
+        // --- Interview Management Panel ---
+        InterviewManagementPanel interviewPanel = new InterviewManagementPanel(rmiClient, session);
+        JButton backBtnInterview = new JButton("← Back to Menu");
+        backBtnInterview.setFont(new Font("Arial", Font.PLAIN, 14));
+        backBtnInterview.addActionListener(e -> cardLayout.show(cardPanel, "HomeMenu"));
+        JPanel interviewPanelWithBack = new JPanel(new BorderLayout());
+        interviewPanelWithBack.add(backBtnInterview, BorderLayout.NORTH);
+        interviewPanelWithBack.add(interviewPanel, BorderLayout.CENTER);
+
+        // Add all panels to CardLayout
+        cardPanel.add(homePanel, "HomeMenu");
+        cardPanel.add(jobPanelWithBack, "JobManagement");
+        cardPanel.add(appMgmtPanelWithBack, "AppManagement");
+        cardPanel.add(candidatePanelWithBack, "CandidateMatching");
+        cardPanel.add(interviewPanelWithBack, "InterviewManagement");
+
+        add(cardPanel);
+
+        cardLayout.show(cardPanel, "HomeMenu");
         setVisible(true);
     }
 }

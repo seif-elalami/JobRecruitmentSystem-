@@ -8,7 +8,7 @@ public class InterviewManagementTest {
     public static void main(String[] args) {
         try {
             System.out.println("╔════════════════════════════════════════╗");
-            System.out.println("║     🧪 Interview Management Test       ║");
+            System.out.println("║      Interview Management Test       ║");
             System.out.println("╚════════════════════════════════════════╝");
             
             // 1. Initialize Service
@@ -30,7 +30,7 @@ public class InterviewManagementTest {
             interview.setNotes("Testing notification triggers");
             
             String id = service.createInterview(interview);
-            System.out.println("✅ Result: Created Interview ID: " + id);
+            System.out.println(" Result: Created Interview ID: " + id);
             
             // 3. Update Interview
             System.out.println("\n------------------------------------------------");
@@ -41,7 +41,7 @@ public class InterviewManagementTest {
             interview.setInterviewId(id);
             interview.setStatus("COMPLETED");
             service.updateInterview(interview);
-            System.out.println("✅ Result: Updated status to COMPLETED");
+            System.out.println(" Result: Updated status to COMPLETED");
             
             // 4. Cancel Interview
             System.out.println("\n------------------------------------------------");
@@ -50,15 +50,15 @@ public class InterviewManagementTest {
             System.out.println("------------------------------------------------");
             
             service.cancelInterview(id);
-            System.out.println("✅ Result: Cancelled interview");
+            System.out.println(" Result: Cancelled interview");
             
             System.out.println("\n╔════════════════════════════════════════╗");
-            System.out.println("║          ✅ Test Suite Passed!         ║");
+            System.out.println("║           Test Suite Passed!         ║");
             System.out.println("╚════════════════════════════════════════╝");
             System.exit(0);
             
         } catch (Exception e) {
-            System.err.println("\n❌ Test Failed: " + e.getMessage());
+            System.err.println("\n Test Failed: " + e.getMessage());
             e.printStackTrace();
             System.exit(1);
         }

@@ -56,7 +56,7 @@ public class Admin implements Serializable {
 
     public String generateReport(String reportType, Date startDate, Date endDate) {
         if (!canGenerateReports) {
-            return "❌ Access denied: Insufficient permissions to generate reports";
+            return " Access denied: Insufficient permissions to generate reports";
         }
 
         actionsPerformed++;
@@ -71,7 +71,7 @@ public class Admin implements Serializable {
 
     public boolean manageUsers(String action, String userId) {
         if (!canModifyUsers) {
-            System.out.println("❌ Access denied: Insufficient permissions to manage users");
+            System.out.println(" Access denied: Insufficient permissions to manage users");
             return false;
         }
 
@@ -88,14 +88,14 @@ public class Admin implements Serializable {
                 System.out.println("✅ User " + action + " successful");
                 return true;
             default:
-                System.out.println("❌ Invalid action: " + action);
+                System.out.println(" Invalid action: " + action);
                 return false;
         }
     }
 
     public boolean manageJobs(String jobId, String action) {
         if (!canManageJobs) {
-            System.out.println("❌ Access denied: Insufficient permissions to manage jobs");
+            System.out.println(" Access denied: Insufficient permissions to manage jobs");
             return false;
         }
 
@@ -108,12 +108,12 @@ public class Admin implements Serializable {
 
     public boolean manageApplications(String applicationId, String action) {
         if (!canManageApplications) {
-            System.out.println("❌ Access denied: Insufficient permissions to manage applications");
+            System.out.println(" Access denied: Insufficient permissions to manage applications");
             return false;
         }
 
         actionsPerformed++;
-        System.out.println("📄 Managing application: " + applicationId);
+        System.out.println(" Managing application: " + applicationId);
         System.out.println("   Action: " + action);
 
         return true;
@@ -122,13 +122,13 @@ public class Admin implements Serializable {
     public void addPermission(String permission) {
         if (!this.permissions.contains(permission)) {
             this.permissions.add(permission);
-            System.out.println("✅ Permission added: " + permission);
+            System.out.println(" Permission added: " + permission);
         }
     }
 
     public void removePermission(String permission) {
         if (this.permissions.remove(permission)) {
-            System.out.println("✅ Permission removed: " + permission);
+            System.out.println(" Permission removed: " + permission);
         }
     }
 
@@ -138,11 +138,11 @@ public class Admin implements Serializable {
 
     public List<String> viewSystemLogs(Date startDate, Date endDate) {
         if (!canGenerateReports) {
-            System.out.println("❌ Access denied: Insufficient permissions to view logs");
+            System.out.println(" Access denied: Insufficient permissions to view logs");
             return new ArrayList<>();
         }
 
-        System.out.println("📋 Fetching system logs from " + startDate + " to " + endDate);
+        System.out.println(" Fetching system logs from " + startDate + " to " + endDate);
         actionsPerformed++;
 
         return new ArrayList<>();
@@ -150,11 +150,11 @@ public class Admin implements Serializable {
 
     public void auditUserActivity(String userId) {
         if (!canModifyUsers) {
-            System.out.println("❌ Access denied: Insufficient permissions to audit users");
+            System.out.println(" Access denied: Insufficient permissions to audit users");
             return;
         }
 
-        System.out.println("🔍 Auditing user activity: " + userId);
+        System.out.println(" Auditing user activity: " + userId);
         actionsPerformed++;
 
     }

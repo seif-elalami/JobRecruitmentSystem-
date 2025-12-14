@@ -36,23 +36,23 @@ public class ApplicationState implements Serializable {
     public void handle(Application app) {
         switch (currentState) {
             case APPLIED:
-                System.out.println("📝 Application is in APPLIED state");
+                System.out.println("📝Application is in APPLIED state");
                 System.out.println("   Waiting for recruiter review...");
                 break;
             case UNDER_REVIEW:
-                System.out.println("🔍 Application is UNDER REVIEW");
+                System.out.println(" Application is UNDER REVIEW");
                 System.out.println("   Recruiter is evaluating the candidate...");
                 break;
             case INTERVIEW_SCHEDULED:
-                System.out.println("📅 Interview SCHEDULED");
+                System.out.println(" Interview SCHEDULED");
                 System.out.println("   Waiting for interview outcome...");
                 break;
             case ACCEPTED:
-                System.out.println("✅ Application ACCEPTED");
+                System.out.println(" Application ACCEPTED");
                 System.out.println("   Congratulations! The candidate has been accepted.");
                 break;
             case REJECTED:
-                System.out.println("❌ Application REJECTED");
+                System.out.println(" Application REJECTED");
                 System.out.println("   The application has been rejected.");
                 break;
         }
